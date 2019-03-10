@@ -40,9 +40,72 @@ link-citations: true
 
 
 
+**摘要：**我们论证了在广义可加混合模型中R包：gammSlice用于贝叶斯拟合和推断的应用。
+这类模型包括广义线性混合模型和广义可加模型作为特例。通过足够大的马尔可夫链蒙特卡洛样本
+可以实现精确的贝叶斯推断。切片采样是MCMC过程中的关键部分。和现有的广义可加混合模型软件
+相比，gammSlice以更长的计算时间为代价，改善了推断的精确度。
+
+**关键词：**广义可加模型；广义线性混合模型；切片抽样；MCMC；惩罚样条；R
+
 # 简介
 
+我们论述了在R计算环境中用gammSlice包进行广义可加混合模型（GAMM）分析的使用。广义线性
+混合模型（GLMM）和广义可加模型（GAM）是GAMM的特列。本文中，混合指的是模型包括混合效应
+和随机效应。在贝叶斯框架下用切片抽样进行拟合和推断，其中切片抽样是一种特殊类型的
+马尔可夫链蒙特卡洛（MCMC）抽样。MCMC用于GAMM分析中的优势就是它推断的精确性。通过
+这种方式，感兴趣参数的实际后验密度函数的数值信息，比如等后尾95%的可信集，能够通过
+绘制足够大的MCMC样本得以任意精确。用于GAMM分析的更加成熟的R包，比如Wood（2017），
+使用拉普拉斯基于概率惩罚的拟似然估计（PQL）。然而，就像Breslow&Lin（1995）和本文
+第四部分阐述的一样，PQL是不太准确的。Bates等（2015）用于GLMM更加精确的拉普拉斯估计
+至今还未扩展到GAMM的场合。
 
+GAMM通过允许连续预测变量扩展GLMM非参数函数对平均响应的影响。假定，在一个纵向数据集中，
+$y_{ij}$ 是一个二元响应变量 $y$ 的第 $i$ 个对象的第 $j$ 个测量，对于任意的
+$1\leq j\leq n_i$，$1\leq i \leq m$。对于连续预测变量 $x_1$ $x_2$，类似地定义
+$x_{1ij}$ $x_2ij$。这个模型的GLMM
+
+$$y_{ij}|U_i \mathop  \to \limits ^{ind} Bernoulli(logit^{-1}(U_i+\beta_1x_{1ij}+\beta_2x_{2ij})),\qquad
+  U_i \mathop  \to \limits ^{ind} N(0,\sigma^2)$$ {#eq:model1}
+
+其中 $U_i$ 是随机截距项。在[eq:model1]中：$x_i \mathop  \to \limits ^{ind} D_i$ 
+表明 $x_i$ 是依赖于 $D_i$ 分布的，$x \mathop  \to \limits Bernoulli(p)$ 意味着
+$x$ 服从均值为 $p$ 的bernoulli分布，且 $logit^{-1}(x)=\frac{e^x}{1+e^x}$。
+同样的数据GAMM为
+
+$$y_{ij}|U_i \mathop  \to \limits ^{ind} Bernoulli(logit^{-1}(U_i+f_1(x_{1ij})+f_2(x_{2ij}))),\quad \quad U_i \mathop  \to \limits ^{ind} N(0,\sigma^2)$$
+
+其中 $f_1$, $f_2$ 假定为任意光滑的函数。这些模型在基于纵向跟踪主题的生物医学领域（如，
+Fitzmaurice等 2008），由于学生在同一个班级存在多层次结构的教育研究（如，Goldstein 2010）和
+基于所谓的面板数据的经济学研究中都比较有用。有很多方法可以估计 $f_1$ $f_2$。在gammaSlice
+中，$f_1(x_1)+f_2(x_2)$ 使用基于惩罚样条的混合模型来建模：
+
+$$f_1(x_1)+f_2(x_2)=\beta_0+\beta_{x1}x_1+\sum_{k=1}^{K_1}u_{1k}z_{1k}(x_1)+\beta_{x2}x_2+\sum_{k=1}^{K_2}u_{2k}z_{2k}(x_2)$$ 
+
+其中 $u_{1k} \mathop  \to \limits ^{ind} N(0,\sigma_1^2),1\leq k \leq K_1$ 且 $u_{2k} \mathop  \to \limits ^{ind} N(0,\sigma_2^2),1\leq k \leq K_2$
+
+下标 $z$ 是正交化的O‘Sullivan样条基函数（Wand和Ormerod 2008）。有关它们的进一步的信息
+参见第二部分和3.2部分。
+
+gammSlice包本质上是GAMM的MCMC实现，一般设计的贝叶斯广义线性混合模型中GLMM和GAM这两个
+特例在Zhao等（2006）中有所描述。读者可以读那篇文章获得这个模型非常广泛的类的细节。
+
+截止2018年初，在comprehensive R Archive Network（www.cran.r-project.org） 中有十几个支持GLMM分析的包。它们中的很多，比如MASS（Venables和Ripley 2002），
+gamma4（Wood和Scheipl 2017）和mgcv（Wood 2017），使用拉普拉斯近似，但是有一些，
+比如，glmmBUGS（Brown和Zhou 2018），MCMCglmm（Hadfield 2017），R2Bayesx（Umlauf等 2017）
+和spikeSlabGAM（Scheipl 2011），使用MCMC的方法。glmmML（Brostrom和Holmberg 2018）
+和lme4（Bates等 2015）支持通过正交基于精确最大似然的方法。据我们所知，GAMM扩展
+只有gamma4，macv，R2BayesX和spikeSlabGAM支持。前两个用拉普拉斯近似，和GAMM分析
+很相似。第三个和第四个支持通过MCMC进行GAMM拟合。Scheipl（2011）提供了spikeSlabGAM
+的详细描述，虽然这篇文章主要关注广义可加模型而不是GAMM。spikeSlabGAM在函数估计上
+不同于gammaSlice和mgcv，因为它们在样条系数上使用尖峰和平板类型的先验分布。R2BayesX包
+支持和gammSlice所支持的相似的模型。截止2017年，我们用R2BayesX1.1版本测试了一些GAMM的
+分析，但是由于模型不支持，很多都失败了。截止2017年11月，我们认为gammaSlice是唯一提供
+基于MCMC进行GAMM分析，且使用像mgcv一样的简单惩罚样条方法推断的R包。
+
+第二节包含gammaSlice包的概述。我们对gammSlice的论证开始于第三部分，其中有四个基于模拟
+数据的说明性示例。第四部分我们阐述了gammaSlice在一些已有的GAMM软件中的精确优势。第五
+部分包含一些gammaSlice的应用。第六部分简单讨论了gammSlice可能的扩展。附录给出了一些
+在GAMM分析中使用gammSlice进行贝叶斯推断的抽样细节。
 
 # 参考文献
 [//]: # (\bibliography{Bibfile})
