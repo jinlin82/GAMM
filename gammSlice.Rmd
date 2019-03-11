@@ -74,15 +74,15 @@ $y_{ij}$ 是一个二元响应变量 $y$ 的第 $i$ 个对象的第 $j$ 个测�
 $1\leq j\leq n_i$，$1\leq i \leq m$。对于连续预测变量 $x_1$ $x_2$，类似地定义
 $x_{1ij}$ $x_2ij$。这个模型的GLMM
 
-$$y_{ij}|U_i \mathop  \to \limits ^{ind} Bernoulli(logit^{-1}(U_i+\beta_1x_{1ij}+\beta_2x_{2ij})),\qquad
-  U_i \mathop  \to \limits ^{ind} N(0,\sigma^2)$$ {#eq:model1}
+$$y_{ij}|U_i \overset{ind}\sim Bernoulli(logit^{-1}(U_i+\beta_1x_{1ij}+\beta_2x_{2ij})),\qquad
+  U_i \overset{ind}\sim N(0,\sigma^2)$$ {#eq:model1}
 
-其中 $U_i$ 是随机截距项。在[eq:model1]中：$x_i \mathop  \to \limits ^{ind} D_i$ 
-表明 $x_i$ 是依赖于 $D_i$ 分布的，$x \mathop  \to \limits Bernoulli(p)$ 意味着
+其中 $U_i$ 是随机截距项。在[@eq:model1]中：$x_i \overset{ind}\sim D_i$ 
+表明 $x_i$ 是依赖于 $D_i$ 分布的，$x \sim Bernoulli(p)$ 意味着
 $x$ 服从均值为 $p$ 的bernoulli分布，且 $logit^{-1}(x)=\frac{e^x}{1+e^x}$。
 同样的数据GAMM为
 
-$$y_{ij}|U_i \mathop  \to \limits ^{ind} Bernoulli(logit^{-1}(U_i+f_1(x_{1ij})+f_2(x_{2ij}))),\quad \quad U_i \mathop  \to \limits ^{ind} N(0,\sigma^2)$$
+$$y_{ij}|U_i \overset{ind}\sim Bernoulli(logit^{-1}(U_i+f_1(x_{1ij})+f_2(x_{2ij}))),\quad \quad U_i \overset{ind}\sim N(0,\sigma^2)$$
 
 其中 $f_1$, $f_2$ 假定为任意光滑的函数。这些模型在基于纵向跟踪主题的生物医学领域（如，
 Fitzmaurice等 2008），由于学生在同一个班级存在多层次结构的教育研究（如，Goldstein 2010）和
@@ -91,7 +91,7 @@ Fitzmaurice等 2008），由于学生在同一个班级存在多层次结构的�
 
 $$f_1(x_1)+f_2(x_2)=\beta_0+\beta_{x1}x_1+\sum_{k=1}^{K_1}u_{1k}z_{1k}(x_1)+\beta_{x2}x_2+\sum_{k=1}^{K_2}u_{2k}z_{2k}(x_2)$$ 
 
-其中 $u_{1k} \mathop  \to \limits ^{ind} N(0,\sigma_1^2),1\leq k \leq K_1$ 且 $u_{2k} \mathop  \to \limits ^{ind} N(0,\sigma_2^2),1\leq k \leq K_2$
+其中 $u_{1k} \overset{ind}\sim N(0,\sigma_1^2),1\leq k \leq K_1$ 且 $u_{2k} \overset{ind}\sim N(0,\sigma_2^2),1\leq k \leq K_2$
 
 下标 $z$ 是正交化的O‘Sullivan样条基函数（Wand和Ormerod 2008）。有关它们的进一步的信息
 参见第二部分和3.2部分。
@@ -182,17 +182,17 @@ gammSlice中唯一的其他部分就是名为indonRespir和toenail的数据集�
 首先我们模拟的数据例子包含简单贝叶斯逻辑斯蒂混合模型
 
 $$\begin{array}{l}
-y_{ij}|x_{ij},\beta_0,\beta_x,U_i,\mathop \to \limits ^{ind} Bernoulli(logit^{-1}(\beta_0+\beta_xx_{ij}+U_i)),\quad 1\leq i \leq m,1\leq j \leq n \\
-x_{ij}\mathop \to \limits ^{ind}Uniform(0,1),\quad U_i|\sigma^2 \mathop \to \limits ^{ind} N(0,\sigma^2)\\
-\beta_0,\beta_x \mathop \to \limits ^{ind} N(0,\sigma_\beta^2),\quad \sigma \mathop \to \limits Half-Cauchy(A)
+y_{ij}|x_{ij},\beta_0,\beta_x,U_i,\overset{ind}\sim Bernoulli(logit^{-1}(\beta_0+\beta_xx_{ij}+U_i)),\quad 1\leq i \leq m,1\leq j \leq n \\
+x_{ij}\overset{ind}\sim Uniform(0,1),\quad U_i|\sigma^2 \overset{ind}\sim N(0,\sigma^2)\\
+\beta_0,\beta_x \overset{ind}\sim N(0,\sigma_\beta^2),\quad \sigma \sim Half-Cauchy(A)
 \end{array}$$ {#eq:model2}
 
-其中 $\sigma\to Half-Cauchy(A)$ 意味着 $\sigma$ 有密度函数
+其中 $\sigma\sim Half-Cauchy(A)$ 意味着 $\sigma$ 有密度函数
 $p(\sigma)=\frac{2A}{\pi(\sigma^2+A^2)},\sigma>0,A>0$。
 超参数 $\sigma_\beta^2$ 和 $A$ 可以由使用者指定。
 它们的默认值在这部分的后面讨论。
 
-为了阐述在gammSlice中拟合[eq:model2]，我们按照如下方法产生了一些数据，
+为了阐述在gammSlice中拟合[@eq:model2]，我们按照如下方法产生了一些数据，
 $m=100,n=2,\beta_0=0.5,\beta_x=1.7,\sigma^2=0.8$：
 
 ```
@@ -252,7 +252,7 @@ and sdPriorScale=A=10^5
 
 比如，一个人想要通过之前的分布去设置
 
-$$\beta_0,\beta_x \mathop \to \limits ^{ind} N(0,10^{13}),\quad \quad \sigma \to Half-Cauchy(10^3)$$
+$$\beta_0,\beta_x \overset{ind}\sim N(0,10^{13}),\quad \quad \sigma \sim Half-Cauchy(10^3)$$
 
 那么命令将会如下所示：
 
@@ -290,7 +290,7 @@ sigmaSquaredMCMC<-fit1$sigmasquared
 
 MCMC输出可以用来关于拟合模型的总结性信息。比如，$x$ 的第三四分位数（$Q_3$）和 $x$ 的第一四分位数（$Q_1$）相比，以每个主题的随机截距为条件的优比为
 
-$$OR_x=eap(\beta_x(Q_3-Q_1))$$
+$$OR_x=exp(\beta_x(Q_3-Q_1))$$
 
 以下命令计算了近似后验均值优比和　$OR_x$ 95%的置信区间
 
@@ -310,11 +310,11 @@ credSetORx<-as,numeric(quantile(ORxMCMC,c(0.025,0.975)))
 
 接下来，我们考虑泊松非参数回归模型
 
-$$y_i \mathop \to \limits ^{ind} Poisson(exp(f(x_i))),\quad 1 \leq i \leq n$$ {#eq:model3}
+$$y_i \overset{ind}\sim Poisson(exp(f(x_i))),\quad 1 \leq i \leq n$$ {#eq:model3}
 
 光滑函数 $f$ 使用惩罚样条进行建模：
 
-$$f(x)=\beta_0+\beta_xx+\sum_{k=1}^K u_kz_k(x),\quad u_k \mathop \to \limits ^{ind} N(0,\sigma^2)$$ {#eq:model4}
+$$f(x)=\beta_0+\beta_xx+\sum_{k=1}^K u_kz_k(x),\quad u_k \overset{ind}\sim N(0,\sigma^2)$$ {#eq:model4}
 
 $\{Z_K(\cdot):1 \leq k \leq K\}$ 是在第四部分描述的Wand和Ormerod（2008）的 
 正交化的 O'Sullivan样条函数。对于惩罚样条，K的选择相对较小。默认值是
@@ -324,9 +324,9 @@ $min(25,n_U/4)$ 其中 $n_U$ 是 $x_i$ 值的数量。
 适合gammaSlice拟合和默认的超参数，完全贝叶斯模型是
 
 $$\begin{array}{l}
-y_i|x_i,\beta_0,\beta_x,u_1,\cdots,u_k \mathop \to \limits ^{ind} Poisson(exp(\beta_0+\beta_xx_i+\sum_{k=1}^Ku_kz_k(x_i))),\\
-x_i \mathop \to \limits ^{ind} Uniform(0,1),\quad u_k|\sigma^2 \mathop \to \limits^{ind} N(0,\sigma^2),\\
-\beta_0,\beta_x \mathop \to \limits ^{ind} N(0,10^{10}),\quad \sigma \to Half-Cauchy(10^5)
+y_i|x_i,\beta_0,\beta_x,u_1,\cdots,u_k \overset{ind}\sim Poisson(exp(\beta_0+\beta_xx_i+\sum_{k=1}^Ku_kz_k(x_i))),\\
+x_i \overset{ind}\sim Uniform(0,1),\quad u_k|\sigma^2 \overset{ind}\sim N(0,\sigma^2),\\
+\beta_0,\beta_x \overset{ind}\sim N(0,10^{10}),\quad \sigma \sim Half-Cauchy(10^5)
 \end{array}$$ {#eq:model5}
 
 为了解释gammaSlice的拟合，我们模拟数据 $n=400$，$x_i$服从 $(0,1)$ 上的均匀
@@ -343,16 +343,16 @@ x<-runif(n)
 y<-rpois(n,exp(cos(4*pi*x)+2*x-1)) 
 ```
 
-为了拟合[eq:model5]，我们使用gSlc()如下：
+为了拟合[@eq:model5]，我们使用gSlc()如下：
 
 ```
 fit2<-gSlc(y~s(x),family="poisson")
 ```
 
 这里使用的函数s()是内部函数，将 $f$ 建模为基于惩罚样条的混合模型，
-就像[eq:model4]描述的一样。
+就像[@eq:model4]描述的一样。
 
-在[eq:model5]中没有明确可识别和可解释的参数。对于这个模型的收敛性评估，
+在[@eq:model5]中没有明确可识别和可解释的参数。对于这个模型的收敛性评估，
 我们建议使用平滑函数成分的有效自由度（edf）进行度量。在当前的模型中，
 只有一个光滑函数成分，有效自由度被定义为：
 
@@ -392,14 +392,14 @@ points(x,y)
 
 我们第三个例子是简单的半参数logistic模型：
 
-$$y_i \mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_{x|x_{1i}}+f(x_{2i}))),\quad 1 \leq i \leq n$$ {#eq:model7}
+$$y_i \overset{ind}\sim Bernoulli(logit^{-1}(\beta_{x|x_{1i}}+f(x_{2i}))),\quad 1 \leq i \leq n$$ {#eq:model7}
 
 贝叶斯惩罚样条公式是：
 
 $$\begin{array}{l}
-y_i|x_{1i},x_{2i},\beta_0,\beta_{x1},\beta_{x2,u_1,\cdots,u_K} \mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_0+\beta_{x1}x_{1i}+\beta_{x2}x_{2i}+\sum_{k=1}^Ku_kz_k(x_{2i}))) \\
-x_{1i}\mathop \to \limits ^{ind} Bernoulli(\frac{1}{2}),\quad x_{2i}\mathop \to \limits ^{ind} Uniform(0,1),\\
-u_k|\sigma^2 \mathop \to \limits ^{ind} N(0,\sigma^2),\quad \beta_0,\beta_{x1},\beta_{x2} \mathop \to \limits^{ind}N(0,10^{10}),\quad \sigma \to Half-Cauchy(10^5)
+y_i|x_{1i},x_{2i},\beta_0,\beta_{x1},\beta_{x2,u_1,\cdots,u_K} \overset{ind}\sim Bernoulli(logit^{-1}(\beta_0+\beta_{x1}x_{1i}+\beta_{x2}x_{2i}+\sum_{k=1}^Ku_kz_k(x_{2i}))) \\
+x_{1i}\overset{ind}\sim Bernoulli(\frac{1}{2}),\quad x_{2i}\overset{ind}\sim Uniform(0,1),\\
+u_k|\sigma^2 \overset{ind}\sim N(0,\sigma^2),\quad \beta_0,\beta_{x1},\beta_{x2} \overset{ind}\sim N(0,10^{10}),\quad \sigma \sim Half-Cauchy(10^5)
 \end{array}$$ {#eq:model8}
 
 考虑数据集 $n=500$，$f(x)=sin(2\pi x)$：
@@ -414,7 +414,7 @@ mu<-1/(1+exp(-(betax1True*x1+sin(2*pi*x2))))
 y<-rbinom(n,1,mu)
 ```
 
-拟合模型[eq:model8]并汇总信息，在gammSlice中使用：
+拟合模型[@eq:model8]并汇总信息，在gammSlice中使用：
 
 ```
 fit3<-gSlc(y~x1+s(x2),family="binomial)
@@ -437,17 +437,17 @@ $x_2$ 的 $\beta_x|\bar{x}_1+f(x_2)$ 的贝叶斯估计，其中 $\bar{x}_1$ 是
 
 拟合数据的最后一个例子是泊松混合可加模型
 
-$$y_{ij}\mathop \to \limits^{ind} Poisson(exp(U_i+f_1(x_{1ij})+f_2(x_{2ij}))) \quad U_i \mathop \to \limits ^{ind} N(0,\sigma^2)$$ {#eq:model9}
+$$y_{ij}\overset{ind}\sim Poisson(exp(U_i+f_1(x_{1ij})+f_2(x_{2ij}))) \quad U_i \overset{ind}\sim N(0,\sigma^2)$$ {#eq:model9}
 
 相应的贝叶斯惩罚样条如下：
 
 $$\begin{array}{l}
-y_{ij}|x_{1ij},x_{2ij},\beta_0,\beta_{x1},u_11,\cdots,u_{1K_1},u_{21},\cdots,u_{2K_2}\mathop \to \limits^{ind}\\
+y_{ij}|x_{1ij},x_{2ij},\beta_0,\beta_{x1},u_11,\cdots,u_{1K_1},u_{21},\cdots,u_{2K_2}\overset{ind}\sim \\
 Poisson(exp(\beta_o+U_i+\beta_{x1}x_{1i}+\sum_{k=1}^{k_1}u_{1k}z_{1k}(x_{1ij})+\beta_{x2}x_{2ij}+\sum_{k=1}^{K_2}u_{2k}z_{2k}(x_{2ij}))) \\
-x_{1ij} \mathop \to \limits ^{ind} Uniform(0,1),\quad x_{2ij}\mathop \to \limits^{ind}Uniform(0,1),\\
-U_i\mathop \to \limits^{ind} N(0,\sigma^2),\quad u_{1k}|\sigma_{x_1}^2\mathop \to \limits^{ind} N(0,\sigma_{x_1}^2),\quad u_{2k}|\sigma_{x2}^2\mathop \to \limits^{ind} N(0,\sigma_{x_2}^2),\\
-\beta_0,beta_{x1},\beta_{x2}\mathop \to \limits^{ind} N(0,10^{10}),\quad \sigma\to Half-Cauchy(10^5),\\
-\sigma_{x1}\to Half-Cauchy(10^5),\quad \sigma_{x_2}\to Half-Cauchy(10^5)
+x_{1ij} \overset{ind}\sim Uniform(0,1),\quad x_{2ij}\overset{ind}\sim Uniform(0,1),\\
+U_i\overset{ind}\sim N(0,\sigma^2),\quad u_{1k}|\sigma_{x_1}^2\overset{ind}\sim N(0,\sigma_{x_1}^2),\quad u_{2k}|\sigma_{x2}^2\overset{ind}\sim N(0,\sigma_{x_2}^2),\\
+\beta_0,beta_{x1},\beta_{x2}\overset{ind}\sim N(0,10^{10}),\quad \sigma\sim Half-Cauchy(10^5),\\
+\sigma_{x1}\sim Half-Cauchy(10^5),\quad \sigma_{x_2}\sim Half-Cauchy(10^5)
 \end{array}$$  {#eq:model10}
 
 其中
@@ -456,7 +456,7 @@ $$\{z_{1k}(\cdot):1\leq k \leq K_1\},\quad \{z_{2k}(\cdot):1 \leq k \leq K_2\}$$
 
 分别是 $x_{1i}$ 和 $x_{2i}$ 的基函数。
 
-考虑又[eq:model9]产生的数据 $m=100,n=10$，$x_{1i}$，$x_{2i}$ 独立同分布于
+考虑又[@eq:model9]产生的数据 $m=100,n=10$，$x_{1i}$，$x_{2i}$ 独立同分布于
 均匀分布(0,1)，$\sigma^2=1$ 且均值函数为
 
 $$f_1(x)=cos(4\pi x)+2x,\quad f_2(x)=sin(2\pi x^2)$$
@@ -498,7 +498,7 @@ $\sigma^2$ 95%的置信区间是 $(0.535,0.975)$ ，接近我们产生的数据�
 
 根据GLMM我们产生了100个样本
 
-$$y_{ij}\mathop \to \limits^{ind}Bernoulli(logit^{-1}(\beta_0+U_i)),\quad 1\leq i \leq 250,1\leq j \leq2,U_i\mathop\to\limits^{ind}N(0,\sigma^2)$$ {#eq:model11}
+$$y_{ij}\overset{ind}\sim Bernoulli(logit^{-1}(\beta_0+U_i)),\quad 1\leq i \leq 250,1\leq j \leq2,U_i\overset{ind}\sim N(0,\sigma^2)$$ {#eq:model11}
 
 真实值
 
@@ -549,11 +549,11 @@ $months_{ij}$ 表示第 $i$ 个病人在第 $j$ 次访问时从治疗开始的�
 我们考虑logistic混合模型：
 
 $$\begin{array}{l}
-onycholysis_{ij}|\beta_{terb},\beta_{months},\beta_{terbXmonths},U_i\mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_0+U_i+\beta_{terb}(terb_i)+ \\
-\beta_{months}(months_{ij})+\beta_{terbXmonths}(terb_i\times months_{ij}))),\quad U_i \mathop \to \limits^{ind}N(0,\sigma^2)
+onycholysis_{ij}|\beta_{terb},\beta_{months},\beta_{terbXmonths},U_i\overset{ind}\sim Bernoulli(logit^{-1}(\beta_0+U_i+\beta_{terb}(terb_i)+ \\
+\beta_{months}(months_{ij})+\beta_{terbXmonths}(terb_i\times months_{ij}))),\quad U_i \overset{ind}\sim N(0,\sigma^2)
 \end{array}$$ {#eq:model12}
 
-[eq:model12]基于切片的抽样拟合和总结可以由以下代码实现：
+[@eq:model12]基于切片的抽样拟合和总结可以由以下代码实现：
 
 ```
 data("toenail")
@@ -594,7 +594,7 @@ summary(fitTN)
 表示$9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子，$1 \leq j \leq n_i$
 表示对每个孩子重复的测量。一个可加混合模型如下：
 
-$$logit(P(respiratory infection_{ij}=1))=U_i+\beta^{T}x_{ij}+f(age_{ij}),\quad U_i \mathop \to \limits^{ind} N(0,\sigma^2)$$  {#eq:model13}
+$$logit(P(respiratory infection_{ij}=1))=U_i+\beta^{T}x_{ij}+f(age_{ij}),\quad U_i \overset{ind}\sim N(0,\sigma^2)$$  {#eq:model13}
  
 模型通过以下命令进行拟合：
 
