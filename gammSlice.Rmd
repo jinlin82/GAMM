@@ -181,7 +181,7 @@ gammSlice中唯一的其他部分就是名为indonRespir和toenail的数据集�
 
 首先我们模拟的数据例子包含简单贝叶斯逻辑斯蒂混合模型
 
-$$\begin{array}{1}
+$$\begin{array}{l}
 y_{ij}|x_{ij},\beta_0,\beta_x,U_i,\mathop \to \limits ^{ind} Bernoulli(logit^{-1}(\beta_0+\beta_xx_{ij}+U_i)),\quad 1\leq i \leq m,1\leq j \leq n \\
 x_{ij}\mathop \to \limits ^{ind}Uniform(0,1),\quad U_i|\sigma^2 \mathop \to \limits ^{ind} N(0,\sigma^2)\\
 \beta_0,\beta_x \mathop \to \limits ^{ind} N(0,\sigma_\beta^2),\quad \sigma \mathop \to \limits Half-Cauchy(A)
@@ -323,7 +323,7 @@ $min(25,n_U/4)$ 其中 $n_U$ 是 $x_i$ 值的数量。
 
 适合gammaSlice拟合和默认的超参数，完全贝叶斯模型是
 
-$$\begin{array}{1}
+$$\begin{array}{l}
 y_i|x_i,\beta_0,\beta_x,u_1,\cdots,u_k \mathop \to \limits ^{ind} Poisson(exp(\beta_0+\beta_xx_i+\sum_{k=1}^Ku_kz_k(x_i))),\\
 x_i \mathop \to \limits ^{ind} Uniform(0,1),\quad u_k|\sigma^2 \mathop \to \limits^{ind} N(0,\sigma^2),\\
 \beta_0,\beta_x \mathop \to \limits ^{ind} N(0,10^{10}),\quad \sigma \to Half-Cauchy(10^5)
@@ -396,7 +396,7 @@ $$y_i \mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_{x|x_{1i}}+f(x_{2i}))
 
 贝叶斯惩罚样条公式是：
 
-$$\begin{array}{1}
+$$\begin{array}{l}
 y_i|x_{1i},x_{2i},\beta_0,\beta_{x1},\beta_{x2,u_1,\cdots,u_K} \mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_0+\beta_{x1}x_{1i}+\beta_{x2}x_{2i}+\sum_{k=1}^Ku_kz_k(x_{2i}))) \\
 x_{1i}\mathop \to \limits ^{ind} Bernoulli(\frac{1}{2}),\quad x_{2i}\mathop \to \limits ^{ind} Uniform(0,1),\\
 u_k|\sigma^2 \mathop \to \limits ^{ind} N(0,\sigma^2),\quad \beta_0,\beta_{x1},\beta_{x2} \mathop \to \limits^{ind}N(0,10^{10}),\quad \sigma \to Half-Cauchy(10^5)
@@ -441,7 +441,7 @@ $$y_{ij}\mathop \to \limits^{ind} Poisson(exp(U_i+f_1(x_{1ij})+f_2(x_{2ij}))) \q
 
 相应的贝叶斯惩罚样条如下：
 
-$$\begin{array}{1}
+$$\begin{array}{l}
 y_{ij}|x_{1ij},x_{2ij},\beta_0,\beta_{x1},u_11,\cdots,u_{1K_1},u_{21},\cdots,u_{2K_2}\mathop \to \limits^{ind}\\
 Poisson(exp(\beta_o+U_i+\beta_{x1}x_{1i}+\sum_{k=1}^{k_1}u_{1k}z_{1k}(x_{1ij})+\beta_{x2}x_{2ij}+\sum_{k=1}^{K_2}u_{2k}z_{2k}(x_{2ij}))) \\
 x_{1ij} \mathop \to \limits ^{ind} Uniform(0,1),\quad x_{2ij}\mathop \to \limits^{ind}Uniform(0,1),\\
@@ -548,7 +548,7 @@ $months_{ij}$ 表示第 $i$ 个病人在第 $j$ 次访问时从治疗开始的�
 
 我们考虑logistic混合模型：
 
-$$\begin{array}{1}
+$$\begin{array}{l}
 onycholysis_{ij}|\beta_{terb},\beta_{months},\beta_{terbXmonths},U_i\mathop \to \limits^{ind} Bernoulli(logit^{-1}(\beta_0+U_i+\beta_{terb}(terb_i)+ \\
 \beta_{months}(months_{ij})+\beta_{terbXmonths}(terb_i\times months_{ij}))),\quad U_i \mathop \to \limits^{ind}N(0,\sigma^2)
 \end{array}$$ {#eq:model12}
