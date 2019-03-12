@@ -141,7 +141,7 @@ help(s,package="mgcv")
 ```
 
 给出了s()完整的描述和具体的细节，在本文第三部分给出了一些例子。fomula参数也支持通过
-factor()构造函数进入模型的类别预测变量。比如，如果 $x_1$ $x_2$ 是数值预测变量，而 $x_3$ 通过字符串“female”和“male”包含了性别信息，则
+factor()构造函数进入模型的类别预测变量。比如，如果 $x_1$，$x_2$ 是数值预测变量，而 $x_3$ 通过字符串“female”和“male”包含了性别信息，则
 
 ```
 y ~ x1+s(x2)+factor(x3)
@@ -226,7 +226,24 @@ summary(fit1)
 是每个链的样本自相关函数，以更加一般的方式评估每个滞后期链的相关性。第五列是每个参数
 后验密度函数的核估计，第六列是基于相关链的数值总结。
 
-图1中2-4列显示了MCMC收敛的迹象，看起来相当好：跟踪图显示没有趋势，滞后一期的相关系数
+```{r fig1,fig.cap="基于MCMC抽样的简单logistic回归模型的信息总结,dev="png"}
+set.seed(39402)
+m<-100
+n<-2
+beta0True<-0.5
+betaxTrue<-1.7
+sigsqTrue<-0.8
+idnum<-rep(1:m,each=n)
+x<-runif(m*n)
+U<-rep(rnorm(m,0,sqrt(sigsqTrue)),each=n)
+mu<-1/(1+exp(-(beta0True+betaxTrue*x+U)))
+y<-rbinom((m*n),1,mu)   
+library(gammSlice)
+fit1<-gSlc(y~x,random=list(idnum=~1),family="binomial") 
+summary(fit1)
+```
+
+图 \@ref(fig:fig1) 中2-4列显示了MCMC收敛的迹象，看起来相当好：跟踪图显示没有趋势，滞后一期的相关系数
 很小，自相关函数的峰值合理地衰减。最后两列显示出估计的后验密度函数和一些基本的数值总结。
 
 ### 输入数据的前期处理
@@ -371,10 +388,10 @@ $$C=[1\quad x_i \quad z_1(x_i) \cdots z_k(x_i)]_{1 \leq i \leq n},\quad D=diag(0
 summary(fit2)
 ```
 
-将以上模拟的数据绘制在图2中。有效自由度的收敛似乎是合理的，因为在跟踪图中全局趋势
+将以上模拟的数据绘制在图 \@ref(fig:fig2) 中。有效自由度的收敛似乎是合理的，因为在跟踪图中全局趋势
 是平坦的，滞后一期的相关性也很小，自相关峰值远低于1。有效自由度的后验分布似乎以
 10.5为中心，这就显示出高度的非线性性——与使用我们产生的数据的均值函数一致。$f$
-估计的可视化在图3中显示，通过以下命令获得：
+估计的可视化在图 \@ref(fig:fig3) 中显示，通过以下命令获得：
 
 ```
 plot(fit2) 
@@ -387,6 +404,22 @@ points(x,y)
 
 使用额外的ad hoc R命令增加 $f$ 曲线和图例，将其设置为虚线。从gSlc()可以看出
 在这个例子中f的估计相当好。
+
+```{r fig2,fig.cap="有效自由度的MCMC输出信息汇总",dev="png}
+set.seed(53902)
+n<-400
+x<-runif(n)
+y<-rpois(n,exp(cos(4*pi*x)+2*x-1))   
+fit2<-gSlc(y~s(x),family="poisson")
+summary(fit2)
+```
+
+```{r fig3,fig.cap="贝叶斯后验密度均值和95%的置信区间",dev="png"}
+par(mfrow=c(1,2))
+#plot(fit2)
+plot(fit2,responseScale=TRUE)
+points(x,y)
+```
 
 ## 半参数logistic回归
 
@@ -421,7 +454,19 @@ fit3<-gSlc(y~x1+s(x2),family="binomial)
 summary(fit3)
 ```
 
-图4显示了summary(fit3)的结果。MCMC收敛对于关键参数 $\beta_{x1}$ 是很好的，对于 $f(x_2)$ 组成成分的有效自由度也是合理的。
+图 \@ref(fig:fig4) 显示了summary(fit3)的结果。MCMC收敛对于关键参数 $\beta_{x1}$ 是很好的，对于 $f(x_2)$ 组成成分的有效自由度也是合理的。
+
+```{r fig4,fig.cap="基于切片MCMC抽样的信息总结",dev="png}
+set.seed(981127)
+n<-500
+betax1True<-0.5
+x1<-sample(c(0,1),n,replace=TRUE)
+x2<-runif(n)
+mu<-1/(1+exp(-(betax1True*x1+sin(2*pi*x2))))
+y<-rbinom(n,1,mu)
+fit3<-gSlc(y~x1+s(x2),family="binomial")
+summary(fit3)
+```
 
 最后，$f$ 的估计的可视化可以使用：
 
@@ -429,9 +474,13 @@ summary(fit3)
 plot(fit3)
 ```
 
-这就产生了图5，捕获了真正 $f$ 函数的正弦性质。同时注意到gammSlice是去绘制感兴趣
+这就产生了图 \@ref(fig:fig5)，捕获了真正 $f$ 函数的正弦性质。同时注意到gammSlice是去绘制感兴趣
 的预测变量的拟合，所有其他的预测变量设置成它们的样本均值。图5显示我们绘制的是针对
 $x_2$ 的 $\beta_x|\bar{x}_1+f(x_2)$ 的贝叶斯估计，其中 $\bar{x}_1$ 是 $x_{1i}$ 的均值。
+
+```{r fig5,fig.cap="f的贝叶斯后验均值估计及95%置信区间",dev="png"}
+plot(fit3)
+```
 
 ## 泊松可加混合模型
 
@@ -487,10 +536,29 @@ summary(fit4)
 plot(fit4)
 ```
 
-图6显示了summary(fit4)的结果。在默认MCMC样本量的情况下显示出很好的收敛性。
+图\@ref(fig:fig6)显示了summary(fit4)的结果。在默认MCMC样本量的情况下显示出很好的收敛性。
 $\sigma^2$ 95%的置信区间是 $(0.535,0.975)$ ，接近我们产生的数据集中包括的1值。
 
-高的有效自由度反映出拟合函数部分的非线性性。非线性效应在图7中进一步加强。
+```{r fig6,fig.cap="基于切片MCMC抽样的模型拟合信息总结",dev="png"}
+set.seed(2966703)
+m<-100
+n<-10
+x1<-runif(m*n)
+x2<-runif(m*n)
+idnum<-rep(1:m,each=n)
+sigsqTrue<-1
+U<-rep(rnorm(m,0,sqrt(sigsqTrue)),each=n)
+mu<-exp(U+cos(4*pi*x1)+2*x1+sin(2*pi*x2^2))
+y<-rpois(m*n,mu)
+fit4<-gSlc(y~s(x1)+s(x2),random=list(idnum=~1),family="poisson")
+summary(fit4)
+```
+
+高的有效自由度反映出拟合函数部分的非线性性。非线性效应在图 \@ref(fig:fig7)中进一步加强。
+
+```{r fig7,fig.cap="f1和f2的贝叶斯后验均值估计及95%的置信区间",dev="png"}
+plot(fit4)
+```
 
 # 精准预测
 
@@ -562,7 +630,7 @@ toenailPlus<-cbind(toenail,terbXmonths)
 fitTN<-gSlc(onycholysis~terb+months+terbXmonths,random=list(idum=~1),data=toenailPlus,family="binomial")
 summary(fitTN)
 ```
-结果绘制在图10中。这个结果显示出所有关键变量非常好的MCMC收敛。由月计算的时间效应
+结果绘制在图\@ref(fig:fig10)中。这个结果显示出所有关键变量非常好的MCMC收敛。由月计算的时间效应
 显著，$\beta_{months}$ 的95%的置信区间是 $(-0.489,-0.313)$。这就显示出在研究过程中显著
 降低了甲剥离的患病率。同样，$\beta_{terbXmonths}$ 的置信区间是 $(-0.278,-0.00379)$。
 显示出特比萘芬在减少甲剥离患病率上有轻微的影响。$\sigma^2$ 95%的置信带 $(12.4,26)$ 
@@ -572,8 +640,18 @@ summary(fitTN)
 
 优比，以每个对象的随机截距为条件，$terb=1$，则$months=$月份的中位数，值为 $Q_2$；$terb=0$，
 则$months=$ 0，优比 $OR_{terb}=exp(\beta_{terb} Q_2)$。通过类比3.1.4中的计算，$OR_{terb}$
-的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$。这个结果和表10、11中统计
+的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$。这个结果和图\@ref(fig:fig10)、11中统计
 显著交互效应是一致的。
+
+```{r fig10,fig.cap="基于切片MCMC抽样拟合logistic混合模型的信息汇总",dev="png"}
+data("toenail")
+terbXmonths<-toenail[,"terb"]*toenail[,"months"]
+toenailPlus<-cbind(toenail,terbXmonths)
+head(toenailPlus)
+fitTN<-gSlc(onycholysis~terb+months+terbXmonths,random=list(idnum=~1),data=toenailPlus,family="binomial")
+summary(fitTN)
+```
+
 
 ### 惩罚拟似然和精确最大似然的比较
 
@@ -610,18 +688,31 @@ fitIR<-gSlc(respirInfec~s(age)+vitAdefic+female+height+stunted+visit2+visit3+vis
 summary(fitIR)
 ```
 
-我们得到了图12的汇总信息。和Zhao等（2006）的图1是相似的，表明富含维生素A的饮食和
+我们得到了图\@ref(fig:fig12)的汇总信息。和Zhao等（2006）的图1是相似的，表明富含维生素A的饮食和
 规则的诊所问诊往往会降低呼吸道感染的风险。
 
-图13显示了作为年龄的函数呼吸道感染的概率，由以下代码获得：
+```{r fig12,fig.cap="基于切片MCMC抽样的拟合logistic可加混合模型的信息汇总",dev="png"}
+data("indonRespir")
+head(indonRespir)
+fitIR<-gSlc(respirInfec~s(age)+vitAdefic+female+height+stunted+visit2+visit3+visit4+visit5+visit6,
+            random=list(idnum=~1),family="binomial",data=indonRespir)
+summary(fitIR)
+```
+
+
+图\@ref(fig:fig13)显示了作为年龄的函数呼吸道感染的概率，由以下代码获得：
 
 ```
 plot(fitIR,responseScale=TRUE)
 ```
 
-图13显示了有趣的非单调年龄效应，这也被Lin和Carrill（2001）和Zhao（2006）等发现过。
+图\@ref(fig:fig13)显示了有趣的非单调年龄效应，这也被Lin和Carrill（2001）和Zhao（2006）等发现过。
 一个更简单的模型，就像没有惩罚样条的广义线性模型，也不会发现非线性的年龄效应。
 因此，广义可加混合模型提供了一个更加全面更深刻的分析。
+
+```{r fig13,fig.cap="f(age)的贝叶斯后验均值估计及95%的置信区间",dev="png"}
+plot(fitIR,responseScale=TRUE)
+```
 
 # 扩展
 
@@ -631,7 +722,6 @@ plot(fitIR,responseScale=TRUE)
 可加模型，在Zhao等（2006）的广义线性混合模型的框架中有所描述。最后一个扩展就是允许
 向量随机效应结构——适用于有随机截距和斜率的模型。基于gammaSlice的结构，所有的这些拓展
 都相对简单。时间和资源限制了对当前gammaSlice版本的通常限制。
-
 
 # 参考文献
 [//]: # (\bibliography{Bibfile})
