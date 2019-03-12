@@ -71,8 +71,8 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 GAMM通过允许连续预测变量扩展GLMM非参数函数对平均响应的影响。假定，在一个纵向数据集中，
 $y_{ij}$ 是一个二元响应变量 $y$ 的第 $i$ 个对象的第 $j$ 个测量，对于任意的
-$1\leq j\leq n_i$，$1\leq i \leq m$。对于连续预测变量 $x_1$ $x_2$，类似地定义
-$x_{1ij}$ $x_2ij$。这个模型的GLMM
+$1\leq j\leq n_i$ ，$1\leq i \leq m$ 。对于连续预测变量 $x_1$ $x_2$ ，类似地定义
+$x_{1ij}$ $x_2ij$ 。这个模型的GLMM
 
 $$y_{ij}|U_i \overset{ind}\sim Bernoulli(logit^{-1}(U_i+\beta_1x_{1ij}+\beta_2x_{2ij})),\qquad
   U_i \overset{ind}\sim N(0,\sigma^2)$$ {#eq:model1}
@@ -141,7 +141,7 @@ help(s,package="mgcv")
 ```
 
 给出了s()完整的描述和具体的细节，在本文第三部分给出了一些例子。fomula参数也支持通过
-factor()构造函数进入模型的类别预测变量。比如，如果 $x_1$ $x_2$ 是数值预测变量，而 $x_3$ 通过字符串“female”和“male”包含了性别信息，则
+factor()构造函数进入模型的类别预测变量。比如，如果 $x_1$ , $x_2$ 是数值预测变量，而 $x_3$ 通过字符串“female”和“male”包含了性别信息，则
 
 ```
 y ~ x1+s(x2)+factor(x3)
@@ -583,7 +583,7 @@ summary(fitTN)
 贝叶斯推断的比较的潜在的哲学批评这里也同样存在。先验的扩散意味着至少非正式的比较是合理的。
 
 从图11中可以看到，gammSlice和AGHQ的结果是非常接近的，进一步提供了切片抽样方法
-精确性的证据。PQL对于一些参数是不精确的，如 $\beta_{months}$ 和 $\sigma$。
+精确性的证据。PQL对于一些参数是不精确的，如 $\beta_{months}$ 和 $\sigma$ 。
 
 ## 印度尼西亚儿童健康研究数据
 
