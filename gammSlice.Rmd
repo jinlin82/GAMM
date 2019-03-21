@@ -625,7 +625,7 @@ knitr::include_graphics(".\\results\\fig5-toenail.png")
 之后由Diggle等（2002）使用。响应变量是呼吸道感染（0表示没有感染，1表示感染），
 潜在的预测变量是年龄，维生素A缺少的指标，性别，身高，发育不良的指标和每个孩子
 门诊就诊的次数。这里，我们使用门诊就诊次数的指标，需要5个这样的指标。让 $x_{ij}$ 
-表示$9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子，$1 \leq j \leq n_i$
+表示 $9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子，$1 \leq j \leq n_i$
 表示对每个孩子重复的测量。一个可加混合模型如下：
 
 $$logit(P(respiratory infection_{ij}=1))=U_i+\beta^{T}x_{ij}+f(age_{ij}),\quad U_i \overset{ind}\sim N(0,\sigma^2)$$  {#eq:model13}

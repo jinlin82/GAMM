@@ -1,5 +1,5 @@
 ---
-title: "MixedModel"
+title: "Mixed Model"
 author: "Jin"
 date: "2019-03"
 output:
