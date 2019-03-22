@@ -36,7 +36,7 @@ link-citations: true
 **TODO**
 
 
-```{r setup, echo=F}
+```{r setup,echo=F}
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
@@ -506,7 +506,7 @@ $$\|y-U\beta-Pb\|^2+d^{-2}b^\prime D^{-1}b \Rightarrow \mathop{\min\limits_{\bet
 表示第 $i$ 个人每月消耗低 $j$ 种食物的数量，$i=1,\cdots,n$。为了确定饮食效果，可以
 建立logistic回归模型
 
-$$Pr(y_i=1)=\frac{exp(\beta_0+\beta_1z_{i1}+\cdots+\beta_mz_{im})}{1+exp(\beta_0+\beta_1z_{i1}+\cdots+\beta_mz_{im})}$$  {#eq:model:1.48}
+$$Pr(y_i=1)=\frac{exp(\beta_0+\beta_1z_{i1}+\cdots+\beta_mz_{im})}{1+exp(\beta_0+\beta_1z_{i1}+\cdots+\beta_mz_{im})}$$  {#eq:model1.48}
 
 如果一种食物增加了概率，$\beta>0$（坏食物），否则，$\beta<0$（好食物）。通常 $y$ 
 表示一种疾病是否存在，$z$ 从问卷调查中获得。如果食物的数量很多（比如，超过了观测值的数量），
@@ -586,6 +586,128 @@ Tikhonov正则化旨在通过增加一个二次惩罚项用适定问题代替不
 选择是个问题。虽然T正则化在贝叶斯框架下有很好的统计解释，但是惩罚系数仍然是一个遗留
 问题。结合感兴趣的参数 $\theta$ ，非线性混合模型可以从已知数据中估计惩罚系数。
 
+# 线性混合效应模型实例分析
+
+## 基本模型设定
+
+研究礼貌程度与声音音调高低的关系，可建立如下模型：
+
+$$pitch\sim politeness+\epsilon$$
+
+考虑性别差异：
+
+$$pitch\sim politeness+sex+\epsilon$$
+
+对每个个体进行多次测量，即每个个体都进行多次有礼貌和无礼貌的回答。这违反了线性回归
+模型中独立性的假定，相同个体的多次回答不能被视为是独立的。处理这个问题的方法就是为
+每个个体加入随机效应。将随机效应添加到固定效应中建立混合模型，为每个个体增加随机效
+应，表示由于个体差异所导致的特殊变化。模型形式为：
+
+$$pitch\sim politeness+sex+(1|subject)+\epsilon$$
+
+$(1|subject)$ 表示假定每个个体的截距项不同，1代表截距。
+
+再考虑不同的情景。例如，向教授寻求帮助（有礼貌条件），向同龄人寻求帮助（非正式条件），
+来不及时间紧迫的情况等，都在有礼貌和非正式之间划分，共7个不同的情景。和个体差异相似，
+我们也考虑情景不同的差异：
+
+$$pitch\sim politeness+sex+(1|subject)+(1|item)+\epsilon$$
+
+用R进行相应分析：
+
+```{r fig1,eval=T,fig.cap = "箱线图", dev='png'}
+politeness<-read.csv(".\\data\\politeness_data.csv")
+head(politeness)
+boxplot(frequency~attitude*gender,col=c("white","lightgray"),politeness)
+```
+
+以上图形表明，礼貌情况下音调的中位数比非正式条件的低。男性和女性在两种情况下的音调高低有交叉。
+
+根据以下命令进行模型建立：
+```{r eval=T,echo=T}
+library(lme4)
+politeness.model<-lmer(frequency~attitude+(1|subject)+(1|scenario),data=politeness)
+summary(politeness.model)
+```
+
+Random effects部分表示由随机效应导致的因变量的变异程度。可以发现，scenario对
+因变量的变异程度比subject低。由箱线图也可以看出，个体间比情景间有更多的差异。
+最后的Residul表示 $\epsilon$ 造成的变异。Fixed effects部分表示固定效应导致
+因变量的变异程度。attitudepol表示礼貌类别的斜率。-19.695表示从非正式到礼貌需要
+降低19.695HZ。202.588表示非正式场合音调的平均值。
+
+将性别作为固定效应加入模型：
+```{r eval=T,echo=T}
+politeness.model<-lmer(frequency~attitude+gender+(1|subject)+(1|scenario),data=politeness)
+summary(politeness.model)
+```
+
+Random effects中，比较之前没有固定性别的模型，subject的变异急剧下降。
+这是因为性别引起的变化与个体引起的变化混淆了。在Fixed effects中，男性女性的
+差异是109HZ，截距代表男性在非正式场合的音调。
+
+## 统计显著性：似然比检验
+
+在R中建立空模型及全模型进行似然比检验：
+```{r eval=T,echo=T}
+politeness.null<-lmer(frequency~gender+(1|subject)+(1|scenario),data=politeness,REML=FALSE)
+politeness.model<-lmer(frequency~attitude+gender+(1|subject)+(1|scenario),data=politeness,
+                       REML=FALSE)
+anova(politeness.null,politeness.model)
+```
+
+结果显示，全模型更好一点。类似还可以进行其他模型的对比。
+
+随机斜率和随机截距
+
+```{r eval=T,echo=T}
+coef(politeness.model)
+```
+
+以上结果显示，每个个体和每个情景都有不同的截距。并不是所有的个体和情景的固定效应
+（态度和性别）都是相同的。这个模型就是所谓的随机截距模型。我们考虑了音调的基线差异，
+但是我们假设无论礼貌的影响如何，对所有个体和情景都是相同的。事实上，这不是一个有效
+的假设，一些情景下礼貌程度或多或少会有些不同。也就是说，礼貌的效应会因情景的不同而
+不同。比如说，一些人比较礼貌，一些人没有那么礼貌。所以，我们需要的是一个随机斜率模型，
+个体和情景不仅仅允许有不同的截距，也允许有不同的斜率。
+
+```{r eval=T,echo=T}
+politeness.model<-lmer(frequency~attitude+gender+(1+attitude|subject)+(1+attitude|scenario),
+                       data=politeness,REML=FALSE)
+coef(politeness.model)
+```
+
+$(1+attitude|subject)$ 表示不同的基线频率水平（截距用1表示）以及态度在特定情况下
+的不同反应。现在，对于每个个体和情景，attitudepol列（礼貌效应的个体和情景系数）
+是不同的。然而，它始终是负的，并且许多值非常相似。这意味着尽管存在个体差异，但礼貌
+对语调的影响也是一致的：对于我们来说，在礼貌地讲话时声音往往会下降，但对于某些人来说，
+它比其他人稍微下降得多。再看性别那一列，系数并没有改变，这是因为我们并没有指定性别
+效应的不同个体和不同情景的随机斜率。
+
+```{r eval=T,echo=T}
+politeness.null<-lmer(frequency~gender+(1+attitude|subject)+(1+attitude|scenario),data=politeness,
+                      REML=FALSE)
+anova(politeness.null,politeness.model)
+```
+
+结果表明，完全模型显著。
+
+## 假设
+
+所有线性模型中的假设都可以直接应用在混合模型中。共线性、强影响点、异方差等，在R中验证
+这些假设的方法和线性模型相同，通过残差图，残差图的直方图或Q-Q图进行验证。
+
+```{r fig2,eval=T,fig.cap = "残差检验", dev='png'}
+par(mfrow=c(1,3))
+plot(fitted(politeness.model),residuals(politeness.model))
+hist(residuals(politeness.model))
+qqnorm(residuals(politeness.model))
+```
+
+独立性是最重要的假设，用混合模型取代线性模型解决数据中的不独立问题是最主要的原因之一。
+如果遗漏重要的固定效应或随机效应，混合模型也违反了独立性。比如，如果用不包含随机效应
+subject的模型分析我们的数据，我们的模型将不会知道每个个体有多个回答。这就等价于违反了
+独立性假定。所以，谨慎地选择固定效应和随机效应变量，也可以解决不独立的问题。
 
 # 参考文献
 [//]: # (\bibliography{Bibfile})
