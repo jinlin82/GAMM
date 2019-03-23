@@ -592,18 +592,18 @@ Tikhonov正则化旨在通过增加一个二次惩罚项用适定问题代替不
 
 研究礼貌程度与声音音调高低的关系，可建立如下模型：
 
-$$pitch\sim politeness+\epsilon$$
+$$\text{pitch}\sim \text{politeness}+\epsilon$$
 
 考虑性别差异：
 
-$$pitch\sim politeness+sex+\epsilon$$
+$$\text{pitch}\sim \text{politeness}+\text{sex}+\epsilon$$
 
 对每个个体进行多次测量，即每个个体都进行多次有礼貌和无礼貌的回答。这违反了线性回归
 模型中独立性的假定，相同个体的多次回答不能被视为是独立的。处理这个问题的方法就是为
 每个个体加入随机效应。将随机效应添加到固定效应中建立混合模型，为每个个体增加随机效
 应，表示由于个体差异所导致的特殊变化。模型形式为：
 
-$$pitch\sim politeness+sex+(1|subject)+\epsilon$$
+$$\text{pitch}\sim \text{politeness}+\text{sex}+(1|\text{subject})+\epsilon$$
 
 $(1|subject)$ 表示假定每个个体的截距项不同，1代表截距。
 
@@ -611,7 +611,7 @@ $(1|subject)$ 表示假定每个个体的截距项不同，1代表截距。
 来不及时间紧迫的情况等，都在有礼貌和非正式之间划分，共7个不同的情景。和个体差异相似，
 我们也考虑情景不同的差异：
 
-$$pitch\sim politeness+sex+(1|subject)+(1|item)+\epsilon$$
+$$\text{pitch}\sim \text{politeness}+\text{sex}+(1|\text{subject})+(1|\text{item})+\epsilon$$
 
 用R进行相应分析：
 
@@ -709,5 +709,4 @@ qqnorm(residuals(politeness.model))
 subject的模型分析我们的数据，我们的模型将不会知道每个个体有多个回答。这就等价于违反了
 独立性假定。所以，谨慎地选择固定效应和随机效应变量，也可以解决不独立的问题。
 
-# 参考文献
-[//]: # (\bibliography{Bibfile})
+
