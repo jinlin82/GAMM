@@ -1,5 +1,5 @@
 ---
-title: "The Difference between Pooled & Mixed Model"
+title: "混合效应模型和计量面板数据模型的区别"
 author: "Jin"
 date: "2019-03"
 output:
@@ -49,7 +49,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 ```
 
 
-# 面板数据模型和混合模型的区别
+# 混合效应模型和计量面板数据模型的区别
 
 ## 面板数据模型
 
