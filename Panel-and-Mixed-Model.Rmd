@@ -11,7 +11,7 @@ output:
     theme: null
     md_extensions: +east_asian_line_breaks
     keep_md: true
-    toc: false
+    toc: true
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
   bookdown::word_document2:
     fig_caption: true
@@ -62,7 +62,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 $$y_{it}=\alpha+X_{it}^\prime \beta+\epsilon_{it}$$
 
-$\alpha$、$\beta$ 对所有省份在所有时间都相同。
+$\alpha$、 $\beta$ 对所有省份在所有时间都相同。
 
 混合模型假定：随机误差项 $\epsilon_{it}$ 零均值，同方差，不同个体不同时点对应的 $\epsilon_{it}$
 相互独立；随机误差项与 $X_{it}$ 不相关，解释变量不存在完全共线性，且具有有限方差。
