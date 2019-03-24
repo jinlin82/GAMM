@@ -135,7 +135,7 @@ $\alpha_i$、$\beta_i$ 表示每个省份线性回归方程的截距项和斜率
 模型在斜率项都是相同的，截距项不同，两者的区别在于截距项和自变量是否相关，不相关的
 为随机效应模型，相关的为固定效应模型。
 
-## 混合模型
+## 混合模型(mixed model)
 
 方差分析中主要有三种模型，固定效应模型、随机效应模型和混合模型
 
@@ -166,7 +166,7 @@ $\sigma^2\lambda_{ijj^\prime}$，$\lambda_{ijj^\prime}$ 代表每个组之间的
 
 ```{r eval=T,echo=F,results='markup', cache=F}
 library(plm)
-data<-read.csv(".\\data\\pdataquality.csv")
+data<-read.csv("./data/pdataquality.csv")
 data<-data[which(data$province!="全国"),]
 #head(data)
 ## 将数据转化为面板数据
@@ -286,16 +286,11 @@ $b_{i2}$ 是随机变量并假定其服从多元正态分布。上式表明，$\
 
 ```{r eval=T,ecol=F}
 library(lme4)
-data<-read.csv(".\\data\\pdataquality.csv")
+data<-read.csv("./data/pdataquality.csv")
 data<-data[which(data$province!="全国"),]
 me.nlme<-lmer(gdp~capital+labor+edu+(1|province)+(capital|province)+(edu|province),data=data,REML=TRUE)
 summary(me.nlme)
 ```
-
-
-
-
-
 
 
 
