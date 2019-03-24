@@ -131,11 +131,9 @@ b_{ik}\sim N(0,\psi_k^2),\quad Cov(b_k,b_{k^\prime})=\psi_{kk^\prime} \\
 
 $x_1,\cdots,x_p$ 是固定效应部分，$z_1,\cdots,z_p$ 是随机效应部分，假定服从正态分布。随机效应的协方差系数 $\psi_{kk^\prime}$ 假定是常数。第 $i$ 组中误差的协方差是 $\sigma^2\lambda_{ijj^\prime}$，$\lambda_{ijj^\prime}$ 代表每个组之间的误差项相关系数。
 
+# 以中国31个省市的数据为例进行分析
 
-
-
-
-## 以中国31个省市的数据为例进行分析
+## 面板数据模型
 
 ```{r eval=T,echo=F,results='markup', cache=F}
 library(plm)
@@ -154,7 +152,6 @@ knitr::kable(summary(pdata.me)$coefficients, row.names =T, align = "c", caption=
 
 
 ```{r eval=T,echo=F,results='markup', cache=F}
-
 ## 固定效应模型
 ### 个体固定效应模型
 pdata.fe_ind<-plm(gdp~capital+labor+edu,data=pdata,effect="individual",model="within")
@@ -197,24 +194,26 @@ knitr::kable(summary(pdata.fe_two)$coefficients, row.names =T, align = "c", capt
 ```
 
 
-```{r eval=T,echo=F}
+```{r tab5,eval=T,echo=F,results='markup', cache=F}
 ## 随机效应模型
 ### 个体随机效应模型
 pdata.re_ind<-plm(gdp~capital+labor+edu,data=pdata,effect="individual",model="random")
-summary(pdata.re_ind)
+knitr::kable(summary(pdata.re_ind)$coefficients, row.names =T, align = "c", caption="个体随机效应模型",
+      digits=7,
+      longtable = TRUE, booktabs = TRUE, linesep  = "")
 ### 时点随机效应
 pdata.re_time<-plm(gdp~capital+labor+edu,data=pdata,effect="time",model="random")
-summary(pdata.re_time)
+#summary(pdata.re_time)
 ### 个体时点双随机效应模型
 pdata.re_two<-plm(gdp~capital+labor+edu,data=pdata,effect="twoways",model="random")
-summary(pdata.re_two)
+#summary(pdata.re_two)
 ```
 
 ```{r eval=T,echo=F}
 ## F检验，检验应建立混合模型还是固定效应模型（原假设：混合模型）
 pooltest(pdata.me,pdata.fe_two) ##拒绝原假设，应建立固定效应模型
 ## Hausman检验，检验应建立个体固定效应还是个体随机效应模型（原假设：随机效应）
-phtest(pdata.fe_two,pdata.re_two)  ##拒绝原假设，应建立个体固定效应模型
+phtest(pdata.fe_two,pdata.re_two)  ##不拒绝原假设，应建立个体随机效应模型
 ## 变系数模型
 pdata.varw<-pvcm(gdp~capital+labor+edu,data=pdata,model="within")
 pdata.varr<-pvcm(gdp~capital+labor+edu,data=pdata,model="random")
@@ -231,9 +230,25 @@ plmtest(pdata.me,effect="time",type="honda")   ##不拒绝原假设
 
 ```
 
+以上程序分别建立了混合模型、固定效应模型和随机效应模型。经检验，F检验拒绝原假设，说明不应该建立混合模型，Hausman检验不拒绝原假设，说明应该建立随机效应模型。其结果如表\@ref(tab:tab5)所示。
 
+根据以上结果，面板数据混合模型表明，所有省份在所有时间上回归方程都相同，结果为一个回归方程。个体固定效应模型表明，每个省份都有不同的截距项，系数 $\beta$ 相同，可以建立31个不同的方程。时点固定效应模型表明，在每个时间点上有不同的截距项，系数 $\beta$ 相同，可以建立21个不同的方程。个体时点双固定效应模型表明，每个省份在每个时点的截距都不同，系数 $\beta$ 相同，可以建立 `r 21*31` 个不同的方程。随机效应模型与固定效应模型对应类别的解释相同。变系数模型表明，每个省份在每个时间点的截距和斜率都不同，可以建立 `r 21*31` 个不同的方程。
 
+## 线性混合模型
 
+根据数据建立以下线性混合模型
+
+$$\text{gdp}_{it}=\beta_0+\beta_1\text{capital}_{it}+\beta_2\text{labor}_{it}+\beta_3\text{edu}_{it}+b_{i0}+b_{i1}\text{capital}_{it}+b_{i2}\text{edu}_{it}$$
+
+其中，$\beta_0$，$\beta_1$，$\beta_2$，$\beta_3$ 是固定效应部分，对每个省每个时间点都相同，是整体效应。$b_{i0}$，$b_{i1}$，$b_{i2}$ 是随机效应部分，分别表示截距项，$\text{capital}$、$\text{edu}$ 的斜率变动情况，随机效应随地区的不同而不同。$b_{i1}$ 和 $b_{i2}$ 是随机变量并假定其服从多元正态分布。上式表明，$\text{labor}$ 对 $\text{gdp}$ 的作用在每个地区都是一样的，而 $\text{capital}$ 和 $\text{edu}$ 对 $\text{gdp}$ 的作用随地区的不同而不同。
+
+```{r eval=T,ecol=F}
+library(lme4)
+data<-read.csv(".\\data\\pdataquality.csv")
+data<-data[which(data$province!="全国"),]
+me.nlme<-lmer(gdp~capital+labor+edu+(1|province)+(capital|province)+(edu|province),data=data,REML=TRUE)
+summary(me.nlme)
+```
 
 
 
