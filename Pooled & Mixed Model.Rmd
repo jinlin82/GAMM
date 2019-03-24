@@ -1,5 +1,5 @@
 ---
-title: "Mixed Model"
+title: "The Difference between Pooled & Mixed Model"
 author: "Jin"
 date: "2019-03"
 output:
@@ -56,7 +56,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 面板数据模型分为混合模型、固定效应模型和随机效应模型。假设 $i=1,2,\cdots,N;t=1,2,\cdots,T$，
 其中 $i$ 表示第 $i$  个个体，$T$ 表示时间。以下分析均以中国31个省份为例。
 
-### 混合效应模型
+### 混合模型(pooled model)
 
 混合效应模型形式为：
 
@@ -64,7 +64,10 @@ $$y_{it}=\alpha+X_{it}^\prime \beta+\epsilon_{it}$$
 
 $\alpha$、$\beta$ 对所有省份在所有时间都相同。
 
-### 固定效应模型
+混合模型假定：随机误差项 $\epsilon_{it}$ 零均值，同方差，不同个体不同时点对应的 $\epsilon_{it}$
+相互独立；随机误差项与 $X_{it}$ 不相关，解释变量不存在完全共线性，且具有有限方差。
+
+### 固定效应模型(fixed effects model)
 
 固定效应模型可以分为个体固定效应、时点固定效应和个体时点固定效应模型。
 
@@ -74,19 +77,26 @@ $$y_{it}=\alpha_i+X_{it}^\prime \beta+\epsilon_{it}$$
 
 $\alpha_i$ 表示每个省份截距不同，时间层面相同。
 
+$\alpha_i$ 是随机变量，随省份变化，但不随时间变化，表示每个省份截距不同，时间层面相同，
+对任何省份，$\beta$ 相同。这里假定 $\alpha_i$ 与 $X_{it}$ 相关，包含随个体不同而变化，
+但不随时间变化的解释 $y_{it}$ 变化的因素。
+
 时点固定效应模型为：
 
 $$y_{it}=\gamma_t+X_{it}^\prime\beta+\epsilon_{it}$$
 
-$\gamma_t$ 表示每个时间点截距不同，每个省份截距相同。
+$\gamma_t$ 是随机变量，随时间变化，但不随省份变化，表示每个时间点截距不同，每个省份
+截距相同，对任何省份，$\beta$ 相同。$\gamma_t$ 包括随不同时点变化，但不随个体变化的
+变量的影响。
 
 个体时点固定效应模型为：
 
 $$y_{it}=\alpha_i+\gamma_t+X_{it}^\prime\beta+\epsilon$$
 
-$\alpha_i$、$\gamma_t$ 表示每个省份在每个时间点上的截距都不相同。
+$\alpha_i$、$\gamma_t$ 均为随机变量，分别表示对于31个省份有31个不同的截距项，对于
+21年有21个不同的截距项，表示每个省份在每个时间点上的截距都不相同。
 
-### 随机效应模型
+### 随机效应模型(random effects model)
 
 与固定效应模型类似，随机效应模型也分为个体随机效应、时点随机效应和个体时点随机效应模型。
 
@@ -94,21 +104,27 @@ $\alpha_i$、$\gamma_t$ 表示每个省份在每个时间点上的截距都不�
 
 $$y_{it}=\beta_0+X_{it}^\prime \beta+v_i+\epsilon_{it}$$
 
-$v_i$ 表示第 $i$ 个省份的随机差异，不随时间变化。
+$\beta_0$ 是常数，$\beta$ 是回归系数向量，$v_i$ 是随机变量， 表示第 $i$ 个省份的
+随机差异，不随时间变化，需要估计其均值和方差。
+
+其假定条件为：随机误差项 $\epsilon_{it}$ 零均值，同方差，不同个体和不同时点对应的
+$\epsilon_{it}$ 相互独立；随机误差项 $v_i$ 零均值，同方差，不同个体对应的 $v_i$ 
+相互独立，$v_i$ 和 $X_{it}$ 相互独立，$v_i$ 和 $\epsilon_{it}$ 相互独立；解释变量间
+不存在完全共线性，且 $v_i\sim iid(0,\sigma_v^2)$，$\epsilon_{it}\sim iid(0,\sigma_u^2)$。
 
 时点随机效应模型：
 
 $$y_{it}=\beta_0+X_{it}^\prime\beta+v_t+\epsilon_{it}$$
 
-$v_t$ 表示所有省份第 $t$ 年的随机差异，不随省份变化。
+$v_t$ 是随机变量，表示所有省份第 $t$ 年的随机差异，不随省份变化。
 
 个体时点固定效应模型：
 
 $$y_{it}=\beta_0+X_{it}^\prime\beta+v_i+v_t+\epsilon_{it}$$
 
-$v_i$、$v_t$ 表示第 $i$ 个省份第 $t$ 年的随机差异。
+$v_i$、$v_t$ 是随机变量，表示第 $i$ 个省份第 $t$ 年的随机差异。
 
-### 变系数模型
+### 变系数模型((Variable-Coefficient Model)
 
 变系数模型：
 
