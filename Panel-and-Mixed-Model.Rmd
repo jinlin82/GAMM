@@ -288,15 +288,17 @@ library(lme4)
 library(lmerTest)
 data<-read.csv("./data/pdataquality.csv")
 data<-data[which(data$province!="全国"),]
-me.nlme<-lmer(gdp~capital+labor+edu+(1|province)+(capital|province)+(edu|province),data=data,REML=TRUE)
+me.nlme<-lmer(gdp~capital+labor+edu+(1|province)+(0+capital|province)+(0+edu|province),data=data,REML=TRUE)
 knitr::kable(summary(me.nlme)$coefficient, row.names =T, align = "c", caption="混合效应模型固定效应系数",
-      digits=7,
-      longtable = TRUE, booktabs = TRUE, linesep  = "")
-knitr::kable(ranef(me.nlme)$province, row.names =T, align = "c", caption="混合效应模型随机效应系数",
       digits=7,
       longtable = TRUE, booktabs = TRUE, linesep  = "")
 ```
 
+```{r eval=T,ecol=F,results='markup', cache=F}
+knitr::kable(ranef(me.nlme)$province, row.names =T, align = "c", caption="混合效应模型随机效应系数",
+      digits=7,
+      longtable = TRUE, booktabs = TRUE, linesep  = "")
+```
 
 
 # 参考文献
