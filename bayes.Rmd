@@ -1,0 +1,293 @@
+---
+title: "贝叶斯统计"
+author: "Li"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: true
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# 基本概念
+
+## 贝叶斯公式的形式
+
+1. 事件形式： $P(A_i|B)=\frac{P(A_iB)}{P(B)}=\frac{P(B|A_i)P(A_i)}{\sum_{i=1}^KP(B|A_i)P(A_i)}$
+其中， $A_i、B$ 表示事件， $A_i$ 互不相容，且 $B \subset \bigcup_{i=1}^KA_i$ 。
+2. 随机变量形式：假定随机变量 $\xi、\eta$ 的联合分布密度是 $f(x,y)=f_\xi(x)f_{\eta|\xi}(y|x)$ ，
+其中 $f_\xi(x)$ 是 $\xi$ 的边缘密度， $f_{\eta|\xi}(y|x)$ 是当 $\xi=x$ 时 $\eta$ 的条件密度，则：
+
+$$f_{\xi|\eta}(x|y)=\frac{f_{\xi,\eta}(x,y)}{f_{\eta}(y)}=\frac{f_{\eta|\xi}(y|x)f_{\xi}(x)}{\int_{-\infty}^{+\infty}f_{\eta|\xi}(y|x)f_{\xi}(x)dx}$$
+
+$$f_{\eta|\xi}(y|x)=\frac{f_{\xi,\eta}(x,y)}{f_{\xi}(x)}=\frac{f_{\xi|\eta}(x|y)f_{\eta}(y)}{\int_{-\infty}^{+\infty}f_{\xi|\eta}(x|y)f_{\eta}(y)dy}$$
+
+## 贝叶斯方法
+
+1. 将未知参数看成随机变量，记为 $\theta$ ， $\theta$ 已知时，样本 $x_1,\cdots,x_n$ 的联合密度
+$p(x_1,\cdots,x_n;\theta)=p(x|\theta)$ 为 $x_1,\cdots,x_n$ 对 $\theta$ 的条件密度；
+2. 根据以往对 $\theta$ 的认知，确定先验分布 $\pi(\theta)$ ；
+3. 利用 $p(x|\theta)$ 和 $\pi(\theta)$ ，求得 
+$h(\theta|x)=\frac{p(x|\theta)\pi(\theta)}{\int_0^1p(x|\theta)\pi(\theta)d\theta}$ ；
+4. 利用 $h(\theta|x)$ 对 $\theta$ 做出推断。
+
+注：
+
+1. 无信息先验：对 $\theta$ 没有任何过去的信息可以借鉴，而是希望通过试验结果获得。
+无信息指的是没有任何信息可以帮助我们去选用一个特定的分布作为先验分布；
+2. 若没有先验知识，则认为 $\theta\sim U[0,1]$ ，这称为贝叶斯假设；
+3.  $\theta$ 与 $x_1,\cdots,x_n$ 的联合分布密度的关系：
+
+经典方法中： $p(x_1,\cdots,x_n;\theta)$ 为联合分布密度；
+
+贝叶斯方法： $p(x_1,\cdots,x_n|\theta)=p(x|\theta)$ 为条件分布密度。
+
+# 先验分布的选取
+
+## 基本概念
+
+定义1：若 $z\sim f(x)$ ，记 $f(x)=cg(x)$ ， $c$ 表示常数， $g(x)$ 表示 $f(x)$ 中
+与 $x$ 有关的部分，则记 $z\varpropto g(x)$ ，即 $f(x) \varpropto g(x)$ ， $g(x)$ 
+就称为分布密度 $f(x)$ 核。只要知道了分布的核，根据 $A\int_Rg(x)dx=1$ 就可以确定
+常数A。因此，要求随机变量分布密度，关键是求核。
+
+定义2：当 $x_1\cdots,x_n$ 样本取定后， $p(x_1,\cdots,x_x|\theta)$ 只有 $\theta$ 
+在变化，将其看为 $\theta$ 的函数，就称为似然函数，用 $l(\theta|x_1,\cdots,x_n)$ 表示。
+
+根据以上定义可以得到： $h(\theta|x_1,\cdots,x_n)=\frac{\pi(\theta)p(x_1,\cdots,x_n|\theta)}{\int\pi(\theta)p(x_1,\cdots,x_n|\theta)d\theta}$ ，
+其中 $x_1,\cdots,x_n$ 是已知常数，分母是与 $\theta$ 无关的常数， $p(x_1,\cdots,x_n|\theta)$ 是 
+$l(\theta|x_1,\cdots,x_n)$ ，则 $h(\theta|x_1,\cdots,x_n)\varpropto \pi(\theta)l(\theta|x_1,\cdots,x_n)$ 。
+
+定义3：如果不论 $\theta$ 的先验分布是什么，相应的后验分布 $h(\theta|x_1\cdots,x_n)$ 总是 
+$\theta$ 和 $t(x_1,\cdots,x_n)$ 的函数，则对参数 $\theta$ 而言，统计量 $t(x_1,\cdots,x_n)$ 
+称为充分统计量。充分统计量可简化数据，降低维数。
+
+定理1（尼曼因子分解定理）：若样本 $x_1,\cdots,x_n$ 对参数 $\theta$ 的条件密度 
+$p(x_1,\cdots,x_n|\theta)$ 能表示成 $f(\theta,t(x_1,\cdots,x_n))$ 与 $g(x_1,\cdots,x_n)$ 
+的乘积，则 $t(x_1,\cdots,x_n)$ 对参数 $\theta$ 是充分的，反之亦然。
+
+## 先验分布选取方法
+
+### 贝叶斯假设
+
+若没有先验知识，则认为 $\theta\sim U[0,1]$ ，即 $\pi(\theta)=c\theta \in D$ ，
+即 $\pi(\theta) \varpropto 1$ 。可以推出： $h(\theta|x_1,\cdots,x_n)\varpropto \pi(\theta)p(x_1,\cdots,x_n|\theta)\varpropto1\cdot l(\theta|x_1,\cdots,x_n)$ 。
+
+以上假设表明，似然函数 $l(\theta|x_1,\cdots,x_n)$ 就是后验密度的核，即 
+$h(\theta|x_1,\cdots,x_n) \varpropto l(\theta|x_1,\cdots,x_n)$ 。若参数 $\theta$ 
+有充分统计量 $t(x_1,\cdots,x_n)$ ，简记为 $t$ ，则 $h(\theta|t)\varpropto l(\theta|t)$ 。
+
+定义1：满足 $\int_D\pi(\theta)d\theta>0$ 但可以是 $\infty$ 的分布密度为广义分布密度。 
+
+注：贝叶斯假设只有在 $\theta$ 变化范围是无界区域时才会遇到困难，此时需要引入广义分布密度才能处理。
+
+总结：贝叶斯假设为 $h(\theta|x)\varpropto l(\theta|x)$ 
+
+1. 参数 $\theta$ 在有界区域内变化，先验密度 $\pi(\theta)\varpropto 1$ ，称为贝叶斯假设； 
+2. 参数 $\theta$ 的变化区域无界，先验密度 $\pi(\theta) \varpropto 1$ ，称为广义贝叶斯假设。
+
+### 共轭分布法
+
+共轭分布法认为，先验分布应取共轭分布才合适。
+
+定义1：设样本 $x_1,\cdots,x_n$ 对参数 $\theta$ 的条件分布为 $p(z_1,\cdots,x_n|\theta)$ ，
+如果 $\pi(\theta)$ 决定的后验分布密度 $h(\theta|x_1,\cdots,x_n)$ 与 $\pi(\theta)$ 
+的分布密度是同一个类型，则先验分布 $\pi(\theta)$ 称为 $p(x_1,\cdots,x_n|\theta)$ 的共轭分布。
+
+常用共轭先验分布：
+
+|总体分布|参数|共轭先验分布|
+|:-------|:---|:-----------|
+|二项分布|成功概率|贝塔分布 $\text{Be}(\alpha,\beta)$ |
+|泊松分布|均值|伽玛分布 $\text{Ga}(\alpha,\lambda)$ |
+|指数分布|均值的倒数|伽玛分布 $\text{Ga}(\alpha,\lambda)$ |
+|正态分布（方差已知）|均值|正态分布 $\text{N}(\mu,\sigma^2)$ |
+|正态分布（均值已知）|方差|倒伽马分布 $\text{IGa}(\alpha,\lambda)$ |
+
+定义2：先验分布中所含的未知参数称为超参数。一般共轭先验分布中常含有超参数，无信息先验中不含超参数。
+
+确定超参数的方法：
+
+1. 利用先验距
+2. 利用先验分位数
+3. 利用先验距和先验分位数
+4. 其他方法
+
+注：在以上方法中，均是用样本值估计的距和分位数等于共轭先验分布的距和分位数来确定参数。
+
+### 杰弗莱原则
+
+用信息阵行列式的平方根 $\mid{I(\theta)\mid^{1/2}}$ 作为先验分布的核，即 
+$\pi(\theta)\varpropto \mid{I(\theta)\mid^{1/2}}$ 。其中 $I(\theta)=E(\frac{\partial\ln p(x_1,\cdots,x_n;\theta)}{\partial\theta_1},\cdots,\frac{\partial\ln p(x_1,\cdots,x_n;\theta)}{\partial\theta_K})$ 。
+
+### 最大熵原则
+
+无信息先验分布应取参数 $\theta$ 的变化范围内熵最大的分布。
+
+定义1：对离散随机变量 $x$ ，取 $a_1,\cdots,a_k,\cdots$ 至多可列个值，且 
+$p(x=a_i)=p_i,\quad i=1,2,\cdots$ ，则 $-\sum_{i}p_i\ln p_i$ 称为 $x$ 的熵，
+记为 $\text{H}(x)$ ，规定 $0\cdot\ln0=0$ ；对连续型随机变量 $x$ ，若 $x\sim f(x)$ ，
+且 $-\int p(x)\ln p(x)dx$ 有意义，则称其为 $x$ 的熵，也记为 $\text{H}(x)$ 。
+
+# 估计及检验
+
+## 基本概念
+
+定义1：在参数 $\theta$ 的变化范围Q上，定义一个二元非负实值函数 $\text{L}(\theta,a)$ ，
+称为损失函数，表示用 $a$ 去估计 $\theta$ 的损失。 $E(L(\theta,a))$ 表示期望平均损失，
+称为 $a$ 相应的风险函数，用 $\text{R}(\theta)$ 表示。
+
+定义2：若 $\hat{\theta}_*(x)$ 在估计时使得风险函数 $\text{R}(\theta)$ 最小，则称 
+$\hat{\theta}_*(x)$ 是一致最小风险估计。
+
+定义3：若 $\hat{\theta}_*(x)$ 使 
+$\rho(\hat{\theta}(x),\pi(\theta))=\min_{\hat{\theta}(x)}\rho(\hat{\theta}(x),\pi(\theta))$ ，则称 
+$\hat{\theta}_*(x)$ 是针对 $\pi(\theta)$ 的贝叶斯解。其中 
+$\rho(\hat{\theta}(x),\pi(\theta))=\int_{\theta(x)}R(\theta)\pi(\theta)d\theta$ 。
+
+定理1：对给定的损失函数 $\text{L}(\theta,a)$ 和先验分布 $\pi(\theta)$ ，若存在 $p(x|\theta)$ ，
+记 $R(\hat{\theta}(x)|x)=\int L(\theta,\hat{\theta}(x))p(x|\theta)\pi(\theta)d\theta$ ，
+称为 $\hat{\theta}(x)$ 对 $x$ 的后验风险。当 $R(\hat{\theta}(x)|x)=\min_{\hat{\theta}(x)}R(\hat{\theta}(x)|x)$ ， 
+$\hat{\theta}_*(x)$ 就是 $\pi(\theta)$  相应的贝叶斯解。相当于，如果有一个 $\theta$ 的估计
+使对每个样本值 $x$ ，后验风险都达到最小，它就是所要求的贝叶斯解。
+
+## 估计
+
+### 最大后验估计
+
+使后验密度 $p(\theta|x)$ 达到最大的估计 $\hat{\theta}(x)$ 为最大后验估计。
+
+### 条件期望估计
+
+用后验分布的条件期望值（即后验分布密度的期望值）去估计参数。当不指明损失函数时，
+贝叶斯估计为条件期望估计。
+
+### 区间估计
+
+定义1：设参数 $\theta$ 的后验分布为 $h(\theta|x)$ ，对给定的样本 $x$ 和概率 $1-\alpha$ ，
+若存在 $\hat{\theta}_L=\hat{\theta}_L(x)、\hat{\theta}_U=\hat{\theta}_U(x)$ ，使 
+$p(\hat{\theta}_L\leq\theta\leq\hat{\theta}_U|x)\geq1-\alpha$ ，则称区间 $[\hat{\theta}_L,\hat{\theta}_U]$ 
+为参数 $\theta$ 的可信水平为 $1-\alpha$ 的贝叶斯可信区间，其解释为“ $\theta$ 落入 $[\hat{\theta}_L,\hat{\theta}_U]$ 
+的概率为 $1-\alpha$ ”，这与经典统计中有所区别，在经典统计中，$\theta$ 不是随机变量，
+而是一个固定的数，置信区间解释为这个区间能覆盖住 $\theta$ 的概率为 $1-\alpha$ 。满足 
+$p(\theta\geq\hat{\theta_L})\geq1-\alpha$ 的 $\hat{\theta}_L$ 称为 $1-\alpha$ 的可信下限；
+满足 $p(\theta\leq\hat{\theta}_U|x)\geq1-\alpha$ 的 $\hat{\theta}_U$ 称为 $1-\alpha$ 的可信上限。
+
+定义2：设参数 $\theta$ 的后验密度为 $h(\theta|x)$ ，对给定的概率 $1-\alpha$ ，若在直线上
+存在这样一个子集 $C$ ，满足： $p(C|x)=1-\alpha、\forall\theta_1\in C,\theta_2\notin C$ ，
+总有 $h(\theta_1|x)\geq h(\theta_2|x)$ ，则称 $C$ 为 $\theta$ 的可信水平为 $1-\alpha$ 的
+最大后验密度可信集，简称 $1-\alpha$ HPD可信集，若 $c$ 是一个区间，则 $C$ 称为 $1-\alpha$ 
+最大后验密度可信区间。
+
+## 假设检验
+
+### 假设检验基本思想
+
+算得贝叶斯后验分布 $h(\theta|x)$ 后，即可计算两个假设的后验概率 $\alpha_i=p(\Theta_i|x)d\theta,\quad i=0,1$ 
+，之后比较 $\alpha_0、\alpha_1$ 的大小，当 $\frac{\alpha_0}{\alpha_1}>1$ 时，接受 $\text{H}_0$ ；
+当 $\frac{\alpha_0}{\alpha_1}<1$ 时，拒绝 $\text{H}_0$ ；当 $\frac{\alpha_0}{\alpha_1}\approx 1$ 
+时，尚需进一步抽样获得先验信息。其中 $\frac{\alpha_0}{\alpha_1}$ 称为后验机会比。举例说明其含义， 
+$\frac{\alpha_0}{\alpha_1}=8.14$ 表明 $\Theta_0$ 为真的可能要比 $\Theta_1$ 为真的可能大8.14倍。
+
+### 贝叶斯因子
+
+定义1：设两个假设 $\Theta_0、\Theta_1$ 的先验概率分别为 $\pi_0、\pi_1$ ，后验概率分别为 
+$\alpha_0、\alpha_1$ ，则称 $B^{\pi}(x)=\frac{\alpha_0/\alpha_1}{\pi_0/\pi_1}$ 为贝叶斯因子，
+表征 $x$ 支持 $\Theta_0$ 的程度。
+
+### 简单假设具体情况
+
+1. 简单假设对简单假设（$\text{H}_0:\theta=\theta_0,\quad \text{H}_1:\theta=\theta_1$）
+
+$\alpha_0=\frac{\pi_0p(x|\theta_0)}{\pi_0p(x|\theta_0)+\pi_1p(x|\theta_1)}, \quad \alpha_1=\frac{\pi_1p(x|\theta_1)}{\pi_0p(x|\theta_0)+\pi_1p(x|\theta_1)}$ ，
+则 $\frac{\alpha_0}{\alpha_1}=\frac{\pi_0p(x|\theta_0)}{\pi_1p(x|\theta_1)}$ 。
+
+2. 复杂假设对复杂假设（$\text{H}_0:\theta>1,\quad \text{H}_1:\theta\leq 1$）
+
+$g_0(\theta)\varpropto \pi(\theta)I_{\theta_0}(\theta),\quad g_1(\theta)\varpropto \pi(\theta)I_{\theta_1}(\theta)$ 
+，则先验分布 $\pi(\theta)=\pi_0g_0(\theta)+\pi_1g_1(\theta)$ ，其中 $\pi_0、\pi_1$ 分别是 
+$\Theta_0、\Theta_1$ 上的先验概率， $g_0、g_1$ 分别是 $\Theta_0、\Theta_1$ 上的概率密度函数，
+则 $\frac{\alpha_0}{\alpha_1}=\frac{\int_{\theta_0}p(x|\theta)\pi_0g_0(\theta)d\theta}{\int_{\theta_1}p(x|\theta)\pi_1g_1(\theta)d\theta}$
+
+3. 简单假设对复杂假设（$\text{H}_0:\theta=\theta_0,\quad \text{H}_1:\theta \neq \theta_0$）
+
+当 $\theta$ 连续时，用上述假设是不合适的，应为： 
+$\text{H}_0:\theta\in[\theta_0-\varepsilon,\theta_0+\varepsilon];\text{H}_1:\theta\notin [\theta_0-\varepsilon,\theta_0+\varepsilon]$ ，
+其中 $\varepsilon$ 为一个很小的数。对 $\theta=\theta_0$ 给一个正概率 $\pi_0$ ，
+对 $\theta\notin \theta_0$ 给一个加权密度 $\pi_1g_1(\theta)$ ，即 $\theta$ 的先验密度为 
+$\pi(\theta)=\pi_0\text{I}_{\theta_0}(\theta)+\pi_1g_1(\theta)$ ，其中 $\text{I}_{\theta_0}(\theta)$ 为 
+$\theta=\theta_0$ 的示性函数， $\pi_1=1-\pi_0$ ， $g_1(\theta)$ 为 $\theta\notin \theta_0$ 
+上的一个正概率密度函数。样本 $x$ 的边缘分布 
+$m(x)=\int_{\theta}p(x|\theta)\pi(\theta)d\theta=\pi_0p(x|\theta_0)+\pi_1m_1(x)$ ，其中 
+$m_1(x)=\int_{\theta\notin\theta_0}p(x|\theta)\pi(\theta)d\theta$ ，从而简单假设与
+复杂假设的后验概率为： $\pi(\Theta_0|x)=\frac{\pi_0p(x|\theta_0)}{m(x)}、\pi(\Theta_1|x)=\frac{\pi_1m_1(x)}{m(x)}$ 
+，则 $\frac{\alpha_0}{\alpha_1}=\frac{\pi_0p(x|\theta_0)}{\pi_1m_1(x)}$ 。
+
+# 贝叶斯决策
+
+## 决策问题三要素
+
+1. 状态集 $\Theta=\{\theta\}$ ，每个 $\theta$ 表示自然界（社会）会出现的一种状态，
+状态集用实数表示为状态参数，由一些实数组成为状态空间；
+2. 行动集 $\{a\}$ ，每个 $a$ 表示个人对自然界（社会）采取的行动；
+3. 收益函数 $\text{Q}(\theta,a)$ 。
+
+## 决策准则
+
+### 行动的容许性
+
+定义1：在给定的决策问题中，假如存在这样的 $a_2$ 使 
+$\forall\theta\in\Theta,\exists \text{Q}(\theta,a_2)\geq\text{Q}(\theta,a_1)$ ，
+且至少有一个 $\theta$ 使上述不等式严格成立，则称 $a_1$ 是非容许的；假如不存在
+这样的 $a_2$ ，则称 $a_1$ 是容许的；假如 $a_1、a_2$ 的收益函数在 $\Theta$ 上
+处处相等，则称 $a_1、a_2$ 是等价的。
+
+### 决策准则
+
+
+
+
+
+
+
+
+# 参考文献
+[//]: # (\bibliography{Bibfile})
