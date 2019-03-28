@@ -282,9 +282,215 @@ $\forall\theta\in\Theta,\exists \text{Q}(\theta,a_2)\geq\text{Q}(\theta,a_1)$ �
 
 ### 决策准则
 
+1. 悲观准则：每一行动选最小收益，在所有最小收益中选最大值；
+2. 乐观准则：每一行动选最大收益，在所有最大收益中选最小值；
+3. 折中准则：选乐观系数 $\alpha\in(0,1)$ ，对每一行动 $a$ ，
+计算 $H(a)=\alpha\cdot maxQ(\theta,a)+(1-\alpha)\cdot minQ(\theta,a)$ ，取行动 $a$ 使 $H(a)$ 最大。
 
+### 先验期望准则
 
+每种状态给一个先验概率，每种行动下的所有状态乘先验概率得先验期望收益，选最大的；
+期望相同时，比较方差，选方差最小的。
 
+### 损失函数
+
+$L(\theta,a)=maxQ(\theta,a)-Q(\theta,a)$ ，为最大收益减去当前收益；
+
+$L(\theta,a)=w(\theta,a)-minw(\theta,a)$ ，为当前支付减去最小支付。
+
+悲观准则：每个行动选最大损失 $maxL(\theta,a)$ ，所有最大损失中选最小的；
+
+先验期望准则：先验期望损失达到最小的行动为最优行动，若先验期望损失相同，
+则选先验方差最小的。
+
+常用损失函数：
+
+1. 平方损失函数： $L(\theta,a)=(a-\theta)^2$ ；
+2. 加权平方损失函数： $L(\theta,a)=\lambda(\theta)(a-\theta)^2$
+3. 线性损失函数： $L(\theta,a)=\begin{cases} K_0(\theta-a), a\leq\theta\\K_1(\theta-a),a>\theta \end{cases}$
+4. 绝对值损失函数： $L(\theta,a)=|\theta-a|$
+5. 加权线性函数： 
+$L(\theta,a)=\begin{cases} K_0(\theta)(\theta-a),a\leq\theta \\K_1(\theta)(\theta-a),a>\theta \end{cases}$
+6. 0-1损失函数： $L(\theta,a)=\begin{cases} 0,|a-\theta|\leq\varepsilon\\ 1,|a-\theta|>\varepsilon \end{cases}$
+7. 多元二次损失函数： $L(\theta,a)=(a-\theta)^{\prime}A(a-\theta)$ ，其中 
+$\theta^{\prime}=(\theta_1,\cdots,\theta_p),a^\prime=(a_1,\cdots,a_p)，A_{p\times p}>0$
+8. 二行动线性决策问题的损失函数：状态 $\theta$ 连续或离散， 
+$a=\begin{cases} a_1 & \text{接受}\\ a_2 &\text{拒绝} \end{cases}$ ，在每个行动下的收益都是 
+$\theta$ 的线性函数，即 $Q(\theta,a)=\begin{cases}b_1+m_1\theta,a=a_1  \\b_2+m_2\theta,a=a_2 \end{cases}$
+
+### 效用函数
+
+常见的效用曲线：
+
+1. 直线型： $U(\alpha m_1+(1-\alpha)m_2)=\alpha U(m_1)+(1-\alpha) U(m_2)$ （风险中立型）
+2. 上凸型： $U(\alpha m_1+(1-\alpha)m_2)>\alpha U(m_1)+(1-\alpha) U(m_2)$ （风险偏好型）
+3. 下凸型： $U(\alpha m_1+(1-\alpha)m_2)<\alpha U(m_1)+(1-\alpha) U(m_2)$ （风险厌恶型）
+4. 混合型：上面几种类型的混合
+
+# 贝叶斯推断
+
+## 离散随机变量的贝叶斯推断
+
+$x_i$ 的先验概率密度为 $g(x_i)$ ，给定 $x_i$ 的条件下 $y_i$ 的后验概率密度为 $f(y_i|x_i)$ ，
+则 $x_i、y_i$ 的联合概率密度为 $f(x_i,y_i)=g(x_i)f(y_i|x_i)$ 。给定 $Y=y_j$ ， $x_i$ 的后验
+概率密度为 $g(x_i|y_j)=\frac{g(x_i)f(y_j|x_i)}{\sum_{i=1}^{n_i}g(x_i)f(y_j|x_i)}$
+
+例：容器中有5个球，可能一部分是红色，剩下的是绿色，我们不知道有多少球是红色， $x_i=i$ 表示
+红球的个数，则 $i=0,1,2,3,4,5$ 。因为没有任何关于红球的信息，所以假设 $X$ 的先验分布为 
+$g(0)=g(1)=g(2)=g(3)=g(4)=g(5)=\frac{1}{6}$ 。我们随机抽取一个球，随机变量 $Y=1$ 表示
+抽到红球，否则 $Y=0$ ，则 $P(Y=1|x_i=i)=\frac{i}{5}、P(Y=0|x_i=i)=1-\frac{i}{5}$ 。
+根据公式可算得后验概率。
+
+注：贝叶斯学派中，不考虑新数据集，只考虑当前数据集，若出现新数据集，则用当前数据集
+算得的后验概率作为新数据集的先验概率再进行新后验概率的计算，等价于直接进行计算 
+$f(y_1,y_2|x)=f(y_1|x)f(y_2|x,y_1)$ 。
+
+在贝叶斯理论中，常数乘以先验概率并不会影响贝叶斯后验理论的结果，常数乘以似然也不会
+改变贝叶斯理论的结果。因为后验概率与先验概率乘以似然成比例，常数在计算后验概率时被消掉了。
+
+## 二项分布比例的贝叶斯推断
+
+假定 $Y\sim \text{B}(n,\pi)$ ，则给定参数 $\pi$ ， $y$ 的条件分布为 
+$f(y|\pi)=C_{n}^{y}\pi^y(1-\pi)^{n-y},\quad y=1,\cdots,n$ 。假定 $y$ 是固定的，
+是我们观测的成功的次数， $\pi$ 是可变参数，则 $f(y|\pi)=C_{n}^{y}\pi^y(1-\pi)^{n-y},\quad 0\leq\pi\leq1$ 
+。根据以上知识可知， $g(\pi|y)=\frac{g(\pi)f(y|\pi)}{\int_0^1g(\pi)f(y|\pi)d\pi}$ 。
+
+### 使用均匀先验
+
+令 $g(\pi)=1,\quad0\leq\pi\leq1$ ，则 $g(\pi|y)=C_{n}^{y}\pi^y(1-\pi)^{n-y},\quad 0\leq\pi\leq1$ 。
+
+### 使用贝塔先验
+
+假定贝塔先验为 $g(\pi;a,b)=\frac{\Gamma(a+b)}{\Gamma(a)+\Gamma(b)}\pi^{a-1}(1-\pi)^{b-1},\quad 0\leq\pi\leq1$ 
+，因为后验和先验乘以似然成比例，因此 $g(\pi|y)\varpropto \pi^{a+y-1}(1-\pi)^{b+n-y-1}$ ，令 
+$a^\prime=a+y、b^\prime=b+n-y$ ，易知，后验密度也服从贝塔分布，为 
+$g(\pi|y)=\frac{\Gamma(n+a+b)}{\Gamma(y+a)\Gamma(n-y+b)}\pi^{y+a-1}(1-\pi)^{n-y+b-1}$
+，易知二项分布的共轭先验是贝塔分布。
+
+二项分布的Jefferys先验是 $\text{Be}(\frac{1}{2},\frac{1}{2})$ 。
+
+### 先验选择准则
+
+1. 当有模糊的先验知识时，选择共轭先验；
+2. 通过匹配位置参数（均值）和尺度参数（方差）获得真正的先验知识，选择
+共轭先验（样本距等于分布距求参数确定分布）；
+3. 构建一般的连续先验（分段函数，不同区间有不同先验）。
+
+### 总结后验分布
+
+位置的测量：
+
+1. 后验众数：极大化后验分布的数，若后验分布连续，则求导令其为0。不足之处为，
+可能位于分布的一端或附近，不能代表整体分布；有很多局部极大值极小值求导都为0；
+2. 后验中位数： $\int_0^{median}g(\pi|y)d\pi=0.5$ 的 $\text{median}$ ，是很好的位置测量；
+3. 后验均值： $m^\prime=\int_0^1\pi g(\pi|y)d\pi$ ，当分布厚尾时，会受到很大影响。
+
+散度测量：
+
+1. 后验方差： $var(\pi|y)=\int_0^1(\pi-m^\prime)^2g(\pi|y)d\pi$
+2. 后验标准差： $var(\pi|y)^{\frac{1}{2}}$
+3. 后验分位数： $k=\int_{-\infty}^{\pi_k} g(\pi|y)d\pi$ ， $\pi_k$ 是第 $k$ 百分位数
+4. 四分位差： $IQR=Q_3-Q_1$
+
+### 估计比例$\pi$
+
+后验均值作为对 $\pi$ 的估计，从后验均方误差 $PMSE(\hat{\pi})=var(\pi|y)+(m^\prime-\pi)^2$ 
+中可以看出后验均值作为对 $\pi$ 的估计是最好的。
+
+### 贝叶斯可信区间
+
+贝叶斯可信区间为 $m^\prime+z_{\frac{\alpha}{2}}\times s^\prime$ ，其中 $m^\prime$ 
+是后验均值， $s^\prime$ 是后验标准差。
+
+### 贝叶斯学派和频率学派对于比例推断的比较
+
+贝叶斯学派认为参数是固定的未知常数，不是随机变量；而贝叶斯学派认为参数是随机变量，
+任何贝叶斯推断都是由后验分布计算的。后验均值作为贝叶斯估计，贝叶斯估计比频率学派
+的估计有更小的均方误差，即贝叶斯估计更接近真实值。
+
+贝叶斯统计的假设检验：
+
+1. 单边假设检验（ $\text{H}_0:\pi\leq\pi_0;\text{H}_1:\pi>\pi_0$）
+
+后验概率 $P(\pi\leq\pi_0|y)=\int_0^{\pi_0}g(\pi|x)d\pi$ ，若后验概率小于显著性
+水平 $\alpha$ ，则拒绝原假设。
+
+2. 双边假设检验（$\text{H}_0:\pi=\pi_0;\text{H}_1:\pi\neq \pi_0$）
+
+置信区间和双边假设的关系：若不拒绝 $\text{H}_0$ ，则说明 $\pi\in[\pi_0-\varepsilon,\pi_0+\varepsilon]$ ；
+若拒绝 $\text{H}_0$ ，则说明 $\pi\notin[\pi_0-\varepsilon,\pi_0+\varepsilon]$ ，其中 $\varepsilon$ 
+是个很小的数。贝叶斯统计中，用后验分布进行计算，若 $\pi_0$ 落入可信区间，则接受 $\text{H}_0$ ，否则，
+拒绝 $\text{H}_0$ 。
+
+## 正态均值的贝叶斯推断
+
+### 有离散先验均值的贝叶斯理论
+
+将多个观察值一个一个算得的后验和用观察值的均值算得的后验相同。
+
+### 有连续先验的正态均值的贝叶斯理论
+
+1. 正态均值Jeffreys先验： $g(\mu)=1$ 。
+
+单一观测 $y$ ：
+
+$$f(y|\mu)\varpropto \exp(-\frac{(y-\mu)^2}{2\sigma^2}),\quad y|\mu\sim N(\mu,\sigma^2)$$
+
+$$g(\mu|y)\varpropto\exp(-\frac{(\mu-y)^2}{2\sigma^2}),\quad \mu|y\sim N(y,\sigma^2)$$
+
+正态随机样本 $y_1,\cdots,y_n$ ：
+
+$$f(\bar{y}|\mu)\varpropto \exp(-\frac{(\bar{y}-\mu)^2}{2\sigma^2/n}),\quad \bar{y}|\mu\sim N(\mu,\frac{\sigma^2}{n})$$
+
+$$g(\mu|\bar{y})\varpropto \exp(-\frac{(\mu-\bar{y})^2}{2\sigma^2/n}),\quad \mu|\bar{y}\sim N(\bar{y},\frac{\sigma^2}{n})$$
+
+2. 正态均值正态先验： $g(\mu)\varpropto \exp(-\frac{(\mu-m)^2}{2s^2}),\quad \mu\sim N(m,s^2)$
+
+单一观测 $y$ ：
+
+$$f(y|\mu)\varpropto \exp(-\frac{(y-\mu)^2}{2\sigma^2}),\quad \mu\sim N(m,s^2)$$
+
+因此， $g(\mu)f(y|\mu)\varpropto \exp(-\frac{(y-\mu)^2}{2\sigma^2}-\frac{(\mu-m)^2}{2s^2})$
+
+正态分布族简单的更新规则：
+
+后验正态分布的均值和方差分别为： 
+$m^\prime=\frac{\sigma^2m+s^2y}{\sigma^2+s^2},\quad (s^\prime)^2=\frac{\sigma^2s^2}{\sigma^2+s^2}$ ，
+其中正态先验分布 $\text{N}(m,s^2)$ ， $y\sim N(\mu,\sigma^2)$ 。
+
+下一个观测值的预测密度 $f(y_{n+1}|y_1,\cdots,y_n)\sim N(m^\prime,(s^\prime)^2$ ，其中 
+$m^\prime=m_n、(s^\prime)^2=\sigma^2+s_n^2$ ，这里 $m_n=\bar{y}、s_n^2=\frac{1}{n-1}\sum_{i=1}^n(y_i-\bar{y})^2$ 
+，相当于 $\bar{y}\sim N(m_n,s_n^2)$ 。
+
+### 正态均值和贝叶斯可信区间
+
+方差已知时，可信区间为 $m^\prime+z_{\frac{\alpha}{2}}s^\prime$
+
+方差未知时，用 $\hat{\sigma}^2=\frac{1}{n-1}\sum_{i=1}^n(y_i-\bar{y})^2$ 
+估计 $\sigma^2$ 带入上式进行求解。
+
+非正态先验，则后验也不是正态的。 $\int_{\mu_L}^{\mu_U}g(\mu|y_1,\cdots,y_n)d\mu=1-\alpha$ ，
+最好的 $\mu_L、\mu_U$ 的估计满足 $g(\mu_L|y_1,\cdots,y_n)=g(\mu_U|y_1,\cdots,y_n)$ 。
+
+### 贝叶斯学派和频率学派对于均值推断的比较
+
+频率学派置信区间和有均值先验的贝叶斯可信区间一样。
+
+正态均值的假设检验：
+
+1. 单侧检验（ $\text{H}_0:\mu<\mu_0;\text{H}_1:\mu\geq\mu_0$ ）
+
+零假设的后验概率 $P(\mu<\mu_0|y_1,\cdots,y_n)=\int_{-\infty}^{\mu}g(\mu|y_1,\cdots,y_n)d\mu$ ，
+当 $g(\mu|y_1,\cdots,y_n)\sim N(m^\prime,(s^\prime)^2)$ 时，上式
+$=P(\frac{\mu-m^\prime}{s^\prime}\leq\frac{\mu_0-m^\prime}{s^\prime})=P(z\leq\frac{\mu_0-m^\prime}{s^\prime})$
+，后验概率小于显著性水平 $\alpha$ 时，拒绝原假设，否则，不拒绝原假设。
+
+2.双侧检验（ $\text{H}_0:\mu=\mu_0;\text{H}_1:\mu\neq\mu_0$ ）
+
+$\mu_0$ 在可信区间内，接受原假设，否则，拒绝原假设。原假设设定标准为原来就有的，
+备择假设为希望去检验的。
+
+## 简单线性回归的贝叶斯推断
 
 
 
