@@ -47,6 +47,13 @@ graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
 
+**To Do**
+
+- [x] 逆卡方分布
+- [x] 均值方差均未知的贝叶斯后验的推导
+- [x] 思想基本可以看懂，但是不会自己写代码，感觉还是分布密度和判断准则不会计算的问题
+
+
 # 基本概念
 
 ## 贝叶斯公式的形式
@@ -458,6 +465,11 @@ $$f(y|\mu)\varpropto \exp(-\frac{(y-\mu)^2}{2\sigma^2}),\quad \mu\sim N(m,s^2)$$
 $m^\prime=\frac{\sigma^2m+s^2y}{\sigma^2+s^2},\quad (s^\prime)^2=\frac{\sigma^2s^2}{\sigma^2+s^2}$ ，
 其中正态先验分布 $\text{N}(m,s^2)$ ， $y\sim N(\mu,\sigma^2)$ 。
 
+进一步将上式化简，可以得到：
+$\frac{1}{(s^\prime)^2}=\frac{1}{s^2}+\frac{1}{\sigma^2}$ ;
+$m^\prime=\frac{1/s^2}{1/\sigma^2+1/s^2}\times m+\frac{1/\sigma^2}{1/\sigma^2+1/s^2}\times y$ 。
+可以发现：后验均值是先验均值和观测值的加权平均，权重是其精度对后验的精度。
+
 下一个观测值的预测密度 $f(y_{n+1}|y_1,\cdots,y_n)\sim N(m^\prime,(s^\prime)^2$ ，其中 
 $m^\prime=m_n、(s^\prime)^2=\sigma^2+s_n^2$ ，这里 $m_n=\bar{y}、s_n^2=\frac{1}{n-1}\sum_{i=1}^n(y_i-\bar{y})^2$ 
 ，相当于 $\bar{y}\sim N(m_n,s_n^2)$ 。
@@ -492,6 +504,520 @@ $\mu_0$ 在可信区间内，接受原假设，否则，拒绝原假设。原假
 
 ## 简单线性回归的贝叶斯推断
 
+### 最小二乘回归
+
+最小二乘的基本思想是极小化残差平方和，如果回归方程是 $y=\alpha_0+\beta x$ ，
+则其参数估计值 $\begin{cases} \hat{\alpha_0}=\bar{y}-\beta \bar{x} \\ \hat{\beta}=\frac{\bar{xy}-\bar{x}\bar{y}}{\bar{x^2}-{\bar{x}^2}} \end{cases}$ 。
+用 $A_0$ 代替 $\alpha_0$ ， $B$ 代替 $\beta$ ，则原式为 $y=A_0+Bx$ ，且 $A_0=\bar{y}-B\bar{x}$ ，
+得到 $\bar{y}=A_0+B\bar{x}$ ，将其记为 $A_{\bar{x}}$ ，则最小二乘的等价形式为 
+$y=A_{\bar{x}}+B(x-\bar{x})=\bar{y}-B(x-\bar{x})$ ，相应的最小二乘的方差估计为 
+$\hat{\sigma}^2=\frac{\sum_{i=1}^n[y_i-(A_\bar{x}+B(x-\bar{x}))]^2}{n-2}$ ，
+除以 $n-2$ 是因为有两个待估参数 $A_{\bar{x}}、B$ 。
+
+### 指数增长模型
+
+当遇到经济时间序列时，预测变量是时间 $t$ ，想要看响应变量对 $t$ 的依赖程度，
+通常画时间 $t$ 与响应变量之间的散点图，会发现两件事情。首先，响应变量随时间 $t$ 
+的增长不再是线性的，第二，点的变异性似乎随着响应变量有相同的增长速率。在 $t$ 
+和残差的图中会看的更清楚一点。在这种情况下，指数增长模型会有更好的拟合： 
+$u=\exp(\alpha_0+\beta t)$ ，令 $y=\log_e(u)$ ，则方程式变为 $y=\alpha_0+\beta t$ 
+是线性形式，可以用最小二乘进行估计，拟合的指数增长模型为 $u=\exp(A_0+Bt)$ ，
+其中 $A_0、B$ 是取对数后数据的斜率和截距。
+
+### 简单线性回归假设
+
+1. 均值假设：给定 $x$ 后 $y$ 的条件均值是 $x$ 的未知线性函数，即 $\mu_{y|x}=\alpha_0+\beta x$ ，
+其中 $\alpha_0$ 是当 $x=0$ 时的截距；也可以将其表示为： $\mu_{y|x}=\alpha_{\bar{x}}+\beta(x-\bar{x})$ ，
+其中 $\alpha_{\bar{x}}$ 是当 $x=\bar{x}$ 时的截距。
+2. 误差假设：误差服从零均值同方差的正态分布。
+3. 独立性假设：误差项之间相互独立。
+
+### 回归模型的贝叶斯理论
+
+贝叶斯理论可以总结为：后验和先验乘以似然成比例，所以，想要知道后验，必须知道似然和先验。
+
+1. $\beta$ 和 $\alpha_{\bar{x}}$ 的联合似然
+
+观测 $i$ 的似然：
+
+$$likelihood_i(\alpha_{\bar{x},}\beta)\varpropto \exp(-\frac{1}{2\sigma^2}[y_i-(\alpha_{\bar{x}}+\beta(x_i-\bar{x}))]^2)$$
+
+所有样本的似然： 
+
+$$likelihood_{sample}(\alpha_{\bar{x},}\beta)\varpropto \prod_{i=1}^n \exp(-\frac{1}{2\sigma^2}[y_i-(\alpha_{\bar{x}}+\beta(x_i-\bar{x}))]^2)$$
+
+指数部分可以变成求和，因此 ：
+
+$$likelihood_i(\alpha_{\bar{x},}\beta)\varpropto \exp(-\frac{1}{2\sigma^2}[\sum_{i=1}^n[y_i-(\alpha_{\bar{x}}+\beta(x_i-\bar{x}))]^2])$$
+
+分析上式中的指数部分，忽略常数，将其余中的内容加 $\bar{y}$ 再减 $\bar{y}$ ，得到
+
+$$\sum_{i=1}^n(y_i-\bar{y})^2+2\sum_{i=1}^n(y_i-\bar{y})(\bar{y}-(\alpha_{\bar{x}}+\beta(x_i-\bar{x})))+\sum_{i=1}^n(\bar{y}-(\alpha_{\bar{x}}+\beta(x_i-\bar{x})))^2$$
+
+可以将其简化为： 
+
+$$SS_y-2\beta SS_{xy}+\beta^2SS_x+n(\alpha_{\bar{x}}-\bar{y})^2$$
+
+$$SS_y=\sum_{i=1}^n(y_i-\bar{y})^2,SS_{xy}=\sum_{i=1}^n(y_i-\bar{y})(x_i-\bar{x}),SS_x=\sum_{i=1}^n(x_i-\bar{x})^2$$ 
+
+因此，似然函数可以写为：
+
+$$likelihood_{sample}(\alpha_{\bar{x}},\beta)\varpropto \exp(-\frac{1}{2\sigma^2}[SS_y-2\beta SS_{xy}+\beta^2 SS_x+n(\alpha_{\bar{x}}-\bar{y})^2])$$
+
+进一步将上式分解，可以得到
+
+$$liklihood_{sample}(\alpha_{\bar{x}},\beta)\varpropto \exp(-\frac{1}{2\sigma^2/SS_x}[\beta-\frac{SS_{xy}}{SS_x}]^2)\times\exp(-\frac{1}{2\sigma^2/n}[\alpha_{\bar{x}}-\bar{y}]^2)$$
+
+注意到 $\frac{SS_{xy}}{SS_x}=B,\bar{y}=A_{\bar{x}}$ ，因此，可以将联合似然写为个体似然的乘积，即：
+
+$$likelihood_{sample}(\alpha_{\bar{x}},\beta)\varpropto likelihood_{sample}(\alpha{\bar{x}})\times likelihood_{sample}(\beta)$$
+
+因此， $\beta\sim N(B,\frac{\sigma^2}{SS_x}),\alpha_{\bar{x}}\sim N(A_{\bar{x}},\frac{\sigma^2}{n})$ 。
+
+2. $\beta$ 和 $\alpha_{\bar{x}}$ 的联合先验
+
+联合先验可以选用正态先验，也可以选用均匀先验，且 $g(\alpha_{\bar{x}},\beta)=g(\alpha_{\bar{x}})\times g(\beta)$
+
+3. $\beta$ 和 $\alpha_{\bar{x}}$ 的联合后验
+
+联合后验与联合先验乘以似然成比例，
+
+$$g(\alpha_{\bar{x}},\beta|data)\varpropto g(\alpha_{\bar{x}},\beta)\times likelihood_{sample}(\alpha_{\bar{x}},\beta)$$
+
+其中，data 是 $(x_1,y_1),\cdots,(x_n,y_n)$ 。
+
+给定边际后验，上式可写为： 
+
+$$g(\alpha_{\bar{x}},\beta|data)\varpropto g(\alpha_{\bar{x}}|data)\times g(\beta|data)$$。
+
+使用更新公式，就可以找到每个后验的分布，进而求得联合后验分布。
+
+4. 斜率的贝叶斯可信区间
+
+斜率的可信区间为： $m^\prime_{\beta}\pm z_{\frac{\alpha}{2}}\times s^\prime_{\beta}$ 。
+通常， $\sigma^2$ 是未知的，因此需要通过 $\hat{\sigma}^2=\frac{\sum_{i=1}^n(y_i-(A_{\bar{x}}+B(x_i-\bar{x})))^2}{n-2}$
+进行估计，因此可信区间就变为 $m^\prime_{\beta}\pm t_{\frac{\alpha}{2}}\times s^\prime_{\beta}$ 。
+频率学派的置信区间为 $B\pm t_{\frac{\alpha}{2}}\times \frac{\hat{\sigma}}{SS_x}$ 。
+
+5. 斜率的单边假设检验
+
+建立假设： $H_0:\beta\leq\beta_0;H_1:\beta>\beta_0$
+
+检验统计量： $P(\beta\leq\beta_0|data)=\int_{-\infty}^{\beta_0}g(\beta|data)d\beta=P(Z\leq\frac{\beta_0-m^\prime_\beta}{s^\prime_{\beta}})$
+
+判断标准：当计算的P值小于显著性水平 $\alpha$ 时，拒绝原假设，否则，不拒绝原假设。
+
+注：如果使用方差的估计值，则用自由度为 $n-2$ 的 $t$ 分布的值代替 $Z$ 。
+
+6. 斜率的双侧假设检验
+
+建立假设： $H_0:\beta=0;H_1:\beta\neq0$
+
+判断标准：如果0在可信区间内，则拒绝原假设，否则，不拒绝原假设。
+
+### 未来观测值的预测
+
+回归分析的一个重要的目的就是对观测值做出预测，如果给定 $x_{n+1}$ ，则相应的 
+$\tilde{y}_{n+1}=\hat{\alpha_{\bar{x}}}+\hat{\beta}(x_{n+1}-\bar{x})$ 。
+
+1. 预测分布
+
+预测分布为： $f(y_{n+1}|x_{n+1},data)=\int\int f(y_{n+1},\alpha_{\bar{x}},\beta|x_{n+1},data)d\alpha_{\bar{x}}d\beta$
+
+首先，需要确定参数和下一个观测值的联合后验分布，为：
+
+$$f(y_{n+1},\alpha_{\bar{x}},\beta|x_{n+1},data)=f(y_{n+1}|\alpha_{\bar{x}},\beta,x_{n+1},data)\times g(\alpha_{\bar{x}},\beta|x_{n+1},data)$$
+
+给定参数 $\alpha_{\bar{x}}、\beta$ 和已知的值 $x_{n+1}$ ，下一个观测值 $y_{n+1}$ 
+是回归模型的另一个随机观测，给定参数的值，观测值都是互相独立的，这就意味着，
+给定参数，新的观测值并不依赖于数据，参数 $\alpha_{\bar{x}}、\beta$ 
+从之前的观测值中计算出来，也不依赖于新的观测值。因此，新观测的联合分布可以简化为：
+
+$$f(y_{n+1},\alpha_{\bar{x}},\beta|x_{n+1},data)=f(y_{n+1}|\alpha_{\bar{x}},\beta,x_{n+1})\times g(\alpha_{\bar{x}},\beta|x_{n+1},data)$$
+
+根据之前的假设，可以得到： $\mu_{n+1}=\alpha_{\bar{x}}+\beta(x_{n+1}-\bar{x})$ ，所以后验分布 
+$\mu_{n+1}$ 的均值 $m^\prime_{\mu}=m^\prime_{\alpha_{\bar{x}}}+(x_{n+1}-\bar{x})\times m^\prime_{\beta}$ ，
+方差 $(s^\prime_{\mu})^2=(s^\prime_{\alpha_{\bar{x}}})^2+(x_{n+1}-\bar{x})^2\times (s^\prime_{\beta})^2$ 。
+
+经计算，可得 $y_{n+1}\sim N(m^\prime_y,(s^\prime_y)^2)$ ，其中 
+$m^\prime_y=m^\prime_\mu,(s^\prime_y)^2=(s^\prime_\mu)^2+\sigma^2$ 。
+
+2. 预测的可信区间
+
+方差已知时，预测值 $y_{n+1}$ 的 $1-\alpha$ 的可信区间为： $m^\prime_y\pm z_{\frac{\alpha}{2}}\times s^\prime_y$
+
+方差未知时，预测值 $y_{n+1}$ 的 $1-\alpha$ 的可信区间为： $m^\prime_y\pm t_{\frac{\alpha}{2}}\times s^\prime_y$
+
+## 具有未知均值和方差的正态贝叶斯推断
+
+### 联合似然函数
+
+$$f(y_1,\cdots,y_n|\mu,\sigma^2)\varpropto \frac{1}{(\sigma^2)^{\frac{1}{2}}}\exp(-\frac{n}{2\sigma^2}(\bar{y-}\mu)^2)\times\frac{1}{(\sigma^2)^{\frac{n-1}{2}}}\exp(-\frac{SS_y}{2\sigma^2})$$
+
+其中， $\mu|\sigma^2\sim N(\bar{y},\frac{\sigma^2}{n})$ ， $\sigma^2$ 是 $ss_y$ 乘以逆卡方分布。
+
+### $\mu、\sigma$ 使用独立Jeffreys先验时的后验
+
+正态均值 $\mu$ 的Jeffreys先验： $g_{\mu}(\mu)=1,\quad -\infty<\mu<\infty$
+
+正态方差 $\sigma^2$ 的Jeffreys先验： $g_{\sigma^2}(\sigma^2)=\frac{1}{\sigma^2},\quad 0<\sigma^2<\infty$
+
+联合先验： $g_{\mu,\sigma^2}(\mu,\sigma^2)=\frac{1}{\sigma^2},\quad \begin{cases}  -\infty<\mu<\infty\\0<\sigma^2<\infty \end{cases}$
+
+联合后验与联合先验乘以似然成比例，则：
+
+$$g_{\mu,\sigma^2}(\mu,\sigma^2|y_1,\cdots,y_n)\varpropto g_{\mu,\sigma^-2}(\mu,\sigma^2)\times f(y_1,\cdots,y_n|\mu,\sigma^2)\varpropto \frac{1}{(\sigma^2)^{\frac{n}{2}+1}}\exp(-\frac{1}{2\sigma^2}[n(\mu-\bar{y})^2+SS_y])$$
+
+若将 $\sigma^2$ 看成唯一参数，则上式为常数 $(n(\mu-\bar{y})^2+SS_y)$ 乘以逆卡方分布。
+
+1. $\mu$ 的边际后验分布
+
+通常我们在做推断时感兴趣的是参数 $\mu$ ，同时将参数 $\sigma^2$ 视为讨厌参数。
+去掉讨厌参数的通常做法就是积分积掉它，在这种情况下， $\mu$ 的边际后验分布为：
+
+$$g(\mu|y_1,\cdots,y_n)\varpropto\int_0^{\infty}g(\mu,\sigma^2|y_1,\cdots,y_n)d\sigma^2\varpropto [n(\mu-\bar{y})^2+SS_y]^{-\frac{n}{2}}$$
+
+2. 获得边际后验的另一种方式
+
+定理1：如果 $z、w$ 是独立的随机变量，且分别服从 $N(0,1^2)$ 和 $\chi^2(k)$ ，
+则 $u=\frac{z}{\sqrt{\frac{w}{z}}}\sim t(k)$ 。
+
+注意到，我们可以将联合后验写为： 
+
+$$g_{\mu,\sigma^2}(\mu,\sigma^2|y_1,\cdots,y_n)\varpropto \frac{1}{(\sigma^2)^{\frac{1}{2}}}\exp(-\frac{n}{2\sigma^2}(\mu-\bar{y})^2)\times\frac{1}{(\sigma^2)^{\frac{n-1}{2}+1}}\exp(-\frac{SS_y}{2\sigma^2})$$
+
+我们知道： $\mu|\sigma^2\sim N(\bar{y},\frac{\sigma^2}{n})$ , $\sigma^2$ 是 $SS_y$ 
+和逆卡方分布的乘积，因此：
+
+$$\frac{\mu-\bar{y}}{\sqrt{\frac{\sigma^2}{n}}}\sim N(0,1^2),\quad \frac{SS_y}{\sigma^2}\sim \chi^2(n-1)$$
+
+因此： $t=\frac{\frac{\mu-\bar{y}}{\sqrt\frac{\sigma^2}{n}}}{\sqrt{\frac{SS_y}{\sigma^2(n-1)}}}=\frac{\mu-m^\prime}{\frac{\hat{\sigma}_B}{\sqrt{n}}}\sim t(k^\prime)$
+
+其中 $\hat{\sigma}_B=\frac{SS_y}{k^\prime}$ 是方差的样本估计值。这就意味着后验均值 
+$\mu=m^\prime+\frac{\hat{\sigma}_B}{\sqrt{n^\prime}}\sim ST_{k^\prime}(m^\prime,\frac{\hat{\sigma}_B}{n^\prime})$ 
+，其中 $k^\prime=n-1,n^\prime=n,m^\prime=\bar{y}$
+
+### $\mu、\sigma^2$ 使用共轭先验时的后验
+
+1. 联合共轭先验
+
+2. $\mu$ 的边际后验
+
+3. $\mu$ 边际后验的近似
+
+### 有相同未知方差的正态均值的差异
+
+假设 $y1=(y_{11},\cdots,y_{1n_1}),y2=(y_{21},\cdots,y_{2n_2})$ ，
+且 $y_1\sim N(\mu_1,\sigma^2)，y_2\sim N(\mu_2,\sigma^2)$ 。
+
+令 $\mu_d=\mu_1-\mu_2$ ，则样本均值差为： $m^\prime_d=\bar{y_1}-\bar{y_2}$ 。
+给定 $\sigma^2$ ， $\mu_d$ 的后验分布为 $\mu_d\sim N(m^\prime_d,\sigma^2(\frac{1}{n_1}+\frac{1}{n_2}))$ 。
+
+共轭先验确定精确后验
+
+共轭先验确定近似后验
+
+### 有不同未知方差的正态均值的差异
+
+
+
+
+
+
+
+## 包括马尔可夫链蒙特卡洛的计算的贝叶斯统计
+
+我们可以基于来自后验分布的随机样本进行推断，且随着样本量的增加，后验分布越来越精确。
+
+贝叶斯统计：理论简单，操作困难
+
+贝叶斯理论：后验和先验乘以似然成比例，即 $g(\theta|y)\varpropto g(\theta)f(y|\theta)$ 。
+精确后验分布为 $g(\theta|y)=\frac{g(\theta)f(y|\theta)}{\int g(\theta)f(y|\theta)d\theta}$ 。
+只有在有限的特殊情况才可以找到后验分布的封闭解，在其他情况下，需要用数值估计。随着 $\theta$ 
+维数的增加，这个数值计算过程会很快失去效率，数值积分的精度依赖于高维空间中计算点的位置，
+因此，贝叶斯统计在实现的过程中是很困难的。
+
+计算贝叶斯统计学基于使用这些算法从后验分布中获得样本，之后使用后验分布中的随机样本
+作为推断的基础。即使在不知道后验分布的时候也可以用。它适用于一般的分布，不局限于
+有共轭先验的指数分布族。
+
+### 从后验中抽样的直接方法
+
+1. 逆概率抽样
+
+逆概率抽样依赖于概率积分转换。
+
+定理1：如果 $X$ 是连续随机变量，累积分布函数为 $F_{X}(x)$ ，随机变量 $Y$ 被定义
+为 $Y=F_{X}(X)$ ，且其服从 $U(0,1)$ 。
+
+逆概率积分转换： $X=F_X^{-1}(Y)$ 和 $X$ 有相同的分布。实际上，如果我们知道了
+一个连续随机变量 $X$  的逆累积分布函数通过从 $U(0,1)$  中抽取随机变量并使用
+逆累积概率分布进行转换来得到 $X$ 分布中的随机变量。
+
+例子：假设希望从 $f(x)=\begin{cases} 8x,\quad \text{if}\quad 0\leq x<0.25 \\ \frac{8}{3}-\frac{8}{3}x,\quad \text{if}\quad 0.25\leq x<1 \\ 0,\quad \text{otherwise}\end{cases}$ 中抽取样本，可以算得相应的累计概率分布为
+
+$$F(x)=\begin{cases}0,\quad \text{if} \quad x<0 \\ 4x^2,\quad \text{if}\quad 0\leq x<0.25 \\ \frac{8}{3}x-\frac{4}{3}x^2-\frac{1}{3},\quad \text{if}\quad 0.25\leq x<1 \\ 1,\quad \text{if} \quad x>1   \end{cases}$$
+
+对于 $u\in[0,1]$ ，其反函数为 $F^{-1}(u)=\begin{cases} \frac{\sqrt{u}}{2},\quad \text{if}\quad 0\leq u<0.25 \\ 1-\frac{\sqrt{9-12u}}{4},\quad \text{if} \quad 0.25\le1 x\leq1   \end{cases}$
+
+```{r echo=T,eval=F}
+m<-10000  #采样10000个点
+u<-runif(m,0,1)  #u~U（0,1）
+invcdf.func<-function(u){   #定义逆函数
+  if(u>=0 && u<0.25) sqrt(u)/2
+  else if(u>=0.25 && u<=1) 1-sqrt(3*(1-u))/2
+}
+x<-unlist(lapply(u,invcdf.func))
+curve(8*x,from=0,to=0.25,xlim=c(0,1),ylim=c(0,1),col="red",xlab="",ylab="")
+par(new=TRUE)
+curve((8/3)-(8/3)*x,from=0.25,to=1,xlim=c(0,1),ylim=c(0,2),col="red",xlab="",ylab="")
+par(new=TRUE)
+plot(density(x),xlim=c(0,1),ylim=c(0,2),col="blue",xlab="x",ylab="density")
+```
+
+2. 接受-拒绝抽样
+
+思想：我们希望从概率密度函数为 $f(x)$ 的分布中抽取样本是很难的，但是我们
+可以非常容易地从概率密度函数为 $g(x)$ 的分布中抽取样本， $g(x)$ 包含 $f(x)$ 。
+用数学语言表达为： $f(x)\leq Mg(x)$ ，对所有 $x$ 成立，其中 $M$ 是常数。可以
+看出 $Mg(x)$ 必须比 $f(x)$ 大，通常将 $f(x)$ 称为目标密度， $g(x)$ 称为
+候选密度或建议密度。有时候可以用分布函数代替密度函数。我们可以使用下面的算法
+从 $g(x)$ 中抽样，最终得到 $f(x)$ 的样本：
+
+1. 从 $g(x)$ 中抽取 $x$ ，且 $u\sim U[0,1]$ ；
+2. 如果 $u<\frac{f(x)}{Mg(x)}$ ，则接受 $x$ ；
+3. 否则，拒绝 $x$ ；
+4. 重复1-3，直到抽取到期望的样本容量的样本。
+
+不足：效率比较低，要抽取的样本远远大于想要抽取的样本。如果候选密度接近目标密度，
+则比较有效；如果候选密度远离目标密度，则效率较低。
+
+例子：采用1中的例子，令 $M=3$ 。
+
+```{r echo=T,eval=F}
+f.x<-function(x){    ## 定义要抽样的分布
+  if(x>=0 && x<0.25) 8*x
+  else if(x>=0.25 && x<=1) 8/3-8/3*x
+  else 0
+}
+g.x<-function(x){   ## 定义均匀分布，乘以常数M后可以完全把f(x)盖住
+  if(x>=0 && x<=1) 1
+  else 0
+}
+M<-3
+m<-10000
+n.draws<-0
+draws<-c()
+x.grid<-seq(0,1,by=0.01)
+while(n.draws<m){   ##当样本量小于规定的样本量时，进行循环
+  x.c<-runif(1,0,1)
+  accept.prob<-f.x(x.c)/(M*g.x(x.c))
+  u<-runif(1,0,1)
+  if(accept.prob>=u){
+    draws<-c(draws,x.c)
+    n.draws<-n.draws+1
+  }
+}
+## 绘图
+curve(8*x,from=0,to=0.25,xlim=c(0,1),ylim=c(0,2),col="red",xlab="",ylab="",main="")
+par(new=TRUE)
+curve((8/3)-(8/3)*x,from=0.25,to=1,xlim=c(0,1),ylim=c(0,2),col="red",xlab="",ylab="",main="")
+par(new=TRUE)
+plot(density(draws),xlim=c(0,1),ylim=c(0,2),col="blue",xlab="x,N=10000",ylab="density")
+#text.legend<-c("Target Density","Rejection Sampling")
+3legend("topright",legend=text.legend,lty=c(1,1),col=c("red","blue"))
+```
+
+3. 自适应拒绝抽样
+
+自适应拒绝抽样的本质很容易理解，我们根据来自拒绝抽样的拒绝建议的信息自动更新我们
+的候选密度。实施起来更加复杂。要注意的是，自适应采样仅仅适用于对数凹分布函数。通常，
+一个函数 $f(x)$ 是凹的，如果 $f((1-t)x+ty)\geq(1-t)f(x)+tf(y),\forall t\in(0,1)$ 。
+一个函数是对数凹函数如果 $h(x)=log(f(x))$ 遵循相同的不等式。另一个判断标准就是
+如果 $f^{\prime\prime}(x)=0$ ，则 $f(x)$ 就是凹函数。
+
+自适应拒绝采样算法：
+
+1. 找到 $h(x)=h(x;\theta)=\log f(x;\theta)$ ，其中 $\theta$ 是描述分布的参数向量；
+2. 计算 $h^\prime(x)$ ，解 $h^\prime(x)=0$ 计算极大值点 $x_{max}$ ；
+3. 选择两个任意的点 $x_0、x_1$ ，使得 $x_0<x_{max}$ 且 $x_1>x_{max}$ ；
+4. 计算切线 $t_0(x)、t_1(x)$ 。切线 $t_i(x_i)$ 是通过点 $(x_i,h(x_i))$ 且斜率
+为 $h^\prime(x_i)$ 的线，即：
+
+$$t_i(x)=h^\prime(x_i)x+(h(x_i)-h^\prime(x_i)x)$$
+
+每一条切线都被描述为包含截距和斜率的列向量；
+5. 通过指数化 $t_0(x)、t_1(x)$ 计算包络密度 $g_0(x)$ 
+
+$$g_0(x)=\begin{cases}  \exp(t_0(x))=\exp(\alpha_0+\beta_0x) &  \text{for}\quad -\infty<x<x_{max} \\ \exp(t_1(x))=\exp(\alpha_1+\beta_1x) & \text{for} \quad x_{max}\leq x<+\infty   \end{cases}$$
+6. 计算累积包络密度 $G_0(x)$ ， $G_0(x)=\int_{-\infty}^x g_0(t)dt$ ，
+为了使 $G_0(x)$ 下的面积为1， $k_0=\frac{1}{G_0(+\infty)}$ ；
+7. 计算逆累积概率分布 $G_0^{-1}(p)$ ，即 $G_0^{-1}(k_0G_0(x))=x$ ；
+8. 样本 $(u,v)\sim U(0,1)$ ；
+9. 令 $x=G_0^{-1}(v)$ ；
+10. 如果 $u<\frac{f(x)}{g_0(x)}$ ，接受 $x$ 作为目标分布中的随机变量，如果达到了样本量要求，则停止抽样；否则，重复8-10；
+11. 否则，增加 $x$ 为切线点，重复4-11。
+
+例子：
+
+```{r echo=T,eval=F}
+f<-function(x,a,b){
+  (a-1)*log(x)+(b-1)*log(1-x)
+}
+fprima<-function(x,a,b){   ##求导
+  (a-1)/x-(b-1)/(1-x)
+}
+library(ars)
+mysample<-ars(20000,f,fprima,x=c(0.3,0.6),m=2,lb=TRUE,xlb=0,ub=TRUE,xub=1,a=1.3,b=2.7)
+hist(mysample,freq=F)
+curve(dbeta(x,1.3,2.7),add=T,col="red")
+```
+
+
+### 抽样-重要性抽样
+
+重要性抽样通常发生在人们希望去估计罕见事件的发生的情况下，重要性抽样通过从重要密度
+中抽取样本并相应的加权采样解决了这个问题。
+
+如果 $X$ 是随机变量，概率密度函数为 $p(x)$ ， $f(X)$ 是 $X$ 的某些函数，则 $f(X)$ 的
+期望为 $E[f(X)]=\int_{-\infty}^{+\infty}f(x)p(x)dx$ 。如果 $h(x)$ 是一个概率密度，它的
+条件就包含了 $p(x)$ 的条件，比如 $h(x)>0,\forall x,p(x)>0$ ，则积分可以被重新写为： 
+$E[f(X)]=\int_{-\infty}^{+\infty}f(x)\frac{p(x)}{h(x)}h(x)dx$ ， $h(x)$ 是重要密度， 
+$\frac{p(x)}{h(x)}$ 被称为似然比。因此，如果我们从 $h(x)$ 中抽取足够大的样本，积分可以
+由下式进行估计： $E[f(X)]=\frac{1}{N}\sum_{i=1}^n w_if(x_i)dx$ ，其中 $w_i=\frac{g(x_i)}{h(x_i)}$ 
+是重要权重。这个效率与重要密度接近目标密度的程度有关。选择好的重要密度通常比较困难。
+
+当我们想要从未缩放的后验密度中抽取样本时，重要性采样是比较有用的。然而，这并没有帮助
+我们从后验密度中抽取样本。我们需要稍微拓展一下它：
+
+1. 从重要密度中抽取大样本 $\theta=(\theta_1,\cdots,\theta_N)$ ；
+2. 计算每个值的重要权重： $w_i=\frac{p(\theta_i)}{h(\theta_i)}$ ;
+3. 计算标准化权重： $r_i=\frac{w_i}{\sum_{i=1}^nw_i}$ ;
+4. 用给定 $r_i$ 时的概率从 $\theta$ 中抽取样本量为 $N^\prime$ 的样本。
+
+这个重抽样结合了重要权重，因此将其称为抽样重要再抽样或SIR方法。这种方法有时被称为
+贝叶斯自主法。如果 $N$ 比较小的话， $N^\prime$ 会更小，否则会包含更多的重复值。
+然而，当 $N$ 比较大的时候， $N^\prime$ 上的限制就可以放松。
+
+### 马尔科夫蒙特卡洛方法（MCMC）
+
+这种方法可以从精确后验分布中抽取样本，即使仅仅有后验分布的比例形式。MCMC方法可以
+使用在有很多参数的复杂模型中。
+
+1. 马尔可夫链
+
+从一个状态转移到另一个状态，下一个状态只与当前状态有关，与过去的状态都没有关系。
+这个状态的集合被称为状态空间。我们仅使用马尔可夫链，状态转移矩阵在每一步中都是
+相同的，这种链叫作时间不变。最终马尔可夫链会处于一个不变的状态。
+
+在MCMC中，我们需要找到一个有长期分布的马尔可夫链，其分布与后验分布 $g(\theta|y)$ 
+的分布相同。状态的集合为参数空间，这个集合中包含所有可能参数的值。
+
+有两种方法去做这件事情：M-H算法和Gibbs采样。M-H采样是来自每对样本稳态概率平衡的概念。
+M-H采样也可以用在下列场合：给定其他块参数的值，所有参数只出现一次或每一个块中的参数
+都以块为单位。Gibbs采样循环参数，在给定其他参数和数据的最新值的情况下，依次从该参数
+的条件分布中对每个参数进行采样。条件分布可能很难去获得。
+
+2. 单一参数的M-H算法
+
+M-H算法旨在从一些目标密度中抽取样本。如果 $g(\theta|y)$ 是一个未缩放的后验分布， 
+$q(\theta,\theta^\prime)$ 是候选密度，则转移概率定义为： 
+$\alpha(\theta,\theta^\prime)=\min(1,\frac{g(\theta^\prime|y)q(\theta^\prime,\theta)}{g(\theta|y)q(\theta,\theta^\prime)})$ ，
+将会满足对称转移的要求。
+
+M-H算法的步骤：
+
+1. 设定初始值 $\theta^{(0)}$ ；
+2. 对 $n=1,\cdots,n$ 
+- 从 $q(\theta^{(n-1)},\theta^\prime)$ 中抽取 $\theta^\prime$ ；
+- 计算概率 $\alpha(\theta^{(n-1)},\theta^\prime)$ ；
+- 从 $U(0,1)$ 中抽取 $u$ ；
+- 如果 $u<\alpha(\theta^{(n-1)},\theta^\prime)$ ，令 $\theta^{(n)}=\theta^\prime$ ，
+否则，令 $\theta^{(n)}=\theta^{(n-1)}$ 。
+
+例：提议分布为 $Be(1,1)$ ，观测数据从正态混合分布 $0.2N(0,1)+0.8N(5,1)$ 中产生。
+```{r echo=T,eval=F}
+m<-5000  ##链的长度
+a<-1
+b<-1
+xt<-numeric(m)
+n<-30  ##样本大小
+mu<-c(0,5)
+sigma<-c(1,1)
+# 产生观测样本
+i<-sample(1:2,size=n,replace=TRUE,prob=c(0.2,0.8))
+x<-rnorm(n,mu[i],sigma[i])
+# 产生独立的采样器链
+u<-runif(m)
+y<-rbeta(m,a,b)   ##建议分布
+xt[1]<-0.5
+for(i in 2:m){
+  fy<-y[i]*dnorm(x,mu[1],sigma[1])+(1-y[i])*dnorm(x,mu[2],sigma[2])
+  fx<-xt[i-1]*dnorm(x,mu[1],sigma[2])+(1-xt[i-1])*dnorm(x,mu[2],sigma[2])
+  alpha<-prod(fy/fx)*(xt[i-1]^(a-1)*(1-xt[i-1])^(b-1))/(y[i]^(a-1)*(1-y[i])^(b-1))
+  if(u[i]<=alpha) xt[i]=y[i]
+  else xt[i]=xt[i-1]
+}
+##链的路径图和丢掉100个样本后的直方图
+plot(xt,type="l",ylab="p")
+hist(xt[101:m],main="",xlab="p",prob=TRUE)
+print(mean(xt[101:m]))
+```
+
+
+3. Gibbs采样
+
+Gibbs采样和多参数问题更加相关。M-H采样随着参数的增加算法的接受率会下降。Gibbs采样尤其
+适用于分层模型，可以很好的定义模型中参数之间的相依性。
+
+假定我们使用真实的条件密度作为候选密度 $q(\theta_j,\theta_j^\prime|\theta_{-j})=g(\theta_j|\theta_{-j},y)$ ，
+其中 $\theta_{-j}$ 表示包括第 $j$ 个参数的所有参数的集合。因此，
+在第 $n$ 步 $\theta_j$ 的接受概率为
+
+$$\alpha(\theta_j^{(n-1)},\theta_j^\prime|\theta_{-j}^{(n)})=\min (1,\frac{g(\theta_j^\prime|\theta_{-j},y)q(\theta_j^\prime,\theta_j|\theta_{-j})}{g(\theta_j|\theta_{-j},y)q(\theta_j,\theta_{-j}|\theta_{-j})})=1$$
+
+例：
+
+使用Gibbs抽样产生二元正态分布 $N(\mu_1,\mu_2,\sigma^2_1,\sigma^2_2,\rho)$ 随机数
+
+```{r echo=T,eval=F}
+# 初始化常数和参数
+N<-5000   #链的长度
+burn<-1000   #收敛到目标分布的长度
+X<-matrix(0,N,2)   #N行2列元素为0的矩阵，双变量样本
+rho<--0.75
+mu1<-0
+mu2<-2
+sigma1<-1
+sigma2<-0.5
+s1<-sqrt(1-rho^2)*sigma1
+s2<-sqrt(1-rho^2)*sigma2
+# 产生链
+X[1,]<-c(mu1,mu2)
+for(i in 2:N){
+  x2<-x[i-1,2]   ##i-1?
+  m1<-mu1+rho*(x2-mu2)*sigma1/sigma2
+  X[i,1]<-rnorm(1,m1,s1)
+  x1<-X[i,1]     ##i?
+  m2<-mu2+rho*(x1-mu1)*sigma2/sigma1
+  X[i,2]<-rnorm(1,m2,s2)
+}
+b<-burn+1
+x<-X[b:N,]
+#比较样本统计量和参数
+colMeans(x)
+cov(x)
+cor(x)
+plot(x,main="",cex=.5,xlab=bquote(X[1]),ylab=bquote(X[2]),ylim=range(x[,2]))
+```
+
+### 切片抽样
+
+对于具有单峰的一维密度特别有效。每一步都有两个阶段，在第 $i$ 步，首先给定
+当前参数 $\theta_{i-1}$ ，从均匀分布 $U(0,c)$ 中得到辅助变量 $g_i$ ，
+其中 $c=g(\theta_{i-1})$ ，这是从当前值 $\theta_{i-1}$ 中均匀的抽取垂直切片；
+之后，给定当前辅助变量值从均匀分布 $U(a,b)$ 中抽取 $\theta_i$ ，其中 $g(a)=g(b)=g_i$ 。
+链的长远分布收敛于参数密度下的随机点，因此，水平分量的抽取来自参数密度。
 
 
 
