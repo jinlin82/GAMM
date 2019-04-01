@@ -1,0 +1,510 @@
+---
+title: "贝叶斯统计案例"
+author: "Li"
+date: "2019-04"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: true
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+**To Do**
+
+- [x] 表格出不来，报错
+- [x] createPrior函数怎么产生自己定义的先验分布
+
+
+# 先验分布
+
+## 共轭先验
+
+在贝叶斯统计中，假设似然是 $f(y|\theta)$ ，先验是 $\pi(\theta)$ ，后验是 $p(\theta|y)$ 。
+则共轭指的是使后验 $p(\theta|y)$ 与 先验 $\pi(\theta)$ 有相同的分布。此时，我们称
+先验 $\pi(\theta)$ 与似然 $f(y|\theta)$ 是共轭的。
+
+例1：
+
+假定 $X$ 是在给定的月份中怀孕的女人在某家指定医院生孩子的人数，则到达率就可以表示为泊松分布
+
+$$f(x|\theta)=\frac{\theta^{x}}{x!}\exp(-\theta),x\in\{0,1,2,\cdots\},\theta>0$$
+
+根据实际情况，一个合理的先验分布就是伽玛分布 $\theta\sim G(\alpha,\beta)$
+
+$$\pi(\theta)=\frac{\theta^{\alpha-1}\exp(-\frac{\theta}{\beta})}{\Gamma(\alpha)\beta^{\alpha}},\theta>0,\alpha>0,\beta>0$$
+
+其均值为 $\alpha\beta$ ，方差为 $\alpha\beta^2$ ，当 $\alpha\leq1$ 时是单尾，
+当 $\alpha>1$ 时是双尾，当 $\alpha$ 很大时，会接近正态分布； $\beta$ 是尺度参数，
+扩大或缩小离0的相对距离，但不会改变分布的形状。使用贝叶斯理论获得后验密度
+
+$$p(\theta|x)\varpropto f(x|\theta)\pi(\theta)\varpropto (\theta^{x}\exp(-\theta))(\theta^{\alpha-1}\exp(-\frac{\theta}{\beta}))=\theta^{\alpha+x-1}\exp(-\theta(\frac{1}{\beta}+1))$$
+
+根据以上结果易知，$\theta$ 的后验分布为 $p(\theta|x)\sim G(\alpha^\prime,\beta^\prime)$ ，
+其中 $\alpha^\prime=\alpha+x,\beta^\prime=\frac{1}{\frac{1}{\beta}+1}$ 。易知，伽玛分布是
+泊松似然的共轭分布。
+
+假定在2007年10月有 $x=42$ 个妈妈到我们的医院生孩子。假定我们的先验为 $\pi(\theta)\sim G(5,6)$ ，
+均值为 $\alpha\beta=30$ ，方差为 $\alpha\beta^2=180$ 。反映了过去24个月医院的总数，平均来讲不那么忙。
+
+```{r fig1,fig.cap="先验后验密度图", dev="png", cache=T}
+alpha<-5
+beta<-6
+theta<-seq(0,100,length.out = 101)
+prior<-dgamma(theta,shape = alpha,scale = beta)  ###dgamma：把θ代进密度函数中求对应的y值
+x<-42
+posterior<-dgamma(theta,shape = alpha+x,scale = 1/(1/beta+1))
+plot(theta,posterior,xlab=expression(theta),ylab = "density")
+lines(theta,prior,lty=3)
+postdraw<-rgamma(2000,shape = alpha+x,scale = 1/(1/beta+1))
+r1<-hist(postdraw,freq = F,breaks = 20,plot = F)
+lines(r1,lty=3,freq=F,col="gray90")
+```
+
+例2：
+
+考虑正态似然 $f(y|\theta)=\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{(y-\theta)^2}{2\sigma^2})$ ， 
+$\sigma$ 是已知的正的常数。令 $f(y|\theta)=N(y|\theta,\sigma^2)$ ，
+假定 $\pi(\theta|\eta)=N(\theta|\mu,\tau^2)$ ，其中 $\mu、\tau$ 是已知的超参数，
+即 $\eta=(\mu,\tau)$ 。通过后验密度的计算公式，可得到 
+
+$$p(\theta|y)=N(\theta|\frac{\sigma^2\mu+\tau^2y}{\sigma^2+\tau^2},\frac{\sigma^2\tau^2}{\sigma^2+\tau^2})$$
+
+令 $\mu=2,\tau=1,y=6,\sigma=1$ ，先验 $\theta=2$ ，似然 $\theta=6$ ，得
+
+```{r fig2,fig.cap="先验后验密度图", dev="png", cache=T}
+postplot<-function(mu,tau,ybar,sigma,n){  ##定义后验均值和方差
+  denom<-sigma^2/n+tau^2
+  mu<-(sigma^2/n*mu+tau^2*ybar)/denom
+  stdev<-sqrt(sigma^2/n*tau^2/denom)
+  return(c(mu,stdev))
+}
+x<-seq(-2,8,length.out = 100)   ###
+plot(x,dnorm(x,mean=2,sd=1),ylim=c(0,1.3),xlab=expression(theta),ylab="density",type="l")   ##dnorm相当于把x代进去计算的y值
+param1<-postplot(2,1,6,1,1)  ##更新均值和方差,计算结果返回均值和标准差
+lines(x,dnorm(x,mean=param1[1],sd=param1[2]),lty=2)
+param10<-postplot(2,1,6,1,10)
+lines(x,dnorm(x,mean=param10[1],sd=param10[2]),lty=3)
+#legend(-2,1.3,legend = c("prior","posterior with n=1","posterior with n=10"),lty=1:3,col=1)
+### 直接从更新后的分布中抽取样本
+y1<-rnorm(2000,mean=param1[1],sd=param1[2])
+r1<-hist(y1,freq = F,breaks=20,plot=F)  ##hist要存储在r1中，否则和之前的图画不在一张图上
+lines(r1,lty=2,freq=F,col="gray90")
+mean(y1)
+sd(y1)
+```
+
+例3：
+
+再一次考虑例2中的正态似然，且 $\theta、\sigma^2$ 均未知，则参数 $\theta=(\theta,\sigma^2)$ 。
+把 $f$ 单独看作 $\theta$ 的函数，我们可以看到表达式和 $\exp(-\frac{(\theta-a)^2}{b})$ 成比例，
+因此，共轭先验还是正态分布。假定 $\pi_{1}(\theta)=N(\theta|\mu,\tau^2)$ 。
+之后， $f$ 作为 $\sigma$ 的函数，我们看到一个比例形式 $(\sigma^2)^{-a}\exp(-\frac{b}{\sigma^2})$ ，
+这让人想起伽玛分布。这实际上是伽玛分布的倒数：如果 $X\sim G(\alpha,\beta)$ ，
+则 $Y=\frac{1}{X}\sim  \text{Inverse Gamma}(\alpha,\beta)\equiv IG(\alpha,\beta)$ ，密度函数为 
+
+$$g(y|\alpha,\beta)=\frac{\exp(-\frac{1}{\beta y})}{\Gamma(\alpha)\beta^{\alpha}y^{\alpha+1}},y>0,\alpha>0,\beta>0$$
+
+因此，我们假定 $\pi_2(\sigma^2)=IG(\sigma^2|a,b)$ ，其中 $a、b$ 是形状参数和尺度参数。
+最后，我们假定 $\theta、\sigma^2$ 是独立先验，所以 $\pi(\theta)=\pi_1(\theta)\pi_2(\theta)$ 。
+则两个条件后验分布为
+
+$$p(\sigma^2|x,\theta)=IG(\sigma^2|\frac{1}{2}+a,[\frac{1}{2}(x-\theta)^2+\frac{1}{b}]^{-1})$$
+
+假定给定似然 $f(y|\theta)$ ，采用混合先验 $\pi(\theta)=\alpha\pi_1(\theta)+(1-\alpha)\pi_2(\theta),0\leq\alpha\leq1$，
+则根据贝叶斯后验计算公式，可得 $p(\theta|x)=p_1(\theta|x)w_1+p_2(\theta|x)w_2$ ，
+其中 $w_1=\frac{m_1(x)\alpha}{m_1(x)\alpha+m_2(x)(1-\alpha)}，w_2=1-w_1$ 。因此，
+一个混合的先验会导致一个混合的后验。
+
+## 无信息先验
+
+参数 $\theta$ 服从均匀分布。
+
+例1：
+
+考虑共轭先验中例1的分布，假定过去每个月怀孕妈妈到指定医院生孩子的数据是没有的，
+所以，对于先验 $G(5,6)$ 没有任何信息。假定对于到达率 $\theta$ 采用均匀先验，
+因为 $\theta$ 在理论上假定为一个正值，我们可以使用 $U(0,+\infty)$ 作为先验，
+但是在这里我们简单地使用 $U(0,1000)$ 。
+
+# 贝叶斯推断
+
+## 点估计
+
+后验均值作为参数 $\theta$ 的点估计，因为它极小化了后验方差。
+
+例1：
+
+对于 $n=27$ 的样本，考虑动物身高 $Y_i$ 和年龄 $x_i$  之间的非线性增长模型。
+为了避免非线性，把 $x_i$ 转化为对数形式。
+
+```{r fig3,fig.cap="原始数据图", dev="png", cache=T}
+x<-c(1.0,1.5,1.5,1.5,2.5,4.0,5.0,5.0,7.0,
+     8.0,8.5,9.0,9.5,9.5,10.0,12.0,12.0,13.0,
+     13.0,14.5,15.5,15.5,16.5,17.0,22.5,29.0,31.5)
+Y<-c(1.80,1.85,1.87,1.77,2.02,2.27,2.15,2.26,2.47,
+     2.19,2.26,2.40,2.39,2.41,2.50,2.32,2.32,2.43,
+     2.47,2.56,2.65,2.47,2.64,2.56,2.70,2.72,2.57)
+lgage<-log(x)
+plot(lgage,Y,xlab="log(age)",ylab="length",pch=20)
+```
+
+建立模型 $Y_i=\beta_0+\beta_1\log(x_i)+\varepsilon_i,i=1,\cdots,n$
+
+```{r echo=T,eval=F}
+reg.out<-summary(lm(Y~lgage))
+beta1hat<-reg.out$coefficients[2,1]
+beta1.se<-reg.out$coefficients[2,2]
+# 95%的置信区间
+n<-27
+beta1.CI<-c(beta1hat+qt(0.025,df=n-2)*beta1.se,beta1hat+qt(0.975,df=n-2)*beta1.se)
+```
+
+
+贝叶斯方法：
+
+
+## 区间估计
+
+## 假设检验和贝叶斯因子
+
+贝叶斯因子：两个后验之比，即 $BF=\frac{p(y|M_1)}{p(y|M_2)}$ ，用于贝叶斯模型的比较。
+
+例1：
+
+令 $\theta$ 表示顾客偏好更加昂贵的商品的概率，如果消费者 $i$ 更加偏好昂贵的商品，
+则 $Y_i=1$ ，否则 $Y_i=0$ 。假定消费者是相互独立的， $\theta$ 是常数，则它们的决策
+就形成了伯努利试验序列。定义 $X=\sum_{i=1}^{16}Y_i$ ，则 $X|\theta\sim \text{Binomial}(16,\theta)$ 。
+也就是说， $x$ 的密度函数是 $f(x|\theta)=C_{16}^x\theta^x(1-\theta)^{16-x}$ 。
+
+选取贝塔先验，即 $\pi(\theta)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)+\Gamma(\beta)}\theta^{\alpha-1}(1-\theta)^{\beta-1}$ 。
+
+```{r fig4,fig.cap="先验密度图", dev="png", cache=T}
+x<-seq(0.01,0.99,length=99)
+top<-3.25
+plot(x,dbeta(x,0.5,0.5),type="l",xlab=expression(theta),ylab="prior density",ylim=c(0,top))
+lines(x,dbeta(x,1,1),lty=2)
+lines(x,dbeta(x,2,2),lty=3)
+legend(0.2,top,cex=1.2,legend = c("Beta(0.5,0.5) (Jeffreys prior)","Beta(1,1) (uniform prior)","Beta(2,2) (skeptical prior)"),lty=1:3)
+```
+
+根据贝叶斯理论计算后验密度为 $G(x+\alpha,16-x+\beta)$ ，则：
+
+```{r fig5,fig.cap="后验密度图", dev="png", cache=T}
+x<-seq(0,1,length=100)
+plot(x,dbeta(x,13.5,3.5),type="l",lty=1,xlab=expression(theta),ylab="posterior density")
+lines(x,dbeta(x,14,4),lty=2)
+lines(x,dbeta(x,15,5),lty=3)
+legend(0.1,3.5,cex=1.2,legend = c("Beta(13.5,3.5)","Beta(14,4)","Beta(15,5)"),lty=1:3)
+```
+
+```{r echo=T,eval=F,results='markup', cache=F}
+a<-0.025
+b<-0.5
+d<-0.975
+a1<-qbeta(a,13.5,3.5)
+a2<-qbeta(b,13.5,3.5)
+a3<-qbeta(d,13.5,3.5)
+a4<-pbeta(0.6,13.5,3.5)
+a5<-1-a4
+b1<-qbeta(a,14,4)
+b2<-qbeta(b,14,4)
+b3<-qbeta(d,14,4)
+b4<-pbeta(0.6,14,4)
+b5<-1-b4
+e1<-qbeta(a,15,5)
+e2<-qbeta(b,15,5)
+e3<-qbeta(d,15,5)
+e4<-pbeta(0.6,15,5)
+e5<-1-e4
+prob<-c(a1,a2,a3,a5,b1,b2,b3,b5,e1,e2,e3,e5)
+p<-t(matrix(prob,4,3))
+knitr::kable(p, row.names =T, align = "c", caption="后验信息总结（消费偏好数据）",
+      digits=7,
+      longtable = TRUE, booktabs = TRUE, linesep  = "")
+
+```
+
+# R中函数调用
+
+```{r}
+library(Bolstad)
+?Bolstad
+example("Bolstad")
+?binobp  
+binobp(x=13,n=16,a=1,b=1,pi=seq(0.01,0.999,by=0.001),plot = TRUE)
+```
+
+binobp(x,n,a,b,pi,plot):有beta(a,b)先验的binomial抽样，x表示观测成功的次数，
+n表示试验总次数，pi表示先验分布自变量的取值，默认为c(0,1,0.001)，plot=TRUE
+表示绘制先验和后验密度图。最终的结果是抽出的样本值。
+
+```{r}
+results<-sscsample(20,200)  ###抽取200次，每次样本量为20
+?sscsample
+results$means
+results$samples[,1]   ###表示第一个样本的具体数值
+```
+
+sscsample:抽取来自固定总体的样本，简单随机抽样、分层抽样、整群抽样。
+sscsample(size,n.samples,sample.type=c("simple","cluster","stratified"))，
+size表示期望抽取的样本数，n.samples表示采取的重复样本的数量。
+
+```{r}
+?xdesign
+results<-xdesign(corr=-0.6,size=25,n.treatments = 5)
+boxplot(block.means~ind,data=results)
+boxplot(treat.means~ind,data=results)
+```
+
+# 离散随机变量的贝叶斯推断
+
+## 有离散先验的二项分布概率
+
+假设 $\pi=0.3,0.4,0.5$ ，先验 $f(\pi)=0.2,0.3,0.5$ ，想要在6次试验后
+找到后验分布，且观测成功的次数 $y=5$ 。
+
+```{r}
+pi<-c(0.3,0.4,0.5)
+pi.prior<-c(0.2,0.3,0.5)
+results<-binodp(5,6,pi=pi,pi.prior = pi.prior)
+```
+
+## 有离散先验的泊松参数
+
+观测值 $\text{poisson}(\mu)$ ，假定 $\mu=1,2,3$ ，离散先验 $g(\mu)=0.3,0.4,0.3$ 。
+给定观测值 $y=4$ ，找后验分布
+
+```{r}
+mu<-1:3
+mu.prior<-c(0.3,0.4,0.3)
+poisdp(4,mu,mu.prior)
+```
+
+# 二项分布比例的贝叶斯推断
+
+## 有贝塔先验的伯努利抽样
+
+观测值服从 $\text{binomial}(n,\pi)$ ，先验 $\pi\sim \text{beta}(a,b)$ ，
+因为贝塔分布是二项分布的共轭分布，所以后验分布也为贝塔分布 $\text{beta}(a^\prime,b^\prime)$ ，
+且 $a^\prime=a+y,b^\prime=b+n-y$ 。比如，假定 $n=12,y=4$ ，使用 $\text{beta}(3,3)$ 
+作为 $\pi$ 的先验，则
+
+```{r}
+results<-binobp(4,12,3,3)
+mean(results)  ##后验均值
+sd(results) 
+quantile(results,probs = c(0.025,0.975))
+#?binobp   ##有beta先验的伯努利抽样
+#?binodp   ##有离散随机先验的伯努利抽样
+```
+
+我们可以检验 $H_0:\pi\leq\pi_0;H_1:\pi>\pi_0$ 。比如，假定 $\pi_0=0.1,y=4,n=12$ ，
+使用 $\text{beta}(3,3)$ 作为 $\pi$ 的先验分布，则 $\pi$ 的后验分布为 $\text{beta}(3+4=7,3+12-4=11)$ ，
+因此，我们能够检验 $H_0:\pi\leq\pi_0=0.1;H_1:\pi>\pi_0=0.1$
+
+```{r}
+pbeta(0.1,7,11)
+#?pbeta
+## 或者使用后验分布的累积分布函数进行检验
+results<-binobp(4,12,3,3)
+Fpi<-cdf(results)   ##后验分布的累积分布函数
+Fpi(0.1)  ##累积分布函数在0.1处的取值
+#?cdf  ##返回感兴趣参数的后验分布的累积分布函数
+```
+
+## 有连续先验的伯努利抽样
+
+观测 $\text{binomial}(n,\pi)$ ，连续先验 $\pi$ 。假定 $n=12,y=4$ ，
+连续先验 $\pi\sim N(0.5,0.25)$ 
+
+```{r}
+binogcp(4,12,density="normal",param=c(0.5,0.25))
+#?binogcp  #有连续先验的伯努利抽样
+```
+
+再如，定义 $g(\pi)=\begin{cases}4\pi\quad \quad & \text{for} \quad 0\leq\pi\leq0.5   \\ 4-4\pi &\text{for}\quad0.5<\pi\leq1\end{cases}$
+
+```{r}
+pi=seq(0,1,by=0.001)
+prior<-createPrior(c(0,0.5,1),c(0,1,0))    #参数什么意思？
+#?createPrior   ##产生分段先验，结果是通过线性插值来提供先验函数的值
+pi.prior<-prior(pi)
+results<-binogcp(4,12,"user",pi=pi,pi.prior = pi.prior) #user表示使用自己定义的先验？
+```
+
+```{r fig.cap="后验累积分布图", dev="png", cache=T}
+Fpi<-cdf(results)
+curve(Fpi,from = pi[1],to=pi[length(pi)],xlab=expression(pi[0]),yalb=expression(Pr(pi<=pi[0])))
+```
+
+95%的置信区间：
+
+```{r}
+ci<-quantile(results,probs=c(0.025,0.975))
+ci<-round(ci,4)
+cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse = ","),"]\n"))
+```
+
+假设检验： $H_0:\pi\leq\pi_0=0.1;H_1:\pi>\pi_0=0.1$ ，检验以上假设，需要计算
+累计分布函数在 $\pi_0$ 处的取值，如果小于显著性水平 $\alpha$ ，则拒绝原假设。
+
+```{r}
+Fpi<-cdf(results)
+Fpi(0.1)
+```
+
+计算后验均值和方差：
+
+```{r}
+post.mean<-mean(results)
+post.sd<-sd(results)
+```
+
+使用以上计算出的均值和标准差用公式计算95%的置信区间：
+
+```{r}
+ci<-post.mean+c(-1,1)*qnorm(0.975)*post.sd
+#?qnorm  #给定概率p后的下分位点，保留到16位小数
+cat(paste0("Approximate 95% credible interval : ["),paste0(ci,collapse = ","),"]\n")
+#?cat  ##连接和打印
+#?paste0  ##连接字符串
+```
+
+注：
+
+1. dnorm(x,mean,sd) 返回正态分布概率密度函数在x处的取值，比如 $dnorm(x)$ 表示 $f(x)$
+2. pnorm(q,mean,sd) 返回正态分布分布函数在q处的取值，比如 $\text{pnorm}(z)$ 表示 $F(z)=P(Z\leq z)$
+3. qnorm(p,mean,sd) 返回给定概率p后的下分位点
+4. rnorm(n,mean,sd) 返回n个正态分布随机数构成的向量
+
+# 正态均值的贝叶斯推断
+
+## $\mu$ 取离散先验
+
+观测 $N(\mu,\sigma^2=1)$ ，且 $\sigma^2$ 已知。假定 $\mu$ 取离散先验， 
+$\mu=2,2.5,3,3.5,4;f(\mu)=0.1,0.2,0.4,0.2,0.1$ ，随机样本 $n=5$ ，
+且观测值为 $1.52,0.02,3.35,3.49,1.82$ 。（若方差未知，则需通过观测值进行计算）
+
+```{r}
+mu<-seq(2,4,by=0.5)
+mu.prior<-c(0.1,0.2,0.4,0.2,0.1)
+y<-c(1.52,0.02,3.35,3.49,1.82)
+normdp(y,1,mu,mu.prior)
+#?normdp   ##有离散先验正态均值的贝叶斯推断，结果为后验分布密度函数
+```
+
+normdp(x,sigma.x,mu,mu.prior,n.mu=50,plot=TRUE):返回有离散先验的正态均值的后验密度，
+x表示观测值向量，正态分布，未知均值，已知方差，sigma.x表示总体正态分布的标准差。
+
+## $\mu\sim N(M,s^2)$ 为先验
+
+假定观测值来自正态随机样本 $(\mu,\sigma^2=1)$ ，取值为 2.99、5.56、2.83、3.47。
+假定 $\mu$ 的先验为 $N(3,2^2)$
+
+```{r}
+y<-c(2.99,5.56,2.83,3.47)
+normnp(y,3,2,1)   ##1表示先验中可能的mu的取值个数
+#?normnp  #正态均值有正态先验的贝叶斯推断
+```
+
+置信区间可以从上面的结果直接得到，也可以使用公式计算
+
+```{r}
+y<-c(2.99,5.56,2.83,3.47)
+results<-normnp(y,3,2,1)
+ci<-quantile(results,probs = c(0.025,0.975))
+```
+
+假设检验： $H_0:\mu\leq\mu_0=2;H_1:\mu>\mu_0=2$ 
+
+```{r}
+Fmu<-cdf(results)
+Fmu(2)
+pnorm(2,mean(results),sd(results))  ##与上一条代码作用相同
+```
+
+## $\mu$ 连续先验
+
+假定来自 $N(\mu,\sigma^2)$ 的四个观测值2.99、5.56、2.83、3.47，假定先验分布为
+定义在-3到3上的梯形分布
+
+$$g(\mu)=\begin{cases}\frac{1}{3}+\frac{\mu}{9} &\text{for} \quad -3\leq\mu\leq0 \\\frac{1}{3}-\frac{\mu}{9}&\text{for} \quad0<\mu\leq3 \end{cases}$$
+
+```{r}
+y<-c(2.99,5.56,2.83,3.47)
+mu<-seq(-3,3,by=0.1)
+prior<-createPrior(c(-3,0,3),c(0,1,0))
+results<-normgcp(y,1,density = "user",mu=mu,mu.prior = prior(mu))
+#?normgcp  #正态均值有连续先验的贝叶斯推断
+```
+
+置信区间：
+
+```{r}
+Fmu<-cdf(results)
+curve(Fmu,from=mu[1],to=mu[length(mu)],xlab=expression(mu[0]),ylab=expression(Pr(mu<=mu[0])))
+ci<-quantile(results,probs = c(0.025,0.975))
+ci<-round(ci,4)
+cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse=","),"]\n"))
+```
+
+假设检验： $H_0:\mu\leq\mu_0;H_1:\mu>\mu_0$
+
+```{r}
+post.mean<-mean(results)
+poet.var<-var(results)
+post.sd<-sd(results)
+z<-qnorm(0.975)
+ci<-post.mean+c(-1,1)*z*post.sd
+ci<-round(ci,4)
+cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse = ","),"]\n"))
+```
+
+# 简单线性回归的贝叶斯推断
+
+
+
+
+
+
+
+# 参考文献
+[//]: # (\bibliography{Bibfile})
