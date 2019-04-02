@@ -51,7 +51,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 - [x] 表格出不来，报错
 - [x] createPrior函数怎么产生自己定义的先验分布
-
+- [x] 方差未知贝叶斯推断median(results)结果报错
 
 # 先验分布
 
@@ -264,11 +264,11 @@ knitr::kable(p, row.names =T, align = "c", caption="后验信息总结（消费�
 
 # R中函数调用
 
-```{r}
+```{r fig6,fig.cap="密度图", dev="png", cache=T}
 library(Bolstad)
-?Bolstad
-example("Bolstad")
-?binobp  
+#?Bolstad
+#example("Bolstad")
+#?binobp  
 binobp(x=13,n=16,a=1,b=1,pi=seq(0.01,0.999,by=0.001),plot = TRUE)
 ```
 
@@ -276,9 +276,9 @@ binobp(x,n,a,b,pi,plot):有beta(a,b)先验的binomial抽样，x表示观测成�
 n表示试验总次数，pi表示先验分布自变量的取值，默认为c(0,1,0.001)，plot=TRUE
 表示绘制先验和后验密度图。最终的结果是抽出的样本值。
 
-```{r}
+```{r echo=T,eval=F}
 results<-sscsample(20,200)  ###抽取200次，每次样本量为20
-?sscsample
+#?sscsample
 results$means
 results$samples[,1]   ###表示第一个样本的具体数值
 ```
@@ -287,11 +287,11 @@ sscsample:抽取来自固定总体的样本，简单随机抽样、分层抽样�
 sscsample(size,n.samples,sample.type=c("simple","cluster","stratified"))，
 size表示期望抽取的样本数，n.samples表示采取的重复样本的数量。
 
-```{r}
-?xdesign
+```{r fig7,fig.cap="箱线图", dev="png", cache=T}
+#?xdesign
 results<-xdesign(corr=-0.6,size=25,n.treatments = 5)
 boxplot(block.means~ind,data=results)
-boxplot(treat.means~ind,data=results)
+#boxplot(treat.means~ind,data=results)
 ```
 
 # 离散随机变量的贝叶斯推断
@@ -301,7 +301,7 @@ boxplot(treat.means~ind,data=results)
 假设 $\pi=0.3,0.4,0.5$ ，先验 $f(\pi)=0.2,0.3,0.5$ ，想要在6次试验后
 找到后验分布，且观测成功的次数 $y=5$ 。
 
-```{r}
+```{r fig8,fig.cap="密度图", dev="png", cache=T}
 pi<-c(0.3,0.4,0.5)
 pi.prior<-c(0.2,0.3,0.5)
 results<-binodp(5,6,pi=pi,pi.prior = pi.prior)
@@ -312,9 +312,10 @@ results<-binodp(5,6,pi=pi,pi.prior = pi.prior)
 观测值 $\text{poisson}(\mu)$ ，假定 $\mu=1,2,3$ ，离散先验 $g(\mu)=0.3,0.4,0.3$ 。
 给定观测值 $y=4$ ，找后验分布
 
-```{r}
+```{r fig9,fig.cap="密度图", dev="png", cache=T}
 mu<-1:3
 mu.prior<-c(0.3,0.4,0.3)
+library(Bolstad)
 poisdp(4,mu,mu.prior)
 ```
 
@@ -327,7 +328,7 @@ poisdp(4,mu,mu.prior)
 且 $a^\prime=a+y,b^\prime=b+n-y$ 。比如，假定 $n=12,y=4$ ，使用 $\text{beta}(3,3)$ 
 作为 $\pi$ 的先验，则
 
-```{r}
+```{r fig10,fig.cap="密度图", dev="png", cache=T}
 results<-binobp(4,12,3,3)
 mean(results)  ##后验均值
 sd(results) 
@@ -340,7 +341,7 @@ quantile(results,probs = c(0.025,0.975))
 使用 $\text{beta}(3,3)$ 作为 $\pi$ 的先验分布，则 $\pi$ 的后验分布为 $\text{beta}(3+4=7,3+12-4=11)$ ，
 因此，我们能够检验 $H_0:\pi\leq\pi_0=0.1;H_1:\pi>\pi_0=0.1$
 
-```{r}
+```{r fig11,fig.cap="密度图", dev="png", cache=T}
 pbeta(0.1,7,11)
 #?pbeta
 ## 或者使用后验分布的累积分布函数进行检验
@@ -355,14 +356,14 @@ Fpi(0.1)  ##累积分布函数在0.1处的取值
 观测 $\text{binomial}(n,\pi)$ ，连续先验 $\pi$ 。假定 $n=12,y=4$ ，
 连续先验 $\pi\sim N(0.5,0.25)$ 
 
-```{r}
+```{r fig12,fig.cap="密度图", dev="png", cache=T}
 binogcp(4,12,density="normal",param=c(0.5,0.25))
 #?binogcp  #有连续先验的伯努利抽样
 ```
 
 再如，定义 $g(\pi)=\begin{cases}4\pi\quad \quad & \text{for} \quad 0\leq\pi\leq0.5   \\ 4-4\pi &\text{for}\quad0.5<\pi\leq1\end{cases}$
 
-```{r}
+```{r fig13,fig.cap="密度图", dev="png", cache=T}
 pi=seq(0,1,by=0.001)
 prior<-createPrior(c(0,0.5,1),c(0,1,0))    #参数什么意思？
 #?createPrior   ##产生分段先验，结果是通过线性插值来提供先验函数的值
@@ -370,14 +371,14 @@ pi.prior<-prior(pi)
 results<-binogcp(4,12,"user",pi=pi,pi.prior = pi.prior) #user表示使用自己定义的先验？
 ```
 
-```{r fig.cap="后验累积分布图", dev="png", cache=T}
+```{r fig14,fig.cap="后验累积分布图", dev="png", cache=T}
 Fpi<-cdf(results)
 curve(Fpi,from = pi[1],to=pi[length(pi)],xlab=expression(pi[0]),yalb=expression(Pr(pi<=pi[0])))
 ```
 
 95%的置信区间：
 
-```{r}
+```{r echo=T,eval=F}
 ci<-quantile(results,probs=c(0.025,0.975))
 ci<-round(ci,4)
 cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse = ","),"]\n"))
@@ -386,21 +387,23 @@ cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse = ","),"]\
 假设检验： $H_0:\pi\leq\pi_0=0.1;H_1:\pi>\pi_0=0.1$ ，检验以上假设，需要计算
 累计分布函数在 $\pi_0$ 处的取值，如果小于显著性水平 $\alpha$ ，则拒绝原假设。
 
-```{r}
+```{r echo=T,eval=F}
 Fpi<-cdf(results)
 Fpi(0.1)
 ```
 
 计算后验均值和方差：
 
-```{r}
+```{r echo=T,eval=F}
 post.mean<-mean(results)
+post.mean
 post.sd<-sd(results)
+post.sd
 ```
 
 使用以上计算出的均值和标准差用公式计算95%的置信区间：
 
-```{r}
+```{r echo=T,eval=F}
 ci<-post.mean+c(-1,1)*qnorm(0.975)*post.sd
 #?qnorm  #给定概率p后的下分位点，保留到16位小数
 cat(paste0("Approximate 95% credible interval : ["),paste0(ci,collapse = ","),"]\n")
@@ -423,7 +426,7 @@ cat(paste0("Approximate 95% credible interval : ["),paste0(ci,collapse = ","),"]
 $\mu=2,2.5,3,3.5,4;f(\mu)=0.1,0.2,0.4,0.2,0.1$ ，随机样本 $n=5$ ，
 且观测值为 $1.52,0.02,3.35,3.49,1.82$ 。（若方差未知，则需通过观测值进行计算）
 
-```{r}
+```{r fig15,fig.cap="密度图", dev="png", cache=T}
 mu<-seq(2,4,by=0.5)
 mu.prior<-c(0.1,0.2,0.4,0.2,0.1)
 y<-c(1.52,0.02,3.35,3.49,1.82)
@@ -439,7 +442,7 @@ x表示观测值向量，正态分布，未知均值，已知方差，sigma.x表
 假定观测值来自正态随机样本 $(\mu,\sigma^2=1)$ ，取值为 2.99、5.56、2.83、3.47。
 假定 $\mu$ 的先验为 $N(3,2^2)$
 
-```{r}
+```{r fig16,fig.cap="密度图", dev="png", cache=T}
 y<-c(2.99,5.56,2.83,3.47)
 normnp(y,3,2,1)   ##1表示先验中可能的mu的取值个数
 #?normnp  #正态均值有正态先验的贝叶斯推断
@@ -447,7 +450,7 @@ normnp(y,3,2,1)   ##1表示先验中可能的mu的取值个数
 
 置信区间可以从上面的结果直接得到，也可以使用公式计算
 
-```{r}
+```{r echo=T,eval=F}
 y<-c(2.99,5.56,2.83,3.47)
 results<-normnp(y,3,2,1)
 ci<-quantile(results,probs = c(0.025,0.975))
@@ -455,7 +458,7 @@ ci<-quantile(results,probs = c(0.025,0.975))
 
 假设检验： $H_0:\mu\leq\mu_0=2;H_1:\mu>\mu_0=2$ 
 
-```{r}
+```{r echo=T,eval=F}
 Fmu<-cdf(results)
 Fmu(2)
 pnorm(2,mean(results),sd(results))  ##与上一条代码作用相同
@@ -468,7 +471,7 @@ pnorm(2,mean(results),sd(results))  ##与上一条代码作用相同
 
 $$g(\mu)=\begin{cases}\frac{1}{3}+\frac{\mu}{9} &\text{for} \quad -3\leq\mu\leq0 \\\frac{1}{3}-\frac{\mu}{9}&\text{for} \quad0<\mu\leq3 \end{cases}$$
 
-```{r}
+```{r fig17,fig.cap="密度图", dev="png", cache=T}
 y<-c(2.99,5.56,2.83,3.47)
 mu<-seq(-3,3,by=0.1)
 prior<-createPrior(c(-3,0,3),c(0,1,0))
@@ -478,7 +481,7 @@ results<-normgcp(y,1,density = "user",mu=mu,mu.prior = prior(mu))
 
 置信区间：
 
-```{r}
+```{r fig18,fig.cap="密度图", dev="png", cache=T}
 Fmu<-cdf(results)
 curve(Fmu,from=mu[1],to=mu[length(mu)],xlab=expression(mu[0]),ylab=expression(Pr(mu<=mu[0])))
 ci<-quantile(results,probs = c(0.025,0.975))
@@ -488,7 +491,7 @@ cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse=","),"]\n"
 
 假设检验： $H_0:\mu\leq\mu_0;H_1:\mu>\mu_0$
 
-```{r}
+```{r echo=T,eval=F}
 post.mean<-mean(results)
 poet.var<-var(results)
 post.sd<-sd(results)
@@ -500,11 +503,59 @@ cat(paste0("Approximate 95% credible interval : [",paste0(ci,collapse = ","),"]\
 
 # 简单线性回归的贝叶斯推断
 
+假定有向量 $y、x$ ，标准差 $\sigma=2$ ， $\beta$ 用正态先验 $N(0,3^2)$ ， 
+$\alpha_{\bar{x}}$ 用正态先验 $N(30,10^2)$ 。
+
+```{r fig19,fig.cap="密度图", dev="png", cache=T}
+set.seed(100)
+x<-rnorm(100)
+y<-3*x+22+rnorm(100,0,2)
+library(Bolstad)
+results<-bayes.lin.reg(y,x,"n","n",0,3,30,10,2)
+#“n”表示正态分布，2表示残差的标准差
+#?bayes.lin.reg  ##简单线性回归的贝叶斯推断，返回斜率β的后验分布
+ci<-quantile(results$slope,probs=c(0.025,0.975))
+```
+
+预测：
+
+```{r echo=T,eval=F}
+results<-bayes.lin.reg(y,x,"n","n",0,3,30,10,2,pred.x = c(1,2,3))   ##返回当x=1,2,3时y的预测值
+results
+```
+
+预测值的置信区间：
+
+```{r echo=T,eval=F}
+z<-qnorm(0.975)
+ci<-cbind(results$pred.y-z*results$pred.se,results$pred.y+z*results$pred.se)
+```  
+
+# 标准差的贝叶斯推断
+
+ $\sigma^2$ 是 $S\times$ 逆卡方分布
+
+假定有5个来自正态分布 $N(\mu=200,\sigma^2)$ 的观测值206.4,197.4,212.7,208.5,203.4。
+想要使用的先验中位数等于8，结果是29.11乘以逆卡方分布（ $k=1$ ）的先验中位数等于8。
+
+```{r fig20,fig.cap="密度图", dev="png", cache=T}
+y<-c(206.4,197.4,212.7,208.5,203.4)
+results<-nvaricp(y,200,29.11,1)
+#29.11表示先验的缩放因子，1表示先验的自由度，y表示服从正态分布的随机样本，200表示已知的正态分布均值
+#?nvaricp  ##均值mu已知时，正态分布标准差的后验密度图
+```
+
+可信区间：
+
+```{r echo=T,eval=F}
+quantile(results,probs=c(0.025,0.975))
+
+post.mean<-mean(results)
+#post.median<-median(results)
+```
 
 
-
-
-
+# 有未知均值和方差的贝叶斯推断
 
 # 参考文献
 [//]: # (\bibliography{Bibfile})
