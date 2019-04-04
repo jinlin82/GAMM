@@ -1,0 +1,708 @@
+---
+title: "蒙特卡洛积分及MCMC R程序"
+author: "Li"
+date: "2019-04"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: true
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+**To Do**
+
+- [x] Gibbs抽样接受概率总为1是什么原理？
+
+# 蒙特卡洛积分
+
+例1：积分计算比较： $\int_{0}^{+\infty}x^{\lambda-1}\exp(-x)dx$
+
+```{r echo=T,eval=F}
+ch<-function(la){
+  integrate(function(x) {x^(la-1)*exp(-x)},0,Inf)$val
+}
+#?integrate  ##一维函数的数值积分
+plot(lgamma(seq(0.01,10,le=100)),log(apply(as.matrix(seq(0.01,10,le=100)),1,ch)),xlab="log(integrate(f))",ylab=expression(log(Gamma(lambda))),pch=19,cex=.6)
+#?lgamma  ##返回gamma函数积分后取对数的值
+```
+
+## 蒙特卡洛方法简介
+
+蒙特卡洛积分的优势在于模拟复杂的密度函数，将需要模拟的密度函数称为目标函数，贝叶斯
+统计中后验密度分母上的积分往往不是标准的形式，因此需要用蒙特卡洛模拟，其优势是不受
+参数维度的影响。另外，有时目标函数能够模拟，但是计算比较麻烦，在这种情况下，避免直
+接估计 $f$ ，应用模拟的方法进行估计。模拟方法可以分为准确模拟和近似模拟，准确方法是
+指抽样分布准确是 $f$ ，近似方法是指产生的样本，由近似 $f$ 的分布产生。
+
+例2：计算蒙特卡洛积分 $\theta=\int_0^{1}e^{-x}dx=1-e^{-1}$ ，并与真实值进行比较。
+
+```{r echO=T,eval=F}
+m<-10000
+x<-runif(m)
+theta.hat<-mean(exp(-x))
+print(theta.hat)
+print(1-exp(-1))
+```
+
+例3：用蒙特卡洛方法计算积分 $\theta=\int_2^4e^{-x}dx=e^{-2}-e^{-4}$ ，并将计算值与
+真实值进行比较。
+
+```{r echo=T,eval=F}
+m<-10000
+x<-runif(m,min=2,max=4)
+theta.hat<-mean(exp(-x))*2  
+print(theta.hat)
+print(exp(-2)-exp(-4))
+```
+
+综上所述，简单蒙特卡洛方法估计积分 $\theta=\int_{a}^{b}g(t)dt$ 的步骤如下：
+
+1. 由均匀分布 $U(a,b)$ 生成相互独立的随机变量 $X_1,\cdots,X_m$ ；
+2. 计算 $\bar{g_m(X)}=\frac{1}{m}\sum_{i=1}^mg(X_i)$ ；
+3. 得出积分估计值 $\hat{\theta}=(b-a)\bar{g_m(X)}$ 。
+
+例4:应用蒙特卡洛方法估计标准正态分布函数 $\Phi(x)=\int_{-\infty}^x\frac{1}{\sqrt{2\pi}}e^{-\frac{t^2}{2}}dt$
+
+```{r echo=T,eval=F}
+x<-seq(0.1,2.5,length=10)
+m<-10000
+u<-runif(m)
+cdf<-numeric(length(x))
+for (i in 1:length(x)) {
+  g<-x[i]*exp(-(u*x[i])^2/2)
+  cdf[i]<-mean(g)/sqrt(2*pi)+0.5
+}
+cdf
+```
+
+
+## 重要抽样
+
+蒙特卡洛方法估计积分的局限性在于不能应用于无限区间，如果函数 $h(X)$ 分布不均匀，
+从区间上进行均匀抽样并不有效。在这种情况下，用重要抽样更加有效。
+
+随机变量 $X$ 是由重要函数产生的。
+
+例11：选择不同的重要函数估计积分值 $\int_0^1\frac{e^{-x}}{1+x^2}dx$ 
+
+```{r echo=T,eval=F}
+m<-10000
+theta.hat<-se<-numeric(5)
+g<-function(x) {(exp(-x)/(1+x^2))*(x>0)*(x<1)}
+x<-runif(m) #重要函数f(x)=1,0<x<1
+fg<-g(x)
+theta.hat[1]<-mean(fg);se[1]<-sd(fg)
+x<-rexp(m,1)  #重要函数f(x)=e^(-1),x>0
+fg<-g(x)/exp(-x)
+theta.hat[2]<-mean(fg);se[2]<-sd(fg)
+x<-rcauchy(m)  #重要函数f(x)=π/(1+x^2),x从负无穷到正无穷
+i<-c(which(x>1),which(x<0))
+x[i]<-2  ##为了避免g(x)中的溢出错误
+fg<-g(x)/dcauchy(x)
+theta.hat[3]<-mean(fg);se[3]<-sd(fg)
+u<-runif(m)  #逆变换方法
+x<--log(1-u*(1-exp(-1)))  #逆概率抽样
+fg<-g(x)/(exp(-x)/(1-exp(-1)))
+theta.hat[4]<-mean(fg);se[4]<-sd(fg)
+u<-runif(m)  #逆变换方法
+x<-tan(pi*u/4)
+fg<-g(x)/(4/(1+x^2)*pi)
+theta.hat[5]<-mean(fg);se[5]<-sd(fg)
+theta.hat
+se
+```
+
+必须认真选取重要函数产生较小的估计值 $Y=\frac{h(X)}{g(X)}$ 方差。重要函数 $g(x)$ 的
+定义域和函数 $h(x)>0$ 的定义域相同，并且比率 $\frac{h(x)}{g(x)}$ 接近常数。上例中
+估计的积分值的积分部分就是 $h(x)$ ，随机变量 $X$ 全部由重要函数 $g(x)$ 产生。
+
+## 重要抽样的重抽样（SIR）
+
+该方法用于近似模拟目标函数，具体过程从重要抽样函数 $g$ 中抽取样本， $g$ 也被称为
+包络线函数，另外还要对样本进行加权重抽样，最终得到的样本近似目标函数 $f$ 。用于
+修正抽样概率的权重称为标准重要权重，表示为 $w(x_i)=\frac{f(x_i)/g(x_i)}{\sum_{1}^{m}f(x_i)/g(x_i)}$ ，
+这里 $x_1,\cdots,x_m$ 是由函数 $g$ 生成的样本，目标函数含有未知比例函数时，可以写成 $f=cq$ ，
+其中 $c$ 是未知常数，该常数 $c$ 可以在权重计算中抵消掉。
+
+SIR方法的过程如下所示：
+
+1. 从函数 $g$ 中抽取相互独立的样本 $Y_1,\cdots,Y_m$ ；
+2. 计算标准重要权重 $w(Y_1),\cdots,w(Y_m)$ ；
+3. 从样本 $Y_1,\cdots,Y_m$ 中，以权重概率 $w(Y_1),\cdots,w(Y_m)$ 抽取样本 $X_1,\cdots,X_n$ 。
+
+当 $m\to \infty$ 时，由SIR方法生成的随机样本 $X$ 收敛到目标函数 $f$ 。
+
+在SIR方法中，确定样本数量 $m、n$ 比较重要，理论上，需要 $\frac{n}{m}\to0$ 得到
+分布收敛的样本，在实际应用中，样本比率满足 $\frac{n}{m}\leq0.1$ 即可。另外，
+SIR方法对函数 $g$ 的选取比较敏感，由于应从 $g$ 生成的样本近似函数 $f$ ，它们
+需要有相同的定义域。函数 $g$ 的尾部要比 $f$ 大，确保比率 $f(y)/g(y)$ 不会太大，
+否则会产生一个比较大的权重。如果实际应用中，发现权重分布是有偏的，则应更换 $g$ ，
+或者应用其他抽样方法。
+
+例16：假设随机变量 $Y$ 服从Slash分布，如果标准正态分布随机变量 $X\sim N(0,1)$ 和
+均匀分布随机变量 $U\sim U(0,1)$ 相互独立，则Slash分布随机变量可以表示为 $Y=\frac{X}{U}$ ，
+Slash分布的密度函数如下：
+
+$$f(y)=\begin{cases}\frac{1-\exp(-y^2/2)}{y^2\sqrt{2\pi}} & y\neq0 \\ \frac{1}{2\sqrt{2\pi}} &y=0  \end{cases}$$
+
+下面分别应用Slash分布作为包络线函数，近似标准正态分布；应用标准正态分布作为包络线
+近似Slash分布。由于Slash分布具有比较厚的尾部，比较适合作为重要抽样函数；而标准正态
+分布不适合作为重要抽样函数近似Slash分布。
+
+```{r fig1,fig.cap="不同抽样方法比较图", dev="png", cache=T}
+# 初始值
+m<-100000;n<-5000
+y<-rnorm(m);u<-runif(m)
+v<-y/u
+# slash在VGAM包中
+library(VGAM)
+# 定义标准重要权重函数
+w<-function(x){
+  out=dslash(x)/dnorm(x)  ##f(x)是slash,g(x)是norm,f(x)是目标函数
+  out=out/sum(out)
+  return(out)
+}
+w2<-function(x){
+  out=dnorm(x)/dslash(x)
+  out=out/sum(out)
+  return(out)
+}
+# 权重及重抽样
+weights<-w(y)  #y是标准正态分布随机数,这里y是由g(x)生成的样本
+x<-sample(y,n,replace = TRUE,prob = weights)  ## 从刚开始重要密度函数中抽取出的随机数中再抽取随机数，这个就是最终的结果，看重要密度函数接近目标函数的程度
+weights2<-w2(v)  #v是slash分布随机数，此时slash是g(x)
+u<-sample(v,n,replace = TRUE,prob = weights2)
+# 结果
+par(mfrow=c(1,2))
+hist(x,freq = FALSE,breaks = seq(-7,7,by=0.25),main="",ylab="Slash density")
+points(seq(-10,10,by=0.01),dslash(seq(-10,10,by=0.01)),type="l")
+hist(u,freq = FALSE,breaks = seq(-7,7,by=0.25),main="",ylab="Norm density")
+points(seq(-10,10,by=0.01),dnorm(seq(-10,10,by=0.01)),type = "l")
+```
+
+# 贝叶斯MCMC方法
+
+## 模拟及其在贝叶斯推断中的应用
+
+在数值分析中，经常遇到求积分的问题，比如 $I=\int_x g(x)dx$ ，该积分可以应用不同的
+方法来处理，包括近似求解和数值计算方法，其中一种方法就是通过随机抽样的方法来求积分。
+假设通过积分函数 $f(x)$ 比较容易生成随机数，则积分函数可以
+通过 $I=\int_x[\frac{g(x)}{f(x)}]f(x)dx$ 求得。
+
+具体求解过程归纳如下：
+
+1. 从目标函数 $f(x)$ 中生成样本 $x^{(1)},\cdots,x^{(T)}$ ；
+2. 计算样本均值 $\hat{I}=\frac{1}{T}\sum_{t=1}^T[\frac{g(x^{(t)})}{f(x^{(t)})}]$ 。
+
+这种方法的优势就是比较简单，并且具有较好的准确性，避免计算复杂的高维积分问题。
+该方法可以直接应用在贝叶斯推断中，对于参数 $\theta$ 的任何函数 $G(\theta)$ 都
+可以计算出其后验均值和方差。
+
+1. 从后验分布 $f(\theta|y)$ 生成样本 $\theta^{(1)},\cdots,\theta^{(T)}$ ；
+2. 计算样本 $G(\theta)$ 的均值 $\hat{I}=\frac{1}{T}\sum_{t=1}^T G(\theta^{(t)})$ 。
+
+以上步骤中的主要问题是如何生成后验分布 $f(\theta|y)$ ，在多数情况下，
+并不能直接得出后验密度函数。有一些方法用于生成随机数，比如，逆累积
+分布函数、拒绝抽样算法、重要抽样方法等。
+
+例1：假设有300个风险暴露个体（X=1）发现有25个病例，900个无风险个体（X=0）发现
+30个病例。根据这种情况得出 $y_1=25,n_1=300,y_0=30,n_0=900$ ，假定先验分布参数
+为 $a_0=b_0=a_1=b_1=1$ ，可以得出后验分布 $\pi_0|y_0\sim beta(31,901),\pi_1|y_1\sim beta(26,301)$ 。
+
+应用下面的步骤可以得出风险度量的后验分布，假设 $t=1,\cdots,T$
+
+1. 从 $\pi_0^{(t)}\sim beta(31,901)$ 生成样本；
+2. 从 $\pi_1^{(t)}\sim beta(26,301)$ 生成样本；
+3. 计算 $AR^{(t)}=\pi_1^{(t)}-\pi_0^{(t)}、RR^{(t)}=\frac{\pi_1^{(t)}}{\pi_0^{(t)}}、OR^{(t)}=\frac{\pi_1^{(t)}(1-\pi_0^{(t)})}{\pi_0^{(t)}(1-\pi_1^{(t)})}$ ；
+
+根据生成的样本，可以得到样本量为 $T$ 的风险度量值，基于这些样本可以进行后验推断。
+
+```{r fig2,fig.cap="风险度量的后验密度函数曲线图", dev="png", cache=T}
+a<-1;a0<-b0<-a1<-b1<-a
+y1<-25;y0<-30;n1<-300;n0<-900
+p0<-rbeta(1000,y0+a0,n0+b0)   #产生1000个贝塔分布随机数，就是π0，因为贝塔分布的参数已经是后验分布的参数了
+p1<-rbeta(1000,y1+a1,n1+b1)
+AR<-p1-p0;RR<-p1/p0
+OR<-p1*(1-p0)/(p0*(1-p1))
+mean(AR);mean(RR);mean(OR)
+sd(AR);sd(RR);sd(OR)
+quantile(AR,c(0.025,0.975));quantile(RR,c(0.025,0.975));quantile(OR,c(0.025,0.975))
+par(mfrow=c(3,1))
+plot(density(AR),main="",xlab="Attributable Risk",ylab="Posterior Density")
+plot(density(RR),main="",xlab="Relative Risk",ylab="Posterior Density")
+plot(density(OR),main="",xlab="Odds Ratio",yalb="Posterior Density")
+```
+
+## 马尔可夫链蒙特卡洛方法（MCMC）
+
+### 贝叶斯推断中的积分问题
+
+### MCMC积分
+
+应用MCMC方法，马尔可夫链提供样本生成器，由目标分布产生随机观察值，再应用蒙特卡洛积分方法近似积分。
+
+### MCMC算法
+
+马尔可夫链满足：下一个状态只与当前状态有关，与之前的状态均没有关系。
+
+为了从 $f(\theta|y)$ 生成样本，构建的马尔可夫链具有两个特征：
+
+1. $f(\theta^{(t+1)}|\theta^{(t)})$ 应易于抽样；
+2. 马尔可夫链最终收敛于均衡分布，即是后验分布 $f(\theta|y)$ 。
+
+假设构建的马尔可夫链具有上述性质，通过以下步骤进行分析：
+
+1. 选择初始值 $\theta^{(1)}$ ；
+2. 生成 $T$ 个样本值，直到达到均衡分布；
+3. 用收敛诊断方法检测生成样本的收敛性，如果不收敛，需要生成更多的样本；
+4. 删除开始生成的 $B$ 个模拟值；
+5. 对样本 $\theta^{(B+1)},\cdots,\theta^{(T)}$ 进行后验分析；
+6. 画出后验分布图；
+7. 最后得到后验分布的描述性统计量，比如均值、中位数、标准误、分位数和相关系数等。
+
+上面的这些步骤要进行收敛性诊断，对生成的样本进行统计分析，确认收敛性是否达到。
+
+### MCMC的应用
+
+MCMC方法用于生成函数 $f(\cdot)$ 的样本，其基本原理是构建一个平稳分布为 $f(\cdot)$ 的马尔可夫链。
+运行马尔可夫链足够长，数据链就可以收敛到它的平稳分布。
+
+#### 应用MCMC的有关术语
+
+1. 均衡分布
+
+也称为平稳分布或目标分布，依次生成的样本经过一定的数量 $t>B$ ，之后生成的样本具有平稳分布，
+即样本 $\theta^{(t)}、\theta^{(t+1)}$ 具有相同的分布。因此，一旦MCMC生成的样本达到平稳分布，
+可以认为该样本是由平稳分布生成的随机值。
+
+2. 算法的收敛性
+
+收敛性是指该算法生成的样本达到它的均衡状态，也可以认为从目标分布中生成样本值。一般
+情况下不知道生成多少样本后可以达到收敛的平稳状态，需要通过专门的统计诊断进行收敛性
+诊断。
+
+3. 迭代
+
+迭代是指由后验分布生成样本参数值的循环算法，具体循环次数由参数上标括号里的 $t$ 表示。
+比如， $\theta^{(5)}、\theta^{(t)}$ 分别表示由MCMC算法在第5次迭代和第 $t$ 次迭代生成
+参数 $\theta$ 的样本值。总次数 $T$ 是指MCMC算法总的迭代次数。
+
+4. 样本链的初始值 $\theta^{(1)}$
+
+初始值是指初始化样本链的开始值，不同的初始值会对后验分布产生不同的影响。消除初始值
+影响的方法有删除开始生成的部分样本链，或者生成大量的样本以及从不同分布的初始值生成
+不同的样本。一些人为了使初始值靠近后验分布的中心，把初始值选取为后验分布的众数，
+有人将其选为先验分布的均值或众数。
+
+5. 燃烧期
+
+为了避免初始值的影响，燃烧期是指从生成的样本中把开始的样本删除。如果生成的样本量
+足够大，燃烧期对后验分布推断的影响较小。
+
+6. 样本间隔期或抽样滞后
+
+由于MCMC生成的样本并不具有独立性，所以需要检验生成样本的相关性，每间隔L个样本选取
+一个抽样值，这样最终选取的样本具有较低的相关性，如果合理选取间隔期，可以得到相互
+独立的样本。
+
+7. 保留迭代次数
+
+如果每间隔L样本选取一个抽样值，另外删除初始抽样的B个样本值，最后保留的样本数
+为 $T^\prime=\frac{(T-B)}{L}$ ，可以认为这些样本相互独立，可以用于后验分析。
+
+#### MCMC的评价
+
+1. 应用MCMC结果对目标分布的描述
+
+由MCMC方法生成的随机样本表示为： $\theta^{(1)},\cdots,\theta^{(t)},\cdots,\theta^{(T^\prime)}$ ，
+基于这些样本可以得出参数 $\theta$ 的函数 $G(\theta)$ ，进而得到
+样本 $G(\theta^{(1)}),\cdots,G(\theta^{(t)}),\cdots,G(\theta^{T^\prime})$ ，
+通过这些样本可以描述 $G(\theta)$ 的后验分布特征，比如，后验均值表示为：
+
+$$\hat{E}(G(\theta)|y)=\bar{G(\theta)}=\frac{1}{T^\prime}\sum_{i=1}^{T^{\prime}}(G(\theta^{(t)}))$$
+
+后验方差表示为：
+
+$$\hat{V}(G(\theta)|y)=\frac{1}{T^\prime-1}\sum_{i=1}^{T^\prime}[G(\theta^{(t)})-\hat{E}(G(\theta)|y)]^2$$
+
+其他对后验分布的相关度量有后验中位数和后验分位数等，另外也可以计算参数的相关系数，
+还可以画出各参数边际后验分布图，比如，直方图、密度曲线图等。
+
+2. 蒙特卡洛误差
+
+对MCMC结果进行分析时，需要考虑蒙特卡洛误差，它用于测量模拟样本的可变性。比较小的
+蒙特卡洛误差可以提高参数估计的准确性，一般来讲，模拟次数越多，蒙特卡洛误差越小，
+模型的估计结果越准确。
+
+有两种常用的蒙特卡洛误差：批均值法和窗口估计法。第一种方法比较容易实施，第二种方法
+更加准确。
+
+用批均值方法估计蒙特卡洛误差，可以把模拟样本分成K个批次，每个批次的样本数为 $v=\frac{T^\prime}{K}$ ，
+计算 $G(\theta)$ 后验均值的蒙特卡洛误差，首先计算批均值：
+
+$$\bar{G(\theta)_b}=\frac{1}{v}\sum_{t=(b-1)v+1}^{bv}G(\theta^{(t)})$$
+
+这里， $b=1,\cdots,K$ ，总体均值误差为：
+
+$$\bar{G(\theta)}=\frac{1}{T^\prime}\sum_{t=1}^{T^\prime}G(\theta^{(t)})=\frac{1}{K}\sum_{b=1}^K\bar{G(\theta)_b}$$
+
+蒙特卡洛误差估计值通过批均值的标准偏差进行估计：
+
+$$MCE[G(\theta)]=\hat{SE}[\bar{G(\theta)}]=\sqrt{\frac{1}{K}}\hat{SD}[\bar{G(\theta)_b}]=\sqrt{\frac{1}{K(K-1)}\sum_{b=1}^K(\bar{G(\theta)_b}-\bar{G(\theta)})^2}$$
+
+第二种蒙特卡洛误差估计方法依赖于相关样本的方差表达式：
+
+$$MCE[G(\theta)]=\frac{\hat{SD}[G(\theta)]}{\sqrt{T^\prime}}\sqrt{1+2\sum_{k=1}^\infty\hat{\rho}_k[G(\theta)]}$$
+
+这里， $\hat{\rho}_k[G(\theta)]$ 表示滞后k期的相关系数估计值，即 $G(\theta^{(t)})、G(\theta^{(t+k)})$ 的
+相关系数。当滞后期k比较大时，保留的观察值比较少，相关系数不能得到合理的估计；当滞后期k
+足够大的时候，相关系数可以为0。根据这个原理，一个滞后期 $w$ 被选定，当滞后期 $k>w$ 时，
+相关系数比较小，从而可以从蒙特卡洛误差估计中删除，这样可以得到修正后的蒙特卡洛误差估计值：
+
+$$MCE[G(\theta)]=\frac{\hat{SD}[G(\theta)]}{\sqrt{T^\prime}}\sqrt{1+2\sum_{k=1}^w\hat{\rho}_k[G(\theta)]}$$
+
+另外，统计量 $ESS=\frac{N}{\sqrt{1+2\sum_{k=1}^w\hat{\rho}_k[G(\theta)]}}$ 被称为
+有效样本数。R代码如下：
+
+```
+mcerror.batch<-function(x,batches=50){
+  iter=length(x)   ##样本总数
+  batleng=ceiling(iter/batches)   ##ceiling返回计算结果的整数部分，这里表示每个批次的样本数，batches表示50个批次
+  bats<-sort(rep(seq(from=1,to=batches,by=1),batleng))   ##sort排序，默认升序
+  bats<-bats[1:iter]
+  batmens<-tapply(x,bats,mean)   ##返回结果是第一次到最后一次迭代的均值
+  mc.error<-sd(batmeans)/sqrt(batchaes-1)
+  return(mc.error)
+}
+```
+
+3. 算法的收敛性
+
+收敛性是指算法生成的样本是否达到均衡分布，即样本是否由目标分布完成。检验收敛性的方法：
+
+1. 蒙特卡洛模拟误差，比较小的误差表示比较高的准确性；
+2. 检验自相关系数，比较小的相关系数表示比较快的收敛性；
+3. 检测轨迹图，即画出迭代次数与样本值的曲线图，如果轨迹图中的数值出现在一定的区域内，
+并没有呈现趋势性和周期性变化，可以认为达到收敛状态；
+4. 更加复杂的方法通过几条样本链进行比较分析。
+
+## 常用的MCMC算法
+
+### M-H算法
+
+给定目标密度函数 $f(x)$ ，建议分布函数 $q$ 生成马尔可夫链 $(X_t)$ ，其中建议函数 $q$ 比较
+容易模拟，并且 $q$ 与 $f(x)$ 具有相同的定义域，比率 $f(y)/q(y|x)$ 为一个独立于  $x$ 的常数。
+假设从目标分布 $f(x)$ 中生成样本量为 $T$ 的样本， $x_t$ 表示第 $t$ 次迭代生成的样本，
+应用M-H算法的具体过程如下：
+
+1. 设定初始值 $x_0$ ；
+2. 对于 $t=1,\cdots,T$ 重复以下过程：
+
+- 设定 $x=x_{t-1}$ ；
+- 从建议分布 $q(x\to x^\prime)=q(x^\prime|x)$ 生成新的备选样本值 $x^\prime$ ；
+- 计算 $\alpha=min(1,\frac{f(x^\prime)q(x|x^\prime)}{f(x)q(x^\prime|x)})$ ；
+- 以概率 $\alpha$ 选取样本 $x_t=x^\prime$ ，以概率 $1-\alpha$ 选取样本 $x_t=x=x_{t-1}$ 。
+
+R代码如下：
+
+```
+y<-geneq(x[t])   ##geneq()是建议分布函数q
+if(runif(1)<f(y)*q(y,x[t])/(f(x[t])*q(x[t],y))){
+  x[t+1]=y
+}else{
+  x[t+1]=x[t]
+}
+```
+
+候选值 $Y$ 被接受的概率为 $\alpha=min(1,\frac{f(Y)q(X_t|Y)}{f(X_t)q(Y|X_t)})$ ，
+假设建议分布满足设定的条件，M-H链收敛到平稳分布 $\pi$ ，该平稳分布实际上就是目标分布 $f$ 。
+
+例2：生成目标函数 $Be(2.7,6.3)$ ，建议分布是在[0,1]区间上的均匀分布，M-H算法如下：
+
+```{r}
+a<-2.7;b<-6.3  ##初始值 目标函数是f(x)~Beta(2.7,6.3)
+Nsim<-5000
+X<-rep(runif(1),Nsim) ##初始化样本链，从均匀分布中抽取随机数，重复5000次，马尔科夫链就是一些随机数组成的向量,初始值随便给
+for (i in 2:Nsim) {
+  Y<-runif(1)   ##从建议分布中生成新的备选样本值，只选一个可以？也可以选多个？
+  rho<-dbeta(Y,a,b)/dbeta(X[i-1],a,b)
+  X[i]<-X[i-1]+(Y-X[i-1])*(runif(1)<rho)   ##如果生成的均匀分布随机数小于转移概率，则接受Y作为新的样本，否则，新的样本为X[i-1]
+}
+ks.test(jitter(X),rbeta(5000,a,b))  ##进行单样本或双样本的K-S检验,k-S检验是基于累积分布函数，用于检验一个经验分布是否符合某种理论分布或比较两个经验分布是否有显著性差异
+#?jitter  ##在数值向量上增加一个噪声
+ks.test(X,rbeta(5000,a,b))
+```
+
+上面介绍的算法直接应用于贝叶斯框架中，用参数 $\theta$ 代替 $x$ ，用后验
+分布 $f(\theta|y)$ 代替目标分布 $f(x)$ 。在贝叶斯推断中，具体算法为：
+
+1. 设定初始值 $\theta^{(0)}$ ；
+2. 对于 $t=1,\cdots,T$ 重复以下过程：
+- 设定 $\theta=\theta^{(t-1)}$ ；
+- 从建议分布 $q(\theta^\prime|\theta)$ 生成新的备选参数值 $\theta^\prime$ ；
+- 计算 $\alpha=min(1,\frac{f(\theta^\prime|y)q(\theta|\theta^\prime)}{f(\theta|y)q(\theta^\prime|\theta)})$ ；
+- 以概率 $\alpha$ 选取新的参数值 $\theta^{(t)}=\theta^\prime$ ，以概率 $1-\alpha$ 保留原参数值 $\theta^{(t)}=\theta$ 。
+
+另外，接受概率 $\alpha$ 也可以表示为 
+$\alpha=min(1,\frac{f(y|\theta^\prime)f(\theta^\prime)q(\theta|\theta^\prime)}{f(y|\theta)f(\theta)q(\theta^\prime|\theta)})$ 。
+
+M-H算法的特殊形式有随机游走M算法，独立抽样，单组M-H算法和Gibbs抽样。
+
+#### 随机游走M-H算法
+
+该方法基于当前值的邻近区域进行探索，即通过 $Y_t=Y^{(t)}+\varepsilon_t$ 模拟 $Y_t$ 值，
+其中 $\varepsilon_t$ 是服从分布 $g$ 的随机扰动项。M-H算法的建议密度函数 $q(y|x)=g(y-x)$ ，
+随机游走的M-H方法建议密度为 $q(\theta|\theta^\prime)=q(\theta^\prime|\theta)$ ，此时，
+接受概率只依靠后验分布： $\alpha=min(1,\frac{f(\theta^\prime|y)}{f(\theta|y)})$ 。
+
+例3：应用随机游走M方法生成自由度为 $v$ 的 $t(v)$ 分布随机变量，应用建议分布为正态
+分布 $N(X_t,\sigma^2)$ ，该方法需要计算比率
+
+$$(x_t,y)=\frac{f(Y)}{f(X_t)}=\frac{(1+y^2/v)^{-(v+1)/2}}{(1+x_t^2/v)^{-(v+1)/2}}$$
+
+```{r fig3,fig.cap="参数σ轨迹分布图", dev="png", cache=T}
+rw.Metropolis<-function(n,sigma,x0,N){
+  x<-numeric(N)
+  x[1]<-x0
+  u<-runif(N)
+  k<-0
+  for (i in 2:N) {
+    y<-rnorm(1,x[i-1],sigma)
+    if(u[i]<=(dt(y,n)/dt(x[i-1],n)))   ##dt表示给定x后t分布密度函数值
+      x[i]<-y else {x[i]<-x[i-1];k<-k+1}
+  }
+  return(list(x=x,k=k))
+}
+n<-4  #t分布自由度为4
+N<-2000;sigma<-c(0.05,0.5,2,16);x0<-25
+rw1<-rw.Metropolis(n,sigma[1],x0,N)
+rw2<-rw.Metropolis(n,sigma[2],x0,N)
+rw3<-rw.Metropolis(n,sigma[3],x0,N)
+rw4<-rw.Metropolis(n,sigma[4],x0,N)
+# 舍掉的抽样值
+print(c(rw1$k,rw2$k,rw3$k,rw4$k))  ##结果返回拒绝抽样的次数，可以看出，方差越大，拒绝的次数越多
+index<-1:2000
+y1<-rw1$x[index];y2<-rw2$x[index];y3<-rw3$x[index];y4<-rw4$x[index]
+windows()
+layout(matrix(1:4,nrow=2,byrow=TRUE))
+plot(index,y1,type="l",xlab=bquote(sigma*"=0.05"),main="",ylab="x")
+plot(index,y2,type="l",xlab=bquote(sigma*"=0.5"),main="",ylab="x")
+plot(index,y3,type="l",xlab=bquote(sigma*"=2"),main="",ylab="x")
+plot(index,y4,type="l",xlab=bquote(sigma*"=16"),main="",ylab="x")
+```
+
+### Gibbs抽样
+
+是单变量M-H算法的特殊形式，应用全条件后验分布 $f(\theta_j|\theta_{-j},y)$ 作为
+建议分布 $q(\theta^\prime|\theta^{(t)})$ ，这里参数
+向量 $\theta_{-j}=(\theta_1,\cdots,\theta_{j-1},\theta_{j+1},\cdots,\theta_d)^{T}$ ，
+这种建议分布产生的接受概率为1，因此，所有的迭代都被接受。其优势为，所有抽样数据
+由一维分布产生，样本可以由标准统计分布生成；另外，它不需要定义建议分布，每次接受
+新的样本值。但是在参数空间比较复杂或者参数高度相关的情况下，Gibbs抽样将不再适用。
+
+Gibbs抽样方法经常用在目标分布是多元分布的情况，假设其中的一元条件分布可以明确给出，
+并且从中容易得到随机样本。由目标分布的条件分布进行抽样，得到的样本值能够全部接受。
+
+假设 $X=(X_1,\cdots,X_d)$ 是定义在 $R^d$ 内的随机向量， $d-1$ 维随机向量为： 
+$X_{-j}=(X_1,\cdots,X_{j-1},X_{j+1},\cdots,X_d)$ ，给定 $X_{-j}$ 得到 $X_j$ 的
+条件分布为 $f(X_j|X_{-j})$ ，Gibbs抽样方法就是从 $d$ 个条件密度函数 $f(X_j|X_{-j})$ 中
+进行抽样。具体步骤如下：
+
+1. 设定初始值 $\theta^{(0)}$ ；
+2. 对于 $t=1,\cdots,T$ 重复以下过程：
+- 设定 $\theta=\theta^{(t-1)}$ ；
+- 由 $\theta_j\sim f(\theta_j|\theta_{-j},y)$ 生成参数值 $\theta_j$ ，这里 $j=1,\cdots,d$ ；
+- 设定 $\theta^{(t)}=\theta$ ，将它保存成为 $t+1$ 次迭代生成的值。
+
+因此，给定一个样本值 $\theta^{(t)}$ ，依次从 
+$f(\theta_j|\theta_{-j},y)=f(\theta_1^{(t)},\cdots,\theta_{j-1}^{(t)},\theta_{j+1}^{(t)},\cdots,\theta_d^{(t)})$ 
+分布中生成新的样本值，该分布函数中 $\theta_j$ 以外的参数都认为是常数。
+
+例9：假设一个数据服从正态分布，为了对该分布的参数进行估计，假设其均值和方差参数的
+先验分布分别为正态分布和逆伽玛分布：
+
+$$\mu\sim N(\mu_0,\sigma_0^2),\sigma^2\sim IG(a_0,b_0)$$
+
+应用Gibbs抽样方法，需要分别从条件分布 $f(\mu|y,\sigma^2)、f(\sigma^2|y,\mu)$ 生成样本，
+经过计算可得到条件后验分布：
+
+$$\mu|\sigma^2,y\sim N(w\bar{y}+(1-w)\mu_0,w\frac{\sigma^2}{n})\\
+\sigma^2|\mu,y\sim IG(a_0+\frac{n}{2},b_0+\frac{1}{2}\sum_{i=1}^n(y_i-\mu)^2)$$
+
+其中 $w=\frac{\sigma_0^2}{\sigma_0^2/n+\sigma_0^2}$ ， $n$ 是实际观察值个数。
+该例的Gibbs抽样步骤为：
+
+对于 $t=1,\cdot,T$
+
+1. 设定 $\mu=\mu^{(t-1)},\sigma=\sigma^{(t-1)},\theta=(\mu,\sigma^2)^T$ ；
+2. 计算 $w=\frac{\sigma_0^2}{\sigma_0^2/n+\sigma_0^2},m=w\bar{y}+(1-w)\mu_0,s^2=w\frac{\sigma^2}{n}$ ；
+3. 从分布 $N(m,s^2)$ 中生成参数 $\mu$ ；
+4. 设定 $\mu^{(t)}=\mu$ ；
+5. 计算 $a=a_0+\frac{n}{2},b=b_0+\frac{1}{2}\sum_{i=1}^n(y_i-\mu)^2$ ；
+6. 从分布 $G(a,b)$ 中生成参数 $\tau$ ；
+7. 设定 $\sigma^2=1/\tau,\sigma^{(t)}=\sigma$ 。
+
+```
+Iterations<-3500
+mu0<-0;s0<-100;a0<-0.001;b0<-0.001
+theta<-matrix(nrow=Iterations,ncol=2)
+cur.mu<-0;cur.tau<-2;cur.s<-sqrt(1/cur.tau)
+for (i in 1:Iterations) {
+  w<-s0^2/(cur.s^2/n+s0^2)
+  m<-w*bary+(1-w)*mu0
+  s<-sqrt(w/n)*cur.s
+  cur.mu<-rnorm(1,m,s)
+  a<-a0+0.5*n
+  b<-b0+0.5*sum((y-cur.mu)^2)
+  cur.tau<-rgamma(1,a,b)
+  cur.s<-sqrt(1/cur.tau)
+  theta[t,]<-c(cur.mu,cur.s)
+}
+```
+
+例10：应用Gibbs抽样方法生成均值为 $(\mu_1,\mu_2)$ ，方差为 $\sigma_1^2,\sigma_2^2$ ，
+相关系数为 $\rho$ 的二元正态分布随机样本。在二元的情况下， $X=(X_1,X_2),X_{-1}=X_2,X_{-2}=X_1$ ，
+且
+
+$$f(x_1|x_2)\sim N(\mu_1+\rho\frac{\sigma_1}{\sigma_2}(x_2-\mu_2),(1-\rho^2)\sigma_1^2)\\
+f(x_2|x_1)\sim N(\mu_2+\rho\frac{\sigma_2}{\sigma_1}(x_1-\mu_1),(1-\rho^2)\sigma_2^2)$$
+
+二元正态分布 $(X_1,X_2)$ Gibbs抽样迭代过程如下：
+
+1. 设定 $(x_1,x_2)=X(t-1)$ ；
+2. 由 $f(X_1|x_2)$ 生成样本 $X_1^*(t)$ ；
+3. 由 $f(X_2|x_1)$ 生成样本 $X_2^*(t)$ ；
+4. 设定 $X(t)=(X_1^*(t),X_2^*(t))$ 。
+
+```{r}
+N<-5000  #样本链长度
+burn<-1000  #燃烧长度
+X<-matrix(0,N,2)  #二元样本链
+rho<--0.75  #相关系数
+mu1<-0;mu2<-2;sigma1<-1;sigma2<-0.5
+s1<-sqrt(1-rho^2)*sigma1;s2<-sqrt(1-rho^2)*sigma2
+###生成样本链
+X[1,]<-c(mu1,mu2)   ##初始值
+for(i in 2:N){
+  x2<-X[i-1,2]   ##x2要给一个初始值，x1不用给
+  m1<-mu1+rho*(x2-mu2)*sigma1/sigma2
+  X[i,1]<-rnorm(1,m1,s1)
+  x1<-X[i,1]
+  m2<-mu2+rho*(x1-mu1)*sigma2/sigma1
+  X[i,2]<-rnorm(1,m2,s2)
+}
+##从样本中舍掉初始的1000个样本
+b<-burn+1
+x<-X[b:N,]
+colMeans(x)
+cov(x)
+cor(x)
+plot(x,main="",cex=0.5,xlab=bquote(X[1]),ylab=bquote(X[2]),ylim=range(X[,2]))
+```
+
+### 混合Gibbs抽样
+
+
+
+
+### 切片Gibbs抽样
+
+切片抽样是基于Gibbs抽样的一种方法，广泛应用于条件后验分布比较复杂的情况。切片
+抽样通过增加一个随机变量，该变量也称为辅助变量，来扩大参数空间，该变化可以使
+所有的条件后验分布具有标准的分布形式，并且所关心的边际后验分布的形式并没有发生
+变化，这样可以直接应用简单的Gibbs抽样。
+
+切片的核心思想，假设研究的目标函数 $g(x)$ 难以生成，引入一个新变量 $u$ 具有条件
+分布 $f(u|x)$ ，则联合分布为 $f(u,x)=f(u|x)g(x)$ 。由于 $f(x)=\int f(u,x)du=\int f(u|x)g(x)du=g(x)$ ，
+可以看出边际分布 $f(x)$ 等于开始设定的目标分布 $g(x)$ 。这样应用Gibbs抽样方法，
+分别从联合分布 $f(u,x)$ 和相应的边际分布 $f(x)$ 生成样本值：
+
+1. 从 $f(u|x)$ 生成变量值 $u$ ；
+2. 从 $f(u|x)g(x)$ 生成变量值 $x$ 。
+
+为了能够方便计算， $f(u|x)、f(u|x)g(x)$ 必须采用简单的分布形式，这样便于模拟抽样。 
+$f(u|x)$ 经常采用均匀分布的形式 $U(0,g(x))$ ，可以得到：
+
+$$f(u|x)=\frac{1}{g(x)},0<u<g(x)\\
+f(x)=\int f(x|u)g(x)du=\int_0^{g(x)}du=g(x)$$
+
+则Gibbs抽样的步骤如下：
+
+1. 生成样本值 $u^{(t)}\sim U(0,g(x^{(t-1)}))$ ；
+2. 生成样本值 $x^{(t)}\sim U(x:0\leq u^{(t)}\leq g(x))$ 。
+
+在贝叶斯框架内进行分析时，辅助变量 $u=(u_1,\cdots,u_n)$ 从均匀分布 $U(0,f(y_i|\theta))$ 中
+抽样，其中 $f(y_i|\theta)$ 是似然函数，则得出联合分布为：
+
+$$f(\theta,u|y)\varpropto \{\prod_{i=1}^n I(0\leq u_i \leq f(y_i|\theta)\}f(\theta)$$
+
+这样生成Gibbs抽样的过程如下：
+
+1. 设定 $\theta=\theta^{(t-1)}$ ；
+2.对于 $i=1,\cdots,n$ ，生成样本值 $u_i^{(t)}\sim U(0,f(y_i|\theta))$ ；
+3. 对于 $j=1,\cdots,d$ 生成样本值 $\theta_j\sim \{\prod_{i=1}^n I(0\leq u_i^{(t)} \leq f(y_i|\theta)\}f(\theta_j)$ ；
+4. 设定 $\theta^{(t)}=\theta$ 。
+
+切片抽样可以应用在一些常见的统计模型中，比如广义线性模型。切片抽样避免了M-H抽样
+中的建议分布，但是需要给出辅助分布。一旦找到合适的辅助分布，该方法计算简便，但是
+抽取的样本具有一定的相关性。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 参考文献
+[//]: # (\bibliography{Bibfile})
+
