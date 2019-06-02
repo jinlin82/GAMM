@@ -1,0 +1,41 @@
+---
+title: "开题报告"
+author: "Li"
+date: "2019-04-15"
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+notice: '@*'
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+**TODO**
+
+
+
+
+```{r setup, echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+
+
+# 模型设定
+
+
+
+# 参考文献 {-}
+[//]: # (\bibliography{Bibfile})

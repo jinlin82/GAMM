@@ -1,0 +1,811 @@
+% Encoding: UTF-8
+
+@String{author = {}}
+
+@Book{BOLSTAD2017,
+  title   = {INTRODUCTION TO BAYESIAN STATISTICS},
+  year    = {2017},
+  author  = {WILLIAM M. BOLSTAD, JAMES M. CURRAN},
+  edition = {Third Edition},
+}
+
+@Article{Neal2003a,
+  author    = {Radford M. Neal},
+  title     = {Slice Sampling},
+  journal   = {The Annals of Statistics},
+  year      = {2003},
+  volume    = {31},
+  number    = {3},
+  pages     = {705--741},
+  issn      = {00905364},
+  abstract  = {Markov chain sampling methods that adapt to characteristics of the distribution being sampled can be constructed using the principle that one can sample from a distribution by sampling uniformly from the region under the plot of its density function. A Markov chain that converges to this uniform distribution can be constructed by alternating uniform sampling in the vertical direction with uniform sampling from the horizontal "slice" defined by the current vertical position, or more generally, with some update that leaves the uniform distribution over this slice invariant. Such "slice sampling" methods are easily implemented for univariate distributions, and can be used to sample from a multivariate distribution by updating each variable in turn. This approach is often easier to implement than Gibbs sampling and more efficient than simple Metropolis updates, due to the ability of slice sampling to adaptively choose the magnitude of changes made. It is therefore attractive for routine and automated use. Slice sampling methods that update all variables simultaneously are also possible. These methods can adaptively choose the magnitudes of changes made to each variable, based on the local properties of the density function. More ambitiously, such methods could potentially adapt to the dependencies between variables by constructing local quadratic approximations. Another approach is to improve sampling efficiency by suppressing random walks. This can be done for univariate slice sampling by "overrelaxation," and for multivariate slice sampling by "reflection" from the edges of the slice.},
+  publisher = {Institute of Mathematical Statistics},
+  url       = {http://www.jstor.org/stable/3448413},
+}
+
+@Article{10.1093/biomet/82.1.81,
+  author   = {BRESLOW, NORMAN E. and LIN, XIHONG},
+  title    = {{Bias correction in generalised linear mixed models with a single component of dispersion}},
+  journal  = {Biometrika},
+  year     = {1995},
+  volume   = {82},
+  number   = {1},
+  pages    = {81-91},
+  month    = {03},
+  issn     = {0006-3444},
+  abstract = {{General expressions are derived for the asymptotic biases in three approximate estimators of regression coefficients and variance component, for small values of the variance component, in generalised linear mixed models with canonical link function and a single source of extraneous variation. The estimators involve first and second order Laplace expansions of the integrated likelihood and a related procedure known as penalised quasi-likelihood. Numerical studies of a series of matched pairs of binary outcomes show that the first order estimators of the variance component are seriously biased. Easily computed correction factors produce satisfactory estimators of small variance components, comparable to those obtained with a second order Laplace expansion, and markedly improve the asymptotic performance for larger values. For a series of matched pairs of binomial observations, the variance correction factors rapidly approach one as the binomial denominators increase. These results greatly extend the range of parameter values for which the approximate estimation procedures have satisfactory asymptotic properties.}},
+  doi      = {10.1093/biomet/82.1.81},
+  eprint   = {http://oup.prod.sis.lan/biomet/article-pdf/82/1/81/709310/82-1-81.pdf},
+  url      = {https://doi.org/10.1093/biomet/82.1.81},
+}
+
+@Article{Lin1999,
+  author    = {Xihong Lin and Daowen Zhang},
+  title     = {Inference in Generalized Additive Mixed Models by Using Smoothing Splines},
+  journal   = {Journal of the Royal Statistical Society. Series B (Statistical Methodology)},
+  year      = {1999},
+  volume    = {61},
+  number    = {2},
+  pages     = {381--400},
+  issn      = {13697412, 14679868},
+  abstract  = {Generalized additive mixed models are proposed for overdispersed and correlated data, which arise frequently in studies involving clustered, hierarchical and spatial designs. This class of models allows flexible functional dependence of an outcome variable on covariates by using nonparametric regression, while accounting for correlation between observations by using random effects. We estimate nonparametric functions by using smoothing splines and jointly estimate smoothing parameters and variance components by using marginal quasi-likelihood. Because numerical integration is often required by maximizing the objective functions, double penalized quasi-likelihood is proposed to make approximate inference. Frequentist and Bayesian inferences are compared. A key feature of the method proposed is that it allows us to make systematic inference on all model components within a unified parametric mixed model framework and can be easily implemented by fitting a working generalized linear mixed model by using existing statistical software. A bias correction procedure is also proposed to improve the performance of double penalized quasi-likelihood for sparse data. We illustrate the method with an application to infectious disease data and we evaluate its performance through simulation.},
+  publisher = {[Royal Statistical Society, Wiley]},
+  url       = {http://www.jstor.org/stable/2680648},
+}
+
+@Book{张尧庭1991,
+  title     = {贝叶斯统计推断},
+  publisher = {科学出版社},
+  year      = {1991},
+  author    = {张尧庭 and 陈汉峰},
+  address   = {北京},
+}
+
+@Article{Zhang1998,
+  author    = {Daowen Zhang and Xihong Lin and Jonathan Raz and MaryFran Sowers},
+  title     = {Semiparametric Stochastic Mixed Models for Longitudinal Data},
+  journal   = {Journal of the American Statistical Association},
+  year      = {1998},
+  volume    = {93},
+  number    = {442},
+  pages     = {710--719},
+  issn      = {01621459},
+  abstract  = {We consider inference for a semiparametric stochastic mixed model for longitudinal data. This model uses parametric fixed effects to represent the covariate effects and an arbitrary smooth function to model the time effect and accounts for the within-subject correlation using random effects and a stationary or nonstationary stochastic process. We derive maximum penalized likelihood estimators of the regression coefficients and the nonparametric function. The resulting estimator of the nonparametric function is a smoothing spline. We propose and compare frequentist inference and Bayesian inference on these model components. We use restricted maximum likelihood to estimate the smoothing parameter and the variance components simultaneously. We show that estimation of all model components of interest can proceed by fitting a modified linear mixed model. We illustrate the proposed method by analyzing a hormone dataset and evaluate its performance through simulations.},
+  publisher = {[American Statistical Association, Taylor \& Francis, Ltd.]},
+  url       = {http://www.jstor.org/stable/2670121},
+}
+
+@Article{han2019analysis,
+  author  = {Han, Xiaodan and Li, Huajiao and Liu, Qian and Liu, Fuzhen and Arif, Asma},
+  title   = {Analysis of influential factors on air quality from global and local perspectives in China},
+  journal = {Environmental Pollution},
+  year    = {2019},
+  volume  = {248},
+  pages   = {965--979},
+}
+
+@Article{pham2018generalised,
+  author  = {Pham, Tung H and Wand, M P},
+  title   = {Generalised additive mixed models analysis via gammSlice},
+  journal = {Australian \& New Zealand Journal of Statistics},
+  year    = {2018},
+  volume  = {60},
+  number  = {3},
+  pages   = {279--300},
+}
+
+@Article{zheng2017a,
+  author  = {Zheng, Siqi and Kahn, Matthew E},
+  title   = {A New Era of Pollution Progress in Urban China},
+  journal = {Journal of Economic Perspectives},
+  year    = {2017},
+  volume  = {31},
+  number  = {1},
+  pages   = {71--92},
+}
+
+@Article{umlauf2015structured,
+  author  = {Umlauf, Nikolaus and Adler, Daniel and Kneib, Thomas and Lang, Stefan and Zeileis, Achim},
+  title   = {Structured Additive Regression Models: An R Interface to BayesX},
+  journal = {Journal of Statistical Software},
+  year    = {2015},
+  volume  = {63},
+  number  = {1},
+  pages   = {1--46},
+}
+
+@Article{zanin2012assessing,
+  author  = {Zanin, Luca and Marra, Giampiero},
+  title   = {Assessing the functional relationship between CO2 emissions and economic development using an additive mixed model approach},
+  journal = {Economic Modelling},
+  year    = {2012},
+  volume  = {29},
+  number  = {4},
+  pages   = {1328--1337},
+}
+
+@Article{yue2011bayesian,
+  author  = {Yue, Yu Ryan and Rue, Havard},
+  title   = {Bayesian inference for additive mixed quantile regression models},
+  journal = {Computational Statistics \& Data Analysis},
+  year    = {2011},
+  volume  = {55},
+  number  = {1},
+  pages   = {84--96},
+}
+
+@Article{scheipl2011spikeslabgam,
+  author  = {Scheipl, Fabian},
+  title   = {spikeSlabGAM :Bayesian Variable Selection, Model Choice and Regularization for Generalized Additive Mixed Models in R},
+  journal = {Journal of Statistical Software},
+  year    = {2011},
+  volume  = {43},
+  number  = {1},
+  pages   = {1--24},
+}
+
+@Article{fahrmeir2001bayesian,
+  author  = {Fahrmeir, Ludwig and Lang, Stefan},
+  title   = {Bayesian inference for generalized additive mixed models based on Markov random field priors},
+  journal = {Journal of The Royal Statistical Society Series C-applied Statistics},
+  year    = {2001},
+  volume  = {50},
+  number  = {2},
+  pages   = {201--220},
+}
+
+@PhdThesis{张继磊2009,
+  author   = {张继磊},
+  title    = {GAMM在非寿险公司未决赔款准备金评估中的运用研究},
+  school   = {湖南大学},
+  year     = {2009},
+  abstract = {
+
+
+随着我国保险业的发展,保险业的竞争不断加剧,非寿险公司面临的风险也日益加剧,由于保险行业的特性,其风险主要体现为保险公司的准备金的计提水平,其中,未决赔款准备金是非寿险公司主要的负债之一,而且未决赔款准备金的计提水平将直接影响保险公司的盈利、产品定价、偿付能力和税收,所以未决赔款准备金也是非寿险公司必须使用精算方法谨慎评估的项目。
+
+
+
+从实际操作来看,链梯法是广泛应用于提取未决赔款准备金的一种方法,这种方法由于原理简单、操作简便而受到了保险公司的青睐,但是链梯法也存在很多缺陷,它只能对最终赔付额、发展因子和未决赔款准备金进行点估计,不能对未决赔款准备金的分布函数和提存的缺口进行量化的分析,由于抽样的波动性导致点估计值很不稳定。而且对于长尾业务或新开展的业务,其尾部因子的选取具有很大的主观性,因此链梯法的使用受到了一定的限制,其根源在于该方法是一种确定性的、静态的方法。于是人们开始尝试将随机模型引入到准备金评估中。
+
+
+
+在众多随机模型中,广义线性模型得到了较为广泛的应用,但是该模型仍将连续协变量对联系函数的影响看作是线性的,而且未考虑随机效应的影响,本文以此为切入点,引入广义加法混合模型评估未决赔款准备金。本文构建了伽玛加法混合模型、泊松加法混合模型,并将非参数平滑方法应用于到广义加法混合模型中,结合bayes理论和MCMC方法得到参数的估计。与传统的链梯法相比,广义加法混合模型更适合长尾业务准备金的评估,得到的结果更为准确,结果更为客观。为保险公司提取准备金提供了更大的参考空间,为全面地考察公司持续经营的成果提供了参考依据。},
+  keywords = {未决赔款准备金;;广义加法混合模型;;马尔科夫蒙特卡洛},
+}
+
+@Article{曹红艳2008,
+  author   = {曹红艳 and 刘桂芬 and 曾平 and 张爱莲},
+  title    = {预测性伪似然法和贝叶斯法广义线性混合模型估计},
+  journal  = {中国药物与临床},
+  year     = {2008},
+  number   = {11},
+  pages    = {861--863},
+  abstract = {目的比较预测性伪似然法(PQL)和基于马尔可夫蒙特卡罗(MCMC)的贝叶斯方法在广义线性混合模型参数估计的偏差和精度。方法针对样本含量不等的层次数据,运用SAS/glimmix过程和WinBUGS软件分别进行PQL和贝叶斯法参数估计。结果两种方法固定效应参数估计结果基本一致,但对随机效应方差的估计,基于MCMC的贝叶斯法偏差远小于PQL法。结论对二分类层次数据,采用广义线性混合效应模型贝叶斯估计精度更高,偏差更小。},
+  keywords = {线性模型;;广义线性混合效应模型;;贝叶斯;;马尔可夫蒙特卡罗;;预测性伪似然法},
+}
+
+@PhdThesis{陈小驽2007,
+  author   = {陈小驽},
+  title    = {基于切片抽样MCMC方法的比较分析},
+  school   = {四川大学},
+  year     = {2007},
+  abstract = {
+
+
+
+
+本文首先介绍了Monte Carlo方法以及常用的Markov Chain Monte Carlo(MCMC)方法,并指出他们的不足所在,然后针对这些方法的不足,引入了Slice Sampling(切片抽样)方法。通过这两种方法的模拟分析得到切片抽样可以降低计算成本的结论。本文采用数值模拟的方法来进行比较分析,替换了软件原有的Gibbs抽样,发现切片抽样具有高效性这一事实。最后文章讨论了现有随机模拟方法的不足和改进方向。
+
+
+
+
+
+随着贝叶斯理论的不断发展以及计算机硬件的不断更新,出现了Markov Chain Monte Carlo(MCMC)方法。目前,MCMC方法已经逐渐作为在统计推断中解决高维数值问题的强大而普遍的工具,这些问题包括需要高维积分的复杂似然函数的估计。MCMC算法的使用是建立在贝叶斯推断的框架下的,其基本假设是:所有的模型参数分别服从特定的先验分布。
+
+
+
+
+
+一个贝叶斯推断是基于后验密度函数的参数的,也就是说对第j个参数θ_j的条件密度为。
+
+
+
+
+
+考虑一个分层模型的贝叶斯形式的例子:
+
+
+
+
+
+其中b_i独立同分布于,后验分布由下面表出:
+
+
+
+
+
+标准化常数b_i与参数θ独立,因此对参数θ的估计,如后验众数或后验均值的估计可以由f (θ,y)单独导出。如果θ的先验分布π( i )是常数(称作平面先验或无信息先验),那么它的后验分布有效的正比于它的似然函数。因此,后验众数在数值上与极大似然估计相同。所以,我们通常需要β和D的平面先验或无信息先验(与共轭先验相对)。
+
+
+
+
+
+对于上述模型,后验分布的积分往往难以计算,这就需要引入本文第二章所介绍的随机模拟方法。其中,广泛认可的MCMC方法-Gibbs抽样解决了积分的问题。但随着研究的深入,Gibbs抽样的不足也逐渐被认识。基于这些不足,本文在第三章引入了Slice Sampler(切片抽样),它均匀地从密度函数的图像上抽样,可以作为一种分布抽样的方法。我们可以这样构建一个收敛到一个均匀分布Markov链:交替的在垂直方向均匀抽样以及从这个垂直位置所定义的水平切片抽样来实现。在这种切片抽样上的变化可以很容易的在单变量分布上实现,同时也可以通过轮流更新变量使其从多变量分布抽样,其模型如下:
+
+
+
+
+
+1.指定u及条件分布π( u |x)
+
+
+
+
+
+2.构建联合分布π( x , u ) =π( x )π( u |x)
+
+
+
+
+
+3.定义转移核以及,使得两个核都服从π( x ,u)
+
+
+
+
+
+4.通过系统扫描转移核Px Pu生成现实值
+
+
+
+
+
+这种方法比Gibbs抽样更容易实现,而且可能比简单构造的Metropolis算法更有效。
+
+
+
+
+
+本文的第五章中,我给出了前面介绍的切片抽样法的计算程序,替换了WinBUGS软件默认的抽样方法。通过比较分析,发现切片抽样方法效率更高。文末进一步讨论了所给出算法的实用意义,以及未来改进的方向。},
+  keywords = {贝叶斯推断;;切片抽样;;MCMC;;Gibbs抽样},
+}
+
+@Article{邸俊鹏2019,
+  author   = {邸俊鹏 and 张晓峒},
+  title    = {二元选择分位数回归模型的贝叶斯估计方法及模拟研究},
+  journal  = {统计与决策},
+  year     = {2019},
+  volume   = {35},
+  number   = {05},
+  pages    = {11--16},
+  abstract = {文章针对二元选择分位数回归模型的贝叶斯估计方法进行探索性研究。通过模拟实验比较分析了不同先验设定和不同抽样算法下贝叶斯二元选择分位数回归估计量的统计性质,以及贝叶斯方法与频率学派方法对二元选择分位数模型进行估计的优劣。结果表明,对二元选择分位数回归模型进行贝叶斯估计具有一定的优势,尤其是小样本下,估计效果更佳;而且采用Gibbs抽样得到的估计量精度更高,统计推断更准确,尤其是在高分位数下Gibbs抽样的优势更明显。},
+  keywords = {分位数回归;;贝叶斯估计;;二元离散选择模型},
+}
+
+@Article{蒋青嬗2018,
+  author   = {蒋青嬗 and 韩兆洲},
+  title    = {空间混合效应随机前沿模型估计方法研究},
+  journal  = {数理统计与管理},
+  year     = {2018},
+  pages    = {1--14},
+  abstract = {在经典随机前沿模型中引入随机效应和空间效应,构建了空间混合效应随机前沿模型。模型考虑了生产单元技术水平的异质性并且可以有效避免忽略内生性问题导致的有偏且不一致估计量,适用性更佳。使用贝叶斯方法估计模型,核心在于推导未知参数的后验分布以及MCMC抽样。相比于其他估计方法,贝叶斯方法简单直观且精度较高,更适合复杂模型的估计。数值模拟结果显示:(1)贝叶斯估计的精度较高。增加样本容量有助于提高精度。(2)忽略随机效应,估计精度偏低。数值模拟表明文中模型和方法有存在必要性。},
+  keywords = {随机前沿模型;;空间效应;;随机效应;;极大似然估计;;贝叶斯估计},
+}
+
+@Article{刘鹤飞2019,
+  author   = {刘鹤飞},
+  title    = {隐马尔可夫多元线性回归模型及其贝叶斯估计},
+  journal  = {统计与决策},
+  year     = {2019},
+  volume   = {35},
+  number   = {06},
+  pages    = {21--24},
+  abstract = {文章将隐马尔可夫模型与回归模型相结合,提出了隐马尔可夫回归模型的概念。并以多元线性回归为例,详细给出了隐马尔可夫多元线性回归模型的数学定义。为了对模型的参数进行贝叶斯估计,给出了参数的先验分布,推导出了每个参数的全条件后验分布。用MCMC算法模拟后验分布,取后验均值作为各参数的贝叶斯估计值。最后,将参数的估计值与真实值进行对比,验证了估计方法的可靠性。},
+  keywords = {隐马尔可夫模型;;回归模型;;贝叶斯估计;;先验分布;;MCMC算法},
+}
+
+@Article{苏雅玲2018,
+  author   = {苏雅玲 and 何幼桦},
+  title    = {非参数回归的贝叶斯估计},
+  journal  = {上海大学学报(自然科学版)},
+  year     = {2018},
+  volume   = {24},
+  number   = {06},
+  pages    = {1022--1029},
+  abstract = {基于因变量Y对自变量X条件分布的非参数贝叶斯估计,通过期望计算得到未知回归函数的后验估计表达式,并计算出估计的均方误差,证明该估计的均方收敛性.阐明当先验的选择接近真实的回归函数时,该估计的均方误差小于局部线性核回归的均方误差.最后通过实证分析,表明该非参数贝叶斯回归比非参数局部线性回归具有更好的预测效果.},
+  keywords = {非参数贝叶斯回归;;非参数贝叶斯分布估计;;Dirichlet过程;;局部线性回归;;人口预测},
+}
+
+@Article{王耀富2008,
+  author   = {王耀富},
+  title    = {MCMC中的切片抽样方法研究},
+  journal  = {统计与决策},
+  year     = {2008},
+  number   = {20},
+  pages    = {160--162},
+  abstract = {文章首先介绍了常用的Markov Chain Monte Carlo(MCMC)方法,并指出他们的不足所在,然后针对这些方法的不足,引入了Slice Sampling(切片抽样)方法。通过这几种方法的模拟分析得到切片抽样可以降低计算成本的结论。文章采用数值模拟的方法来进行比较说明,力求客观的反映切片抽样具有高效性这一事实。最后讨论了现有随机模拟方法的不足和改进方向。},
+  keywords = {MCMC方法;;切片抽样;;随机模拟},
+}
+
+@Article{李琛2017,
+  author   = {李琛 and 刘瑾 and 王彦民},
+  title    = {气象因素对西安市城区空气质量的影响},
+  journal  = {干旱区资源与环境},
+  year     = {2017},
+  volume   = {31},
+  number   = {03},
+  pages    = {83--88},
+  abstract = {以西安市城区2014年1月1日~2015年12月31日空气质量监测数据和气象资料为基础,分析了气象因素对空气质量的影响。相关性分析表明:在各污染等级下,气温T和露点温度Td与气态污染物SO_2、CO、NO_2呈显著负相关,与O3呈显著正相关;4级污染时,露点温度Td与PM_(2.5)呈显著负相关,气温T与PM_(10)呈显著正相关;3、4级时,气温T与PM_(2.5)呈显著负相关。3级污染时,仅有气压趋势Pa对PM_(2.5)、PM_(10)、SO_2、CO存在显著相关性;4级及以上污染时,大气压P0、平均海平面大气压P与各污染物浓度间的显著相关性基本一致。4级污染时,湿度RH与PM_(10)和NO_2呈显著负相关,4级及以上污染时,RH与SO_2呈显著负相关。PM_(10)主成分回归模型通过了显著性检验、拟合优度很好且无多重共线性,CO、NO_2、PM_(2.5)、T、Td、RH对PM_(10)浓度存在显著影响。},
+  keywords = {西安市;;气象因素;;污染等级;;相关性分析;;主成分回归模型},
+}
+
+@Article{李健2019,
+  author   = {李健 and 靳泽凡 and 苑清敏},
+  title    = {京津冀空气质量环境库兹涅茨曲线及影响因素——基于2006—2017年面板数据的分析},
+  journal  = {生态经济},
+  year     = {2019},
+  volume   = {35},
+  number   = {02},
+  pages    = {197--201+218},
+  abstract = {通过构建空气质量环境库兹涅茨曲线模型,选取空气质量达到或好于二级的天数为因变量,实证分析了2006—2017年京津冀地区空气质量与经济增长之间的关系,计算出空气质量变化的拐点,并选取代表性变量研究空气质量的影响因素。结果表明,京津冀地区空气质量的环境库兹涅茨曲线为倒"N"型,但未达到拐点。产业结构对空气质量有负向影响,人口密度、城市化进程和城市绿化程度对空气质量的改善有积极作用,但城市绿化程度加大对空气质量的改善效果不显著。在上述结论基础上,提出了缓解京津冀地区空气污染建议。},
+  keywords = {京津冀;;空气质量;;环境库兹涅茨曲线;;城市经济发展},
+}
+
+@Article{李经路2017,
+  author   = {李经路 and 曾天},
+  title    = {北京空气质量影响因素的主成分分析——来自于2000-2011年的经验数据},
+  journal  = {生态经济},
+  year     = {2017},
+  volume   = {33},
+  number   = {01},
+  pages    = {167--171+189},
+  abstract = {中国国内生产总值已经仅次于美国,位居全球第二,但是中国粗放型的经济发展模式带来的环境污染问题却日益严重,空气质量也在逐年恶化。为探究北京市空气质量的影响因素,文章利用北京市2000-2011年相关数据,构建了影响空气质量因素的多元非线性计量模型,采用主成分分析方法,得到研究结论。研究表明:在影响北京市空气质量的各因素中,人均国民生产总值与空气质量指标成倒"N"型曲线关系,空气质量指标用空气质量为良的天数来衡量;第三产业产值占比值和天然气占能源的消费比值分别与空气质量指标成负相关关系。为改善北京市的空气质量,文章提出了改变经济增长模式,促进产业结构调整;改变能源结构,大力推动清洁能源和可再生资源;节约能源消费,提高能源利用效率的三条建议。},
+  keywords = {北京市;;环境库兹涅茨曲线;;空气污染指数;;能源强度},
+}
+
+@Article{蔡怡静2015,
+  author   = {蔡怡静 and 李太平},
+  title    = {城市空气质量影响因素的实证分析},
+  journal  = {环境保护与循环经济},
+  year     = {2015},
+  volume   = {35},
+  number   = {02},
+  pages    = {65--68+71},
+  abstract = {空气污染是人为因素和自然因素相互作用的复杂结果,实证分析空气质量的主要影响因素,对治理城市空气污染具有重要的指导意义。通过运用国家环境保护部发布的2014年1月1日至2014年4月30日161个城市AQI日数据,采用回归分析研究探讨影响AQI的主要因素。研究表明,城市特征因素、排放因素和气象因素都和空气质量显著相关;其中,房屋建筑施工面积、民用汽车拥有量、工业二氧化硫和烟尘排放总量与AQI存在显著的正相关关系,城市绿地面积、风、温度、降雨量与AQI存在显著的负相关关系;城市绿地面积、工业二氧化硫和烟尘排放总量、风和降雨量与AQI的显著性最高。根据相关实证结果,提出了改善城市空气质量的政策建议。},
+  keywords = {空气质量指数;;城市特征因素;;排放因素;;气象因素},
+}
+
+@Article{李静萍2017,
+  author   = {李静萍 and 周景博},
+  title    = {工业化与城市化对中国城市空气质量影响路径差异的研究},
+  journal  = {统计研究},
+  year     = {2017},
+  volume   = {34},
+  number   = {04},
+  pages    = {50--58},
+  abstract = {本文采用结构方程模型,以2014年全国113个环境保护重点城市为样本,就工业化和城市化进程对空气质量的影响进行了研究。研究结果表明:工业化和城市化对我国城市空气质量的影响路径和影响模式均有显著差异。工业化对空气质量具有直接影响,影响模式为正向线性;城市化对空气质量具有间接影响,其中,人口比重对空气质量的影响为负向线性,人口密度的影响表现为"倒U型",人口密度影响拐点的置信区间为(363,1232)人/平方千米,2014年,有64个城市在此区间内,需要决策者重点关注。本文的创新在于首次将SEM引入空气质量影响因素研究领域,在实证分析中揭示出工业化和城市化对城市空气质量影响的不同路径与模式;并提出,城市化率的提高和第二产业比重的降低均有助于空气质量的改善,从改善空气质量的角度,应将集中型城市化作为我国城市化的基本路径。},
+  keywords = {空气质量;;工业化;;城市化;;结构方程模型;;城市},
+}
+
+@Article{李莉娜2017,
+  author   = {李莉娜 and 潘本锋 and 王帅 and 董广霞},
+  title    = {基于环境库兹涅茨曲线的中国城市环境空气质量主要影响因素},
+  journal  = {中国环境监测},
+  year     = {2017},
+  volume   = {33},
+  number   = {05},
+  pages    = {109--115},
+  abstract = {当前,中国城市环境空气污染形势十分严峻,空气质量呈现出典型的区域性特征。研究对2006—2012年各地区环境空气质量数据和经济社会发展指标统计资料面板数据进行分析,结果表明:研究选取时段内多数空气质量指标与人均国内生产总值之间的关系并不符合典型的环境库兹涅茨曲线(倒U型曲线),无显著相关性,但NO2质量浓度与人均国内生产总值之间呈现出倒N型曲线,空气质量综合指数与人口密度之间也呈现出倒N型曲线。空气质量综合指数与国民经济中第二产业占比和第三产业占比之间没有显著的相关关系,但与第一产业占比呈显著的负相关关系。空气质量综合指数与主要污染物单位面积排放量呈显著的正相关关系,与单位面积能源消费总量、单位面积煤炭消费量均呈显著的正相关关系,表明以煤炭为主要能源类型的能源消费带来的污染物排放是影响空气质量的主要因素。空气质量综合指数与降水量呈显著的负相关关系,降水量等气象条件对空气质量有一定影响,在开展大气污染防治时,应综合考虑各地的自然因素特征,合理确定工作目标和防治对策。},
+  keywords = {环境空气质量;;库兹涅茨曲线;;影响因素;;分析},
+}
+
+@Article{曲长雨2018,
+  author   = {曲长雨},
+  title    = {社会经济因素对我国主要城市空气质量影响浅析},
+  journal  = {当代经济},
+  year     = {2018},
+  number   = {24},
+  pages    = {138--139},
+  abstract = {近年来,空气质量问题引起了社会各界的广泛关注,在一味地追求经济高速增长的同时,空气质量状况的日益下降警醒我们须及时采取保护空气环境的相应措施。虽然目前各有关部门已经采取了一系列措施来缓解空气污染问题,但城市空气污染依旧严重。本文选取我国74个主要城市的数据,通过对STIR PAT模型的扩展,分析社会经济因素对我国空气质量的影响情况,并据此为我国空气质量的治理提出科学合理的建议。},
+  keywords = {影响因素;;空气质量;;STIR PAT模型},
+}
+
+@Article{王斌会2015,
+  author   = {王斌会 and 王术},
+  title    = {我国城市空气质量影响因素的实证研究——基于中国31个主要城市面板数据的分析},
+  journal  = {福建农林大学学报(哲学社会科学版)},
+  year     = {2015},
+  volume   = {18},
+  number   = {06},
+  pages    = {29--33},
+  abstract = {根据2006-2012年我国31个主要城市面板数据,对我国城市空气质量的影响因素进行实证研究。结果表明,PM10与城市空气质量之间存在显著负相关关系,SO2和NO2对城市空气质量的影响不显著;经济发展和公共交通发展与城市空气质量大部分呈正比;城市绿化的发展对城市空气质量的影响不显著。另外,从三大经济区域来看,不同的大气污染物对城市空气质量的影响不同。因此,多途径的减排减污,发展公共交通将会显著地改善城市空气质量,且城市绿地发展的整体性亟待提高。},
+  keywords = {城市空气质量;;面板数据;;随机效应模型},
+}
+
+@Article{吴雪萍2018,
+  author   = {吴雪萍 and 高明 and 曾岚婷},
+  title    = {基于半参数空间模型的空气污染与经济增长关系再检验},
+  journal  = {统计研究},
+  year     = {2018},
+  volume   = {35},
+  number   = {08},
+  pages    = {82--93},
+  abstract = {本文选取2001-2014年我国30个省份数据作为样本,考虑空气污染的空间自相关性,采用空间杜宾滞后模型(SDM)和半参数空间滞后模型实证检验经济增长与空气污染的非线性关系。结果表明:①我国空气污染存在显著的空间正相关性,高空气污染水平集聚地随时间推移呈现出"由西向东"的转移特征;②空气污染与经济增长存在一种震荡曲线形式的关系,并不完全吻合传统的EKC倒U型曲线形状,但震荡关系也符合EKC所描述的环境污染与经济增长的关系将长期存在的特征,说明了经济增长并不能自发解决空气污染问题;③半参数空间滞后模型的拟合优度高于普通参数模型,其刻画的空气污染与经济增长的非线性特征验证了前人对二者震荡关系的猜想,结果更为稳健、准确与有效。},
+  keywords = {空气污染;;经济增长;;空间计量;;半参数空间滞后模型},
+}
+
+@Article{蔺雪芹2016,
+  author   = {蔺雪芹 and 王岱},
+  title    = {中国城市空气质量时空演化特征及社会经济驱动力},
+  journal  = {地理学报},
+  year     = {2016},
+  volume   = {71},
+  number   = {08},
+  pages    = {1357--1371},
+  abstract = {城市空气污染是中国在快速城镇化和经济发展过程中亟待解决的难题。利用2013年和2014年全国城市空气质量数据,综合Arc GIS空间分析和统计分析,从年度、季节、月份、小时4个时间尺度比较归纳了全国城市空气质量的时空间演化特征,并采用空间计量模型,从全国和区域两个空间尺度,量化分析了城市空气质量变化的社会经济驱动力。结果表明:(1)全国城市空气质量全年达标天数比例增加,但空气污染程度加重,高污染区域恶化态势明显;(2)城市空气质量与生产生活活动表现出一定的时间耦合性,基本呈现"日出趋差、日落趋优"的态势;(3)全国城市空气污染表现出"东重西轻、北重南轻"的空间格局,区域一体化态势明显;(4)区域城市空气污染的总体程度和分布结构具有明显的分异特征,区域空气污染形成和演化路径可基本归纳为:"重点城市污染加重—重点城市污染扩散—区域整体污染加重—重点城市引领治污—区域污染联防联控—区域整体污染减轻";(5)从全国层面看,能源消耗、工业化和技术进步是推动城市空气质量恶化的重要因素,经济发展对城市空气质量改善具有显著的推动作用。(6)受各地区资源环境基础和社会经济发展阶段影响,各类社会经济因素对城市空气质量改善的驱动方向和驱动强度差异明显。在结论的基础上,讨论了中国经济发展和环境变化关系的区域分异以及发展理念。},
+  keywords = {城市空气质量;;时空演化;;社会经济;;驱动力;;城市;;中国},
+}
+
+@Article{湛社霞2018,
+  author   = {湛社霞 and 匡耀求 and 阮柱},
+  title    = {基于灰色关联度的粤港澳大湾区空气质量影响因素分析},
+  journal  = {清华大学学报(自然科学版)},
+  year     = {2018},
+  volume   = {58},
+  number   = {08},
+  pages    = {761--767},
+  abstract = {利用粤港澳珠江三角洲区域空气监控网络数据,分析2006—2016年粤港澳大湾区空气污染物的时空变化,探讨其影响因素。采用灰色关联度计算社会经济因素与珠三角、香港和澳门空气污染物浓度的关联度。结果表明:粤港澳大湾区内SO2、NO2和PM10年平均浓度总体呈明显下降趋势,月平均浓度呈U形变化趋势;O3年平均浓度呈上升趋势,月际变化呈M形趋势;工业、能源消耗、人口、机动车数量和环境管理政策是影响区域空气质量的主要因素。强化联合防控,严格管控工业污染、降低能源消耗和加强车辆管制,是持续改善粤港澳大湾区空气质量的主要途径。},
+  keywords = {空气质量;;粤港澳大湾区;;灰色关联度;;污染物影响因素},
+}
+
+@Article{李茜2013,
+  author   = {李茜 and 宋金平 and 张建辉 and 于伟 and 胡昊},
+  title    = {中国城市化对环境空气质量影响的演化规律研究},
+  journal  = {环境科学学报},
+  year     = {2013},
+  volume   = {33},
+  number   = {09},
+  pages    = {2402--2411},
+  abstract = {运用2001—2010年237个地级以上城市的面板数据,共计2353个样本,应用计量经济学分析方法,研究城市化进程中环境空气主要污染物的演化规律.在对面板数据进行平稳性检验后,运用固定效应模型和随机效应模型,将城市空气主要污染物SO2、NO2、PM10的年平均浓度、综合污染指数4个空气质量指标与人均GDP、人口密度、第二产业结构、建成区面积4个反映城市社会经济发展的指标进行回归拟合,得到我国城市经济发展与环境质量变化的关系和演化规律,并提出政策建议.结果表明,2001—2010年,我国城市空气质量与经济发展之间的关系并不完全符合倒U型曲线,不同的污染物类型具有不同的演化规律.10年间,随着城市经济的发展,城市空气中SO2浓度呈现下降的趋势,并到达拐点,符合倒U型曲线;而对于NO2、PM10浓度及综合污染指数,10年间与经济发展之间呈U型关系,即现阶段呈现污染继续加重的态势.此外,城市第二产业结构比例、建成区面积与城市空气主要污染物浓度呈显著的正相关关系.},
+  keywords = {城市化;;城市空气质量;;计量经济},
+}
+
+@Article{徐冰烨2017,
+  author   = {徐冰烨 and 俞洁 and 沈叶民},
+  title    = {近10年浙江省城市环境空气质量变化趋势及影响因素分析},
+  journal  = {环境污染与防治},
+  year     = {2017},
+  volume   = {39},
+  number   = {06},
+  pages    = {610--615+619},
+  abstract = {利用浙江省环境空气中SO_2、NO_2和PM_(10)监测数据,采用Daniel趋势检验法,研究了近10年(2005—2014年)浙江省城市环境空气质量变化趋势及影响因素。结果表明:(1)2005—2014年,浙江省县级以上城市综合污染指数平均值呈显著下降趋势,总体环境空气质量呈好转趋势。(2)SO_2年均值呈不显著下降趋势,NO_2年均值基本保持稳定,PM_(10)年均值呈显著下降趋势。浙江省SO_2、NO_2和PM_(10)浓度高值区域主要分布在浙中北部地区,与2005年相比,2014年浓度高值区域面积减少,污染程度降低。(3)SO_2、NO_2和PM_(10)月均值变化趋势基本一致,浓度高值主要出现在1、11、12月,低值集中出现在6—9月。(4)PM_(10)为城市大气中首要污染物,NO_2污染负荷呈显著上升趋势,表明浙江省城市空气污染特征逐渐从煤烟型污染过渡到机动车尾气型污染。(5)产业结构升级、能源结构优化、大气污染物总量减排和污染源综合整治等人为控制措施对城市空气质量改善起到重要作用。地形、气象、沙尘等自然因素是大气污染物浓度时空变化的外因。},
+  keywords = {环境空气质量;;SO2;;NO2;;PM10;;浙江省},
+}
+
+@Article{周景博2015,
+  author   = {周景博 and 王鑫 and 杜婉君 and 薛伊寰},
+  title    = {北京市空气污染指数及其影响因素分析},
+  journal  = {中国环境监测},
+  year     = {2015},
+  volume   = {31},
+  number   = {02},
+  pages    = {53--56},
+  abstract = {以北京市2001—2012年空气污染指数(API)和气象资料为基础,通过描述统计和GLM模型分析了北京市API的变化趋势和影响因素。分析结果表明,从年际变化看,北京空气质量呈逐年好转趋势;空气质量季节差别显著,春季和冬季的空气质量最差,夏季空气质量显著优于冬季和春季;各气象因素对空气质量均有显著影响,气压、气温、降水、日照时间与API呈负相关关系,其升高有利于空气质量改善,而日最高温、湿度、风速与API呈正相关关系。交通限行政策对北京空气质量有显著改善作用,但未发现API存在显著的周末效应。},
+  keywords = {北京;;API;;影响因素},
+}
+
+@Book{Wood2017,
+  title  = {Generalized Additive Models An Introduction with R, Second Edition},
+  year   = {2017},
+  author = {Simon N. Wood},
+}
+
+@Article{Wood2017a,
+  author = {Simon Wood and Fabian Scheipl},
+  title  = {Package "gamm4"},
+  year   = {2017},
+}
+
+@PhdThesis{曹晨2007,
+  author   = {曹晨},
+  title    = {基于MCMC方法的统计模型的参数估计},
+  school   = {南京航空航天大学},
+  year     = {2007},
+  abstract = {
+
+
+
+
+
+Markov链Monte Carlo (MCMC)方法是现代统计计算中最重要的算法之一,该算法为建立实际的统计模型提供了一种有效工具并且广泛应用于复杂统计模型的贝叶斯计算。MCMC方法中常用的抽样方法包括Gibbs抽样方法和Metropolis-Hastings(M-H)算法。
+
+
+
+
+
+
+本文首先运用MCMC方法中的随机游动M-H算法,采用正态分布为建议分布,对三元Logit模型进行参数估计,其中包括对应用该算法的条件进行论证以及具体的算法设计,并给出模拟结果。对引入回归量的三元Logit模型进行参数估计并给出相应算法的模拟结果。同时,对利用Logit模型的外汇风险预警系统进行实际数据的参数估计,实现对外汇风险的预警作用;其次,我们运用MCMC方法对Probit模型进行参数估计并给出模拟结果;最后,运用MCMC方法中的Gibbs抽样方法以及其中的筛选取样(ARS)算法对倒Gamma分布的参数进行估计。通过与传统的极大似然估计等方法进行比较,发现这种方法非常灵活,并且所获得的估计结果更接近参数的真实值。该方法还可以用于求解更多更加复杂的模型,例如,嵌套的Logit模型、多元Probit模型等。},
+  keywords = {MCMC;; M-H算法;;Gibbs取样;;倒Gamma分布;;三元Logit模型;;Probit模型},
+}
+
+@PhdThesis{范永辉2007,
+  author   = {范永辉},
+  title    = {线性混合效应模型的估计与检验},
+  school   = {北京工业大学},
+  year     = {2007},
+  abstract = {
+
+
+
+
+
+本文主要研究线性混合模型中未知参数的估计和检验问题。同时本文也给出了多元Behrens—Fisher问题的几种广义p值解。
+
+
+
+
+
+
+Panel数据模型是一种线性混合模型，常常产生于重复测量试验，多级抽样调查以及含时间和个体效应的经济调查。在计量经济学、市场分析、区域经济调查等领域有着广泛地应用。
+
+
+
+
+
+
+在panel数据模型中，对回归系数的检验，常常用于变量选择或检验模型线性假设的合理性。如果方差分量已知，则存在一致最优功效检验。方差分量未知时，常用它们的估计代替它们。不同的方差分量的估计，就得到不同的检验统计量。这些检验统计量的分布都是未知的，在小样本情况下，很难控制它们的检验水平和功效。本文采用广义p值的方法，给出了一种精确的检验。模拟结果显示，这种检验能很好的控制检验水平，并且有更高的检验功效。本文同时给出了回归系数的广义置信域。
+
+
+
+
+
+
+存panel数据模型中，对方差分量是否为0的检验已经有了很多方法，但检验方差分量小于等于某个指定的常数，已有的检验很难使用。本文利用设计阵的QR分解和广义p值，给出了一种精确的检验。同时还给出方差分量的一个广义胃信区间。
+
+
+
+
+
+
+对多个多元正态总体均值的检验是在生产实践和社会生活中经常遇到的一类检验问题，比如产品质量的检验和控制。如果正态总体的协方差矩阵是不同的，这类问题常常称为Behrens-Fisher问题。协方差矩阵的不同给检验问题带来巨大的困难。用它们的估计代替，则检验统计量分布未知。而把协方差矩阵当作相同的来处理，又会带来偏差。本文中我们给出了样本协方差矩阵Bartlett分解的分布，同时利用广义p值，给出了Behrens-Fisher问题的几种精确的检验方法。模拟结果表明，这些方法比已有的方法有更高的功效。另外本文还利用样本协方差矩阵的Bartlett分解和样本均值，给出了检验共同均值的一种传统方法，这种检验犯第一类错误的概率比标称的检验水平略低。
+
+
+
+
+
+
+线性混合模型不仪对均值部分建立模型，而且对协方差矩阵建模。它能够处理更为复杂的问题，因此在生物学、计量经济学、医学等需要复杂建模的领域，得到越来越广泛的应用。在线性混合模型中，ANOVA估计是常用的估计方差分量的方法。对含三个方差分量的线性混合模型，本文在均方误差意义下，改进ANOVA估计，并把这一结果推广到一般的线性混合模型上。ANOVA估计得到的往往不是非负的，构造方差分量的非负估计，一直是令人感兴趣的问题。对含有两个方差分量的线性混合模型，本文给出了两个正的截尾估计，并指出它们在均方误差意义下优于ANOVA估计和Tatsuya估计。并把这一方法应用到两向分类随机效应模型，给出其中两个方差分量的正估计。
+
+
+
+
+
+
+限制极大似然估计也是一种很重要的估计方差分量的方法，但是它常常需要通过迭代法求解。EM算法是其中一种重要的迭代算法。对设计阵的QR分解，可以把设计阵变换成上三角矩阵。这样可以降低参与迭代运算的矩阵的阶数，减少了参与运算的数据量，从而提高运算的速度。本文把QR分解应用到EM算法中，并用模拟的方法验证了QR分解可以极大的提高运算的速度。同时本文利用设计阵的QR分解，给出了ANOVA估计的一种新方法，在一般情况下，新方法更便于计算。},
+  keywords = {线性混合模型;Panel数据模型;广义p值;广义置信域;Behrens-Fisher问题;QR分解;精确检验;方差分量},
+}
+
+@Article{傅军和2008,
+  author   = {傅军和},
+  title    = {基于先验信息的贝叶斯统计检验和经典统计检验的比较},
+  journal  = {统计与决策},
+  year     = {2008},
+  number   = {02},
+  pages    = {155--156},
+  abstract = {文章通过分析先验分布中的参数和经典统计检验的显著性水平,对贝叶斯统计检验和经典统计检验进行比较研究},
+  keywords = {先验信息;;贝叶斯检验;;经典统计;;显著性水平},
+}
+
+@PhdThesis{谷恒明2018,
+  author   = {谷恒明},
+  title    = {经典统计学与贝叶斯统计学在回归模型中的比较研究},
+  school   = {军事科学院},
+  year     = {2018},
+  keywords = {经典统计;;贝叶斯统计;;回归分析;;拟合效果;;预测效果},
+}
+
+@Article{贾彬2005,
+  author   = {贾彬 and 王彤 and 王琳娜 and 陈长生},
+  title    = {广义可加模型共曲线性及其在空气污染问题研究中的应用},
+  journal  = {第四军医大学学报},
+  year     = {2005},
+  number   = {03},
+  pages    = {280--283},
+  abstract = {目的:针对大气污染与健康关系研究中拟合广义 可加模型时的共曲线性现象进行研究并试图减小其影响. 方法:采用非参数条件自助抽样法来估计模型系数及其可信 区间.结果:实例数据分析可见自助法得到的结果较好. 结论:非参数条件自助抽样法是克服广义可加模型中共曲线 性影响的有益尝试.},
+  keywords = {统计学/方法;;共曲线性;;模型,统计学;;空气污染},
+}
+
+@PhdThesis{刘霞2018,
+  author   = {刘霞},
+  title    = {中国城市空气质量的影响因素分析},
+  school   = {辽宁大学},
+  year     = {2018},
+  keywords = {空气质量;;影响因素;;面板模型},
+}
+
+@PhdThesis{汪卓蓉2018,
+  author   = {汪卓蓉},
+  title    = {中国空气质量影响因素的实证分析},
+  school   = {山东大学},
+  year     = {2018},
+  abstract = {空气质量与我们生活息息相关,近年来的雾霾污染严重危害了居民健康。研究我国现阶段空气污染情况和空气质量的相关影响因素能够使我们有针对性的采取相应措施,对改善空气质量有重要作用。本文首先研究空气质量的现状,选取对空气质量有主要影响的三种大气污染物sO2、NO2和PM_(10)作为聚类指标,以省会城市的空气质量水平代表省的空气质量水平,以2015年31个省市自治区作为聚类对象进行灰色聚类研究,对其空气质量进行等级评价,由此来考察空气污染的省域分布情况。空气质量的影响因素涉及方方面面,经济增长对空气质量有显著影响,城市园林建设、绿化覆盖率的增加起到清洁空气的作用,公共交通的普遍化和人们生活习惯的改变能够减少私家车尾气的排放,工业生产排放的有害气体会加剧空气污染,化石燃料燃烧也对空气质量产生影响。综合考虑国内外相关研究,将影响空气质量的相关因素结合主成分分析法分为经济社会发展,公共交通,燃料燃烧,环保和大气污染五个方面。运用中国最近几年31个省份空气质量面板数据对PM_(10)和PM_(2.5)污染源进行研究。由于传统回归模型无法体现空气质量空间效应的特性,而引入空间计量模型能反映空气质量的空间相关性,模型拟合程度较高,从而减少误差,使其更准确的反映变量与空气质量之间的相关关系。针对PM_(10)、PM_(2.5)建立相应空间计量模型,为了能有效的研究空气质量的空间相关性,选取更为合理的权重矩阵,即指数衰减权重矩阵,并与传统0-1权重矩阵的计算结果进行对比,从而对减少空气污染提出有效建议。实证结果说明我国省际PM_(2.5)和PM_(10)存在显著的空间自相关性,且随着时间的推进空间相关性增强。针对PM_(2.5)的影响因素进行分析时应采用固定效应下的空间杜宾模型,且环保与PM_(2.5)呈负相关,经济社会发展与PM_(2.5)呈正相关。说明加大环保力度,积极采取污染治理措施,提高环保意识可以减少雾霾污染;现阶段经济发展会加剧空气质量的恶化,所以在发展经济的同时也要注意不能以污染空气为代价。针对PM_(10)的影响因素分析结果显示,固定效应下的空间滞后模型拟合程度较好,且大气污染与PM_(10)呈正相关,环保与PM_(10)呈负相关,说明加大环保力度,减少工业废气、汽车尾气的排放可以降低PM_(10)浓度值,从而改善空气质量。公共交通和燃料燃烧指标在两个模型中未通过5%的显著性检验,有理由认为这两个指标对PM_(2.5)和PM_(10)影响关系不大。这是由于现阶段公共交通的发展仍不能减少私家车的使用量,而燃料燃烧由于近几年天然气供气量显著增加,煤炭消耗量大幅下降,天然气燃料相对来说较为清洁,所以对PM_(2.5)和PM_(10)没有起到显著增加的作用。},
+  keywords = {空气质量;;影响因素;;面板数据;;空间计量模型},
+}
+
+@Article{谢俊2009,
+  author   = {谢俊},
+  title    = {贝叶斯统计方法与传统统计方法的比较分析与展望},
+  journal  = {中国商界(下半月)},
+  year     = {2009},
+  number   = {04},
+  pages    = {115+117},
+  abstract = {如今,在经济管理和商业运作中,贝叶斯方法正在受到越来越多人的青睐,在实际经济问题处理上的应用也越来越广泛。本文以贝叶斯统计方法的研究过程为线索,对经典统计学派和贝叶斯统计学派在思想和方法上的联系与区别进行了全面性的比较分析,最后对统计工作中两种方法的应用和探究提出建议且进行了展望,这对于企业在商业运作中的预测与决策都具有重要意义。},
+  keywords = {贝叶斯统计;;经典统计;;点估计;;区间估计;;假设检验},
+}
+
+@Article{杨阳2016,
+  author   = {杨阳 and 沈泽昊 and 郑天立 and 丁雨賝 and 李本纲},
+  title    = {中国当前城市空气综合质量的主要影响因素分析},
+  journal  = {北京大学学报(自然科学版)},
+  year     = {2016},
+  volume   = {52},
+  number   = {06},
+  pages    = {1102--1108},
+  abstract = {基于2010年我国78个主要城市的5个空气质量指标数据,利用主成分分析方法,计算城市空气质量综合得分;采用多元线性回归方法,从气候、地形、城市发展和城市环境状况四方面的48个变量中筛选出与城市空气质量显著相关的10个,并定量评价不同因子对城市空气质量的贡献。依据空气质量综合得分,从78个城市中分层随机选取30个城市作为训练样本,构建基于径向基函数(RBF)的人工神经网络模型。利用城市自然、社会、经济特征及环境管理现状模拟城市空气质量,并应用于我国173个主要城市空气质量状况的模拟。结果表明,年平均饱和水气压、城市建成区面积、城区海拔落差和第二产业占GDP的百分比是影响中国当前城市空气综合质量的主要因素,分别可以解释城市空气质量变异性的14.7%,12.8%,8.8%和7.2%。研究结果突破了以往大部分空气质量评价模型仅以大气污染物和气象因子作为模型输入因子的局限,RBF人工神经网络模型的模拟结果准确性较高(R2=0.658,p<2.2×10?14)。},
+  keywords = {人工神经网络;;城市空气质量;;影响因子},
+}
+
+@PhdThesis{朱彬彬2018,
+  author   = {朱彬彬},
+  title    = {基于MCMC的贝叶斯统计方法在分层正态模型中的应用},
+  school   = {兰州大学},
+  year     = {2018},
+  abstract = {社会科学方面的研究往往会涉及分层数据,研究对象一般具有不同的嵌套结构和层级.此时,如果选择使用传统的经典回归模型,就会得到有偏的参数估计和不准确的统计推断结论,对此比较理想的做法是建立分层模型.分层正态模型是分层模型的一种,本文在对男女生24小时新陈代谢数据进行研究的过程中,发现观测数据具有明显的分层特征.因此,结合观测数据分布特征提出建立分层正态模型对实际案例进行分析研究,取得了良好效果.作为当前两大统计学派之一的贝叶斯,它的推断理论和分析方法几乎能够作为各个学科领域的研究工具.本文主要借助贝叶斯方法对分层正态模型中的一些重要结论进行推导.鉴于分层模型参数求解的复杂性,本文使用MCMC方法对模型中的未知参数进行估计.在模型求解过程中,利用贝叶斯方法推导确定各未知参数的条件后验概率分布,借助Gibbs采样算法对各未知参数进行估计,并对使用MCMC方法生成的Markov链收敛性进行判定.在收敛性诊断中,本文主要结合使用图像判别,遍历均值和方差比方法来判定,并利用方差比法的思想和原理得出了模型中各个未知参数的psrf值.最后,通过综合分析各未知参数迭代图像与收敛性判定指标的方式,验证了基于Gibbs采样算法求得的模型各参数估计值的可靠性.},
+  keywords = {分层模型;;贝叶斯分析;;MCMC算法;;参数估计;;收敛性诊断},
+}
+
+@Article{Green1987,
+  author    = {Peter J. Green},
+  title     = {Penalized Likelihood for General Semi-Parametric Regression Models},
+  journal   = {International Statistical Review / Revue Internationale de Statistique},
+  year      = {1987},
+  volume    = {55},
+  number    = {3},
+  pages     = {245--259},
+  issn      = {03067734, 17515823},
+  abstract  = {This paper examines penalized likelihood estimation in the context of general regression problems, characterized as probability models with composite likelihood functions. The emphasis is on the common situation where a parametric model is considered satisfactory but for inhomogeneity with respect to a few extra variables. A finite-dimensional formulation is adopted, using a suitable set of basis functions. Appropriate definitions of deviance, degrees of freedom, and residual are provided, and the method of cross-validation for choice of the tuning constant is discussed. Quadratic approximations are derived for all the required statistics. /// On examine ici l'estimation par la vraisemblance pénalisée dans le contexte des problèmes généraux de régression, caractérisés comme des modèles avec des fonctions composites de vraisemblance. On accentue la situation fréquente quand on trouve un modèle paramétrique comme utile sauf pour la nonhomogénéité à l'égard de quelques variables supplémentaires. Une formulation de dimension finie est adoptée avec une base convenable de fonctions. Des définitions appropriées de la déviation, des dégrés de liberté, et de résidu sont examinées, et la méthode de validation croisée pour un choix du paramètre d'ajustement est discutée. Des approximations quadratiques sont présentées pour toutes les statistiques nécessaires.},
+  publisher = {[Wiley, International Statistical Institute (ISI)]},
+  url       = {http://www.jstor.org/stable/1403404},
+}
+
+@Article{Breslow1993,
+  author    = {N. E. Breslow and D. G. Clayton},
+  title     = {Approximate Inference in Generalized Linear Mixed Models},
+  journal   = {Journal of the American Statistical Association},
+  year      = {1993},
+  volume    = {88},
+  number    = {421},
+  pages     = {9--25},
+  issn      = {01621459},
+  abstract  = {Statistical approaches to overdispersion, correlated errors, shrinkage estimation, and smoothing of regression relationships may be encompassed within the framework of the generalized linear mixed model (GLMM). Given an unobserved vector of random effects, observations are assumed to be conditionally independent with means that depend on the linear predictor through a specified link function and conditional variances that are specified by a variance function, known prior weights and a scale factor. The random effects are assumed to be normally distributed with mean zero and dispersion matrix depending on unknown variance components. For problems involving time series, spatial aggregation and smoothing, the dispersion may be specified in terms of a rank deficient inverse covariance matrix. Approximation of the marginal quasi-likelihood using Laplace's method leads eventually to estimating equations based on penalized quasilikelihood or PQL for the mean parameters and pseudo-likelihood for the variances. Implementation involves repeated calls to normal theory procedures for REML estimation in variance components problems. By means of informal mathematical arguments, simulations and a series of worked examples, we conclude that PQL is of practical value for approximate inference on parameters and realizations of random effects in the hierarchical model. The applications cover overdispersion in binomial proportions of seed germination; longitudinal analysis of attack rates in epilepsy patients; smoothing of birth cohort effects in an age-cohort model of breast cancer incidence; evaluation of curvature of birth cohort effects in a case-control study of childhood cancer and obstetric radiation; spatial aggregation of lip cancer rates in Scottish counties; and the success of salamander matings in a complicated experiment involving crossing of male and female effects. PQL tends to underestimate somewhat the variance components and (in absolute value) fixed effects when applied to clustered binary data, but the situation improves rapidly for binomial observations having denominators greater than one.},
+  publisher = {[American Statistical Association, Taylor \& Francis, Ltd.]},
+  url       = {http://www.jstor.org/stable/2290687},
+}
+
+@article{zhu2019comprehensively,
+  title={Comprehensively assessing the drivers of future air quality in California},
+  author={Zhu, Shupeng and Horne, Jeremy R and Kinnon, Michael Mac and Samuelsen, G S and Dabdub, Donald},
+  journal={Environment International},
+  volume={125},
+  pages={386--398},
+  year={2019}}
+
+@article{aung2018preliminary,
+  title={Preliminary assessment of outdoor and indoor air quality in Yangon city, Myanmar},
+  author={Aung, Winyu and Noguchi, Mayumi and Yi, Eiei Pannu and Thant, Zarli and Uchiyama, Shigehisa and Winshwe, Tintin    and Kunugita, Naoki and Mar, Ohn},
+  journal={Atmospheric Pollution Research},
+  year={2018}}
+
+@PhdThesis{孙维伟2014,
+  author   = {孙维伟},
+  title    = {中国车险市场化改革的量化分析与精算技术研究},
+  school   = {南开大学},
+  year     = {2014},
+  abstract = {机动车辆保险,是中国财险市场中的“龙头险种”,业务份额一直盘踞着中国财险市场的大半河山。自2001年12月中国正式加入WTO以后,作为财产保险中的主导业务,车险成为了中国第一个实行对外资保险公司放开的险种。与此同时,车险条款和费率市场化改革(以下简称为车险市场化改革),是中国保险市场费率全面自由化迈开的第一步,其重大意义与发挥的示范和指导作用显而易见。
+
+从经济学的角度看,车险市场遵循着价值理论、供求理论、竞争理论等基本原理。车险费率作为车险的价格,对车险市场的供给发挥着重要的调节作用。车险市场的类型往往归结为寡占或垄断竞争的市场,完全竞争或独占类型的车险市场相对较少。由于车险产品自身的特殊属性,在世界各个国家中的车险市场大多受到政府的干预。同时,车险市场上存在着某些市场失灵的现象。就此而言,政府的干预对车险市场和车险消费者起到了一定的保护作用。
+
+从世界范围来看,美国、英国、德国、日本、韩国等多个发达国家的保险市场都出现过车险市场化改革。自1980年恢复车险业务以来,中国已经历多次车险条款和费率制度改革,最早的一次改革可以追溯到1995年。2001年在广东推行的试点以及2003年1月1日全国性规模的展开,掀开了近十年改革的一大浪潮。时至今日,其一直是保险监管部门、保险行业协会、保险公司、保险科研院校等各部门不断思考和共同探讨的重要话题。虽然受到各种主观、客观因素的影响,车险条款费率改革引发了诸多问题,其发展历程也不是如此的一帆风顺,然而,车险费率市场化是大势所趋。
+
+本文的初衷正是突出了精算制度建设的重要性,基于对中国车险市场的全面分析与费率厘定精算技术的深入研究,希望为中国车险市场费率改革提供技术支持。
+
+全文一共分八章对中国车险市场化改革进行量化分析和精算技术研究。第一章是引言部分。首先,从社会实践和数理研究两个方面指出研究背景与意义；之后,系统地汇总与梳理了国内外相关的研究工作；最后,说明了全文的研究思路、方法与结构安排,同时明确了本文的创新点。
+
+研究中国车险条款与费率市场化改革,必须全面地掌握改革相关的基础理论。第二章首先介绍了保险市场中的供求理论、竞争理论、博弈论、市场失灵理论与政府监管问题。这些知识为全文的分析奠定了基础。其次,为了更好地实施中国车险市场改革,详述了欧洲保险市场(英国与德国)、美国、亚洲(日本与韩国)及澳大利亚保险市场的车险自由化改革发展历程。最后,分阶段回顾了中国车险市场改革进程,并客观地分析了改革中出现的主要问题,强调了车险费率厘定精算技术的重要性,为下文精算技术的研究打下基础。
+
+第三章是全文的贡献之一。关于中国车险条款费率市场化改革的问题,很多学者从定性层面解剖分析了车险市场化改革的必要性、各阶段显现的问题并提出了相应的改革措施。然而,很少有从定量分析的角度对车险市场化改革进行剖析研究。在第三章的研究中,首先,从宏观和微观层面分析了中国车险业务发展的国际环境和国内环境,从纵向和横向角度说明了中国车险业规模的发展情况。之后,为了发掘影响中国车险业务发展的因素,借助面板数据模型,做出实证研究。得到的一个结论是：居民消费、车行驶里程数等因素都对车险业的发展产生了影响。最后,将2003年与2006年的车险市场化改革化为解释变量引进面板模型中,得到的另一个结论是：中国车险费率市场化改革对车险业的发展存在明显的影响。因此,采取有效的手段及合理的措施实施车险市场化改革尤为重要。
+
+从第四章至第七章,以车险费率厘定的精算模型为重点进行深入研究,以期助推中国车险费率市场化改革。在第四章中,说明了车险费率厘定相关的基本概念和基本流程,从分类费率厘定、个体风险费率厘定、无赔款优待方面回顾了传统的车险费率厘定精算模型,并对传统模型在中国车险业的应用进行介绍和评价。第五章,系统全面地分析了纵向数据、分层数据等结构复杂的数据集,在广义线性模型基础上引入了随机效应,即得到广义线性混合模型,之后介绍此类模型的基础理论、参数估计与模型选择等问题,并加以车险索赔次数拟合分析。另一方面,在引入随机效应和对数据分层的视角下,采用分层模型对观测数据进行分析十分必要。分层线性模型和分层广义线性模型在中国车险费率厘定中的应用处于空白阶段,笔者对这些模型进行了理论介绍和研究展望。第六章中,笔者从非参数方法的角度,研究了广义可加模型的相关理论并将其运用在预测车险索赔是否发生和索赔强度方面。结合一组车险索赔数据的分析后发现,当存在连续型解释变量时,广义可加模型比广义线性模型对数据的分析更灵活准确。第七章介绍了复合分布、混合分布与GAMLSS等更具有研究前景的知识点,并对贝叶斯方法在车险费率厘定中的应用进行了研究综述。
+
+第八章是对全文的总结,总结了全文的研究成果,既包括车险业务发展的政策分析,又包括精算制度的思考,关于中国车险条款与费率改革提出了几点相关看法和建议,并从精算制度建设等方面提出了设想。},
+  keywords = {车险市场化改革;;面板数据模型;;费率厘定;;广义线性混合模型;;分层模型},
+}
+
+@PhdThesis{孙煜2018,
+  author   = {孙煜},
+  title    = {纵向数据下一类广义部分线性混合效应模型的贝叶斯分析},
+  school   = {北京化工大学},
+  year     = {2018},
+  abstract = {纵向数据在心理学、流行病学、经济学、社会学等诸多领域极为常见,是目前实际分析与学科研究的重要数据格式。纵向数据是对一组个体按照时间或空间顺序重复测量的数据。对于不满足正态分布的具有异方差的纵向数据的处理主要利用广义线性或部分线性混合模型来拟合。通常用来估计广义部分线性混合模型之中非参数分量的整体或局部估计方法均需要求光滑参数,这不仅导致模型估计计算负担增大,还使得模型参数估计的统计推断变得困难。为了克服以上问题,本文选择贝叶斯方法进行分析,由于贝叶斯方法引入了先验信息,所以可以在样本较少的时候得到相对可靠的结果。本文在模型随机效应部分服从正态分布的假定下,基于光滑样条方法研究了纵向数据下广义半参数部分线性混合效应模型和变系数广义部分线性混合效应模型的贝叶斯估计方法。我们首先对纵向数据下广义半参数部分线性混合效应模型进行分析,通过样条方法逼近非参数分量,将半参数广义部分线性混合效应模型转化为广义线性混合效应模型,然后分别基于惩罚样条和光滑样条导出后验分布。基于所得后验分布,我们利用Gibbs和MH混合算法给出了模型中参数的贝叶斯估计,分析所得参数估计值的精确性,并对比光滑样条与惩罚样条的估计效率。进一步,我们将上述方法推广至变系数广义部分线性混合效应模型的贝叶斯推断。此外,基于2004年至2011年12家中国A股上市公司的纵向数据,从成长性、经营状况、股权结构等方面,选用半参数广义部分线性混合效应模型和变系数广义部分线性混合效应模型来分析研究中国A股上市公司现金股利支付倾向的影响因素。最后通过实证分析证明了所建模型的有效性。},
+  keywords = {纵向数据;;半参数广义混合效应模型;;变系数广义混合效应模型;;光滑样条;;惩罚样条;;贝叶斯分析},
+}
+
+@Book{茆诗松1999,
+  title     = {贝叶斯统计},
+  publisher = {中国统计出版社},
+  year      = {1999},
+  author    = {茆诗松},
+}
+
+@Article{Hastie1986,
+  author    = {Trevor Hastie and Robert Tibshirani},
+  title     = {Generalized Additive Models},
+  journal   = {Statistical Science},
+  year      = {1986},
+  volume    = {1},
+  number    = {3},
+  pages     = {297--310},
+  issn      = {08834237},
+  abstract  = {Likelihood-based regression models such as the normal linear regression model and the linear logistic model, assume a linear (or some other parametric) form for the covariates X<sub>1</sub>, X<sub>2</sub>, ⋯, X<sub>p</sub>. We introduce the class of generalized additive models which replaces the linear form ∑ β<sub>jX</sub><sub>j</sub> by a sum of smooth functions ∑ s<sub>j</sub>(X<sub>j</sub>). The s<sub>j</sub>(·)'s are unspecified functions that are estimated using a scatterplot smoother, in an iterative procedure we call the local scoring algorithm. The technique is applicable to any likelihood-based regression model: the class of generalized linear models contains many of these. In this class the linear predictor η = Σ β<sub>jX</sub><sub>j</sub> is replaced by the additive predictor Σ s<sub>j</sub>(X<sub>j</sub>); hence, the name generalized additive models. We illustrate the technique with binary response and survival data. In both cases, the method proves to be useful in uncovering nonlinear covariate effects. It has the advantage of being completely automatic, i.e., no "detective work" is needed on the part of the statistician. As a theoretical underpinning, the technique is viewed as an empirical method of maximizing the expected log likelihood, or equivalently, of minimizing the Kullback-Leibler distance to the true model.},
+  publisher = {Institute of Mathematical Statistics},
+  url       = {http://www.jstor.org/stable/2245459},
+}
+
+@Article{Nelder1972,
+  author    = {J. A. Nelder and R. W. M. Wedderburn},
+  title     = {Generalized Linear Models},
+  journal   = {Journal of the Royal Statistical Society. Series A (General)},
+  year      = {1972},
+  volume    = {135},
+  number    = {3},
+  pages     = {370--384},
+  issn      = {00359238},
+  abstract  = {The technique of iterative weighted linear regression can be used to obtain maximum likelihood estimates of the parameters with observations distributed according to some exponential family and systematic effects that can be made linear by a suitable transformation. A generalization of the analysis of variance is given for these models using log-likelihoods. These generalized linear models are illustrated by examples relating to four distributions; the Normal, Binomial (probit analysis, etc.), Poisson (contingency tables) and gamma (variance components). The implications of the approach in designing statistics courses are discussed.},
+  publisher = {[Royal Statistical Society, Wiley]},
+  url       = {http://www.jstor.org/stable/2344614},
+}
+
+@Article{Laird1982,
+  author        = {Nan M. Laird and James H. Ware},
+  title         = {Random-Effects Models for Longitudinal Data},
+  journal       = {Biometrics},
+  year          = {1982},
+  volume        = {38},
+  number        = {4},
+  pages         = {963--974},
+  issn          = {0006341X, 15410420},
+  __markedentry = {[qq:]},
+  abstract      = {Models for the analysis of longitudinal data must recognize the relationship between serial observations on the same unit. Multivariate models with general covariance structure are often difficult to apply to highly unbalanced data, whereas two-stage random-effects models can be used easily. In two-stage models, the probability distributions for the response vectors of different individuals belong to a single family, but some random-effects parameters vary across individuals, with a distribution specified at the second stage. A general family of models is discussed, which includes both growth models and repeated-measures models as special cases. A unified approach to fitting these models, based on a combination of empirical Bayes and maximum likelihood estimation of model parameters and using the EM algorithm, is discussed. Two examples are taken from a current epidemiological study of the health effects of air pollution.},
+  publisher     = {[Wiley, International Biometric Society]},
+  url           = {http://www.jstor.org/stable/2529876},
+}
+
+@Article{Gilmour1985,
+  author        = {A. R. Gilmour and R. D. Anderson and A. L. Rae},
+  title         = {The Analysis of Binomial Data by a Generalized Linear Mixed Model},
+  journal       = {Biometrika},
+  year          = {1985},
+  volume        = {72},
+  number        = {3},
+  pages         = {593--599},
+  issn          = {00063444},
+  __markedentry = {[qq:6]},
+  abstract      = {Methods for generalized linear models are extended to provide estimates of location and variance parameters for mixed models fitted to binomial data formed by classifying samples from an underlying normal distribution. The method estimates the parameters directly on the underlying scale. For a balanced one-way random effects model, the variance estimator simplifies to the usual analysis of variance one. The estimation of variances and the prediction of random effects for binomial traits is required by animal breeders. The predictors given are analogous to best linear unbiased predictors (Henderson, 1973) but differ from those presented by Harville & Mee (1984).},
+  publisher     = {[Oxford University Press, Biometrika Trust]},
+  url           = {http://www.jstor.org/stable/2336731},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
+
+% Encoding: UTF-8

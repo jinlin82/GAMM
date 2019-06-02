@@ -1,0 +1,551 @@
+---
+title: "开题报告"
+author: "Li"
+date: "2019-04-15"
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: [Bibfile.bib, thesis.bib]
+notice: '@*'
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+**TODO**
+
+
+
+
+```{r setup, echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+
+
+
+在上一章，我们把非参数光滑器加入到一些熟悉模型之中，如线性回归模型
+和Logistic回归模型，得到这些模型的半参数推广模型，这些模型都可以包括
+在GAM框架下。在这一章，我们把非参数回归模型推广到混合模型，也即半参数混
+合模型。与前面相同，我们可以在混合模型中使用光滑器来检验和拟合非线性。
+尽管把光滑方法推广到混合模型的思想比较直观，但是半参数混合模型会带来估
+计和检验上的难度。下面我们首先讨论线性混合模型，给出线性混合模型的模型
+设定和参数估计。第二部分如何把半参数方法加入到混合模型中去，得到了半参
+数混合模型。第三部分简单讨论广义线性模型、半参数方法和混合模型三者结合
+得到的广义可加混合模型(GAMM)。
+
+# 线性混合模型 {#sec:lme}
+
+混合效应模型是分析分组数据的灵活、强大的工具。分组数据在许多领域中广泛
+存在，例如农业、生物、经济、制造业和地质学。纵向数据、重复测量数据，多
+水平数据、层次数据等都属于分组数据。经典线性模型中一个典型的假设就是观
+测值来自一个相同的总体，即是独立同分布的。而分组数据一般组内的观测值是
+相依的，因为它们属于相同的自总体，而组间是独立的。混合效应模型可以对分
+组数据中存在的组内相关进行建模，并且为平衡数据和非平衡数据提供了统一的
+分析框架。混合效应模型是非线性统计模型，主要是因为其具有复杂的方差结构。
+混合模型的出现把线性模型带入了一个更广阔的空间。
+
+线性混合模型在生物、医学、经济、金融、环境保护、工业设计等领域都具有广
+泛应用。但是,在不同的领域有一些特殊的模型。混合效应模型的理论起源较多，
+根据应用领域、模型用途和强调的侧重点不同，不同领域中有不同的称呼。在社
+会学研究中，它经常被称为多层次模型(multilevel models)或分层模
+型(hierarchical models)；在生物统计研究中则有增长曲线模型；计量经济学文
+献称之为随机系数模型 (random coefficient models)和面板数据模型。
+
+混合效应模型除了用于分组数据建模外，其对于理解其他一些统计方法也有重要
+作用。混合模型的作用非常广泛。Demidenko(2004)指出混合效应模型可以用于以
+下目的[@demidenko2004mixed]：拟合复杂的相关数据，包括纵向数据，分
+层数据、空间数据等。拟合具有多变异性的数据；拟合异方差数据；作为频率方
+法和贝叶斯方法的折衷方法；作为罚似然统计模型；处理参数多维性。
+
+混合效应模型像其他统计模型一样，是用来描述一个因变量和多个自变量之间的
+关系。在混合效应模型中，至少有一个自变量是分类变量，其用来代表数据中实
+验或观测的单位。分类变量可以取离散水平值。与自变量水平相关联的参数有
+时候也被称为水平的效应。如果变量水平的取值是固定并且是可复制的，那么
+用**固定效应**参数来对这个自变量建模。如果观测到的水平值代表了该
+自变量所有可能取值水平的一个样本，我们则在模型中加入**随机效应**。
+
+区分固定效应参数和随机效应需要注意两点：第一，这两个名字具有误导性，因
+为固定和随机的区分更多的是针对分类自变量取值水平的性质，而不是与水平相
+关联的效应的性质。第二，注意区分“固定效应参数”和“随机效应”的本质。
+固定效应参数就是我们在统计模型中碰到的普通意义上的参数。而随机效应严格
+来讲，并不能算参数，实际其为未观测到的随机变量。
+
+## 模型设定
+
+从前面的叙述我们看到，混合模型包括一大类模型，适用于各种类型的相关数据。
+下面就主要讨论两种重要数据类型的混合模型：纵向数据的混合模型和分层数据
+的混合模型(也称为多水平模型)模型设定。
+
+### 纵向数据的混合模型设定
+
+纵向数据研究一般是考查对个体单位重复测量的特征随时间的变化规律。每个个
+体单位在不同的时间点，甚至不同的外界条件下进行重复观测。通常，我们不能
+控制观测时的外界条件，并且被观测的个体数量和观测时间可能发生较大变化。
+纵向数据通常难以用未限制协方差结构的普通多元模型分析，而混合模型是分析
+纵向数据的有力工具。纵向数据混合模型的研究最先由Laird，Ware(1982)年的
+一篇论文中给出[@laird1982random]。
+
+线性混合模型可以表示成 $$\begin{aligned}
+  \label{eq:13}
+  y_{ij}=&\beta_{1}x_{1ij}+\cdots+\beta_{p}x_{pij}
+  +b_{i1}z_{1ij}+\cdots+b_{iq}z_{qij}+\varepsilon_{ij} \\
+  b_{ik}\thicksim& \mathcal{N}(0,\sigma^{2}\psi_{k}^{2}),
+  \text{Cov}(b_{k},b_{k'})=\sigma^{2}\psi_{kk'} \nonumber \\
+  \varepsilon_{ij} \thicksim &\mathcal{N}(0,\sigma^{2}\lambda_{ijj}),
+  \text{Cov}(\varepsilon_{ij},\varepsilon_{ij'})
+  =\sigma^{2}\lambda_{ijj'} \nonumber\end{aligned}$$
+其中$y_{ij}$表示所有$M$组中第$i$组，该组中所有$n_{i}$观测值中的
+第$j$个。$\beta_{i},\cdots,\beta_{p}$是固定效应参数，对所有组都是相同
+的。$x_{1ij},\cdots,x_{pij}$表示$p$个固定效应回归子第$i$组第$j$个观测值；
+第一个回归子通常取常数，即$x_{1ij}=1$。$b_{i1},\cdots,b_{iq}$是第$i$组
+的随机效应，假设其服从多元正态分布。随机效应随着组的不同而不
+同。$b_{ik}$被认为是随机变量，而不是参数，在这个意义上，其与误差
+项$\varepsilon_{ij}$相类似。$z_{1ij},\cdots,z_{qij}$是随机效应回归
+子。$\sigma^{2}\psi_{k}^{2}$是随机效应的方差，$\sigma^{2}\psi_{kk'}$是
+随机效应的协方差，随机效应方差和协方差被假定为是常数，不随着组的不同而
+不同。在一些应用中，这些$\psi$的值可以用一些相对较少的基本参数来表
+示。$\varepsilon_{ij}$是组$i$第$j$个观测值的误差项。第$i$组的误差项被假
+定服从多元正态分布。$\sigma^{2}\lambda_{ijj'}$是第$i$组误差项之间的协方
+差。通常$\lambda_{ijj'}$可以用一些基本参数对其进行参数化，它们的具体形
+式依赖于具体问题。例如，当观测值是在组内独立抽样时，这时假定具有不变的
+误差项方差，$\lambda_{ijj}=1,\lambda_{ijj'}=0(\text{当}j\neq
+j'\text{时})$，此时唯一需要估计的参数就是相同的误差项方差$\sigma^{2}$。
+当组内的观测值表示来自同一个个体的纵向数据时，此时$\lambda$的结构必须设
+定为可以体现误差项之间自相关关系。
+
+将模型改写成矩阵形式有 $$\begin{aligned}
+  \label{eq:14}
+  \boldsymbol{y_{i}}=&\boldsymbol{X_{i}\beta+Z_{i}b_{i}+\varepsilon_{i}}, \quad
+  i=1,\cdots , M,\\
+  \boldsymbol{b_{i}}\thicksim&\boldsymbol{\mathcal{N}}(\boldsymbol 0,\sigma^{2} \boldsymbol \Psi)\nonumber\\
+  \boldsymbol{\varepsilon_{i}}\thicksim&\boldsymbol{\mathcal{N}}(\boldsymbol 0,\sigma^{2} \boldsymbol \Lambda_{i})\nonumber\end{aligned}$$
+其中 $\boldsymbol{y_{i}}$是第$i$组观测值的$n_{i}\times 1$因变量向量。
+$\boldsymbol{X_{i}}$是第$i$组观测值的固定效应$n_{i}\times p$模型矩阵。
+$\boldsymbol{\beta}$是固定效应系数的$p\times 1$向量。
+$\boldsymbol{Z_{i}}$是第$i$组观测值的随机效应$n_{i}\times q$维模型矩阵。
+$\boldsymbol{b_{i}}$是第$i$组随机效应$q\times 1$向量。
+$\boldsymbol{\varepsilon_{i}}$是第$i$组观测值的误差项$n_{i}\times 1$向量。
+$\sigma^{2}\boldsymbol{\Psi}$是随机效应的$q\times q$协方差矩阵。
+$\sigma^{2}\boldsymbol{\Lambda_{i}}$是第$i$组误差项的$n_{i}\times n_{i}$
+协方差矩阵。
+
+形式中的$M$个等式可以表示成一个更浓缩的形式 $$\label{eq:15}
+  \boldsymbol{y=X\beta+Zb+\varepsilon},$$ 其中 $$\label{eq:16}
+  \boldsymbol{y=}
+     \left [
+      \begin{array}{c}
+        \boldsymbol y_{1}\\
+        \boldsymbol y_{2}\\
+        \boldsymbol \vdots \\
+        \boldsymbol y_{M}
+      \end{array}\right ],
+    \boldsymbol{X=}
+     \left [
+      \begin{array}{c}
+        \boldsymbol X_{1}\\
+        \boldsymbol X_{2}\\
+        \boldsymbol \vdots \\
+        \boldsymbol X_{M}
+      \end{array}\right ],
+    \boldsymbol{Z=}
+     \left [
+      \begin{array}{ccc}
+        \boldsymbol Z_{1} & \boldsymbol 0 & \boldsymbol 0\\
+        \boldsymbol 0& \boldsymbol \ddots & \boldsymbol 0\\
+        \boldsymbol 0& \boldsymbol 0 & \boldsymbol Z_{M}
+      \end{array}\right ],
+    \boldsymbol{b=}
+     \left [
+      \begin{array}{c}
+        \boldsymbol b_{1}\\
+        \boldsymbol b_{2}\\
+        \boldsymbol \vdots \\
+        \boldsymbol b_{M}
+      \end{array}\right ],
+    \boldsymbol{\varepsilon=}
+     \left [
+      \begin{array}{c}
+        \boldsymbol \varepsilon_{1}\\
+        \boldsymbol \varepsilon_{2}\\
+        \boldsymbol \vdots \\
+        \boldsymbol \varepsilon_{M}
+      \end{array}\right ]$$
+分别是$N\times 1, N\times p, N\times Mq, Mq\times 1, N\times 1$阶向量或
+矩阵，其中$N=\sum_{i=1}^{M}n_{i}$是所有观测值的个数，$\text{Cov}(\boldsymbol
+b)=\sigma^{2}(\boldsymbol{I \otimes \Psi})$，$\text{Cov}(\boldsymbol
+\varepsilon)=\sigma^{2}(\boldsymbol{I \otimes \Lambda_{i}})$。
+
+进一步，模型可以写成只包含一个误差项的形式为 $$\label{eq:17}
+  \boldsymbol{y=X\beta+\eta},$$ 其中 $$\boldsymbol \eta= \left[
+    \begin{array}{c}
+      \boldsymbol \eta_{1}\\
+      \boldsymbol \eta_{2}\\
+      \boldsymbol \vdots\\
+      \boldsymbol \eta_{M}
+    \end{array} \right ] =
+  \left[
+    \begin{array}{c}
+      \boldsymbol{\varepsilon_{1}+Z_{1}b_{1}}\\
+      \boldsymbol{\varepsilon_{2}+Z_{2}b_{2}}\\
+      \boldsymbol \vdots\\
+      \boldsymbol{\varepsilon_{M}+Z_{M}b_{M}}
+    \end{array} \right ].$$
+此时，$E[\boldsymbol \eta]=\boldsymbol 0$，$\boldsymbol \eta$的协方差矩阵为$N \times N$阶块状
+对角矩阵形式： $$\label{eq:18}
+  \boldsymbol V =\sigma^{2} \left [
+    \begin{array}{cccc}
+      \boldsymbol{\Lambda_{1}+Z_{1}\Psi Z_{1}^{T}} & \boldsymbol 0 & \boldsymbol 0 &\boldsymbol 0 \\
+      \boldsymbol 0 &  \boldsymbol{\Lambda_{2}+Z_{2}\Psi Z_{2}^{T}} & \boldsymbol 0&\boldsymbol 0\\
+      \boldsymbol \vdots &\boldsymbol \vdots &\boldsymbol \ddots &\boldsymbol \vdots \\
+      \boldsymbol 0 &\boldsymbol 0 &\boldsymbol \ldots &  \boldsymbol{\Lambda_{M}+Z_{M}\Psi Z_{M}^{T}}
+    \end{array} \right ].$$ 尽管模型和的形式比简单，但其符
+号的说明比较复杂。
+
+在随机效应和随机误差项服从正态分布的假设下，混合模型可以表示为因变量的
+边际分布 $$\label{eq:20}
+  \boldsymbol{y \thicksim \mathcal{N}(X\beta,V)},$$ 其中$\boldsymbol{V}$为式所定义。
+
+### 分层数据的混合模型设定——多水平模型
+
+混合模型在社会科学中也称为多水平模型或层次线性模型，在社会科学中的使用
+非常广泛[^1]。社会科学经常使
+用这些模型来理解背景是如何影响个人层面行为的，但混合模型对于任何分组数
+据都可以使用。关于多水平模型和层次线性模型更详细讨论可以参考其他书籍，例如Raudenbush
+and Bryk(2002)和Gelman and
+Hill(2006)[@raudenbush2001hierarchical; @gelman2006data]。
+
+社会科学中的混合模型通常在每一层都有不同的方程。尽管3层或者4层模型是可
+能的，但高于两层的模型在实际当中很罕见。我们以第一层模型开始：
+$$\label{eq:122}
+  Y_{ij}=\beta_{0j}+\beta_{1j}X_{ij}+e_{ij}$$
+其中$i=1,\cdots,N$是嵌套在$j=1,\cdots,J$个个体当中的观测值。第一层观测
+值可能嵌套在国家，选区，郡或者学校。参数$\beta_{0j}$和参数$\beta_{1j}$
+在$j$个个体之间变化。参数$\beta$的变异性可以用以下第二层模型来表示：
+$$\begin{aligned}
+  \label{eq:123}
+  \beta_{0j}=\gamma_{00}+\gamma_{01}Z_{j}+u_{0j} \nonumber \\
+  \beta_{1j}=\gamma_{10}+\gamma_{11}Z_{j}+u_{1j}\end{aligned}$$
+这些方程表明斜率和截距以组水平特征的函数进行系统变化，同时具有随机变异，
+用$u_{0j}$和$u_{1j}$等表示，也即是随机效应。这里$Z_{j}$表示在组水平或第
+二层测量的一个变量，用来预测第一层参数的变异情况。把第二层的方程代入到
+第一层的方程中就有 $$\begin{aligned}
+  \label{eq:124}
+  Y_{ij}&=\gamma_{00}+\gamma_{01}Z_{j}+u_{0j}
+  +(\gamma_{10}+\gamma_{11}Z_{j}+u_{1j})X_{ij}+e_{ij}  \nonumber \\
+  &=\gamma_{00}+\gamma_{01}Z_{j}+\gamma_{10}X_{ij}+\gamma_{11}Z_{j}X_{ij}+u_{1j}X_{ij}+u_{0j}+e_{ij}.\end{aligned}$$
+上面方程中每一项都有特定的解释。参数$\gamma_{00}$表示总均值，代表了
+$Y_{ij}$在所有$j$个个体之间的平均。参数$\gamma_{01}$表示随着$Z_{j}$的
+变化带来与总均值的偏移。想$\gamma_{10}$表示$X_{ij}$对$Y_{ij}$在$j$个个
+体之间的平均斜率或效应。参数$\gamma_{11}$表示随着$Z_{j}$值变化带来的与
+$\gamma_{10}$的偏移。$u_{0j}$表示第二层的随机效应，是导致个体偏移总均
+值的随机因素。最后，$u_{1j}$是个体$j$相对于$\gamma_{10}$的随机效应。
+
+随机效应$u_{0j}$， $u_{1j}$ 和第一层下误差项$e_{ij}$假设为服从正态分布。
+第一层误差方差$\sigma^{2}$测度$Y_{ij}$在第一层的方差。方差$\sigma^{2}$
+被称为组内变异性，因为其测量的是在同一个体下的观察值与个体均值的变异情
+况。随机效应$u_{0j}$， $u_{1j}$的方差分别记为$\tau_{00}$ 和 $\tau_{11}$ ，
+随机效应的这些方差反映了截距和斜率组间变异性，也就是说，其反映了每个观
+测值相对于总平均和个体平均斜率的变化。
+
+# 半参数混合模型
+
+从混合模型的理论发展过程来看，最开始讨论的是线性混合模型，然后又发展到
+广义线性混合模型。最近以来，半参数混合模型得到了广泛关注。当建立混合模
+型时，我们一般使用线性函数形式。与其他参数模型一样，对于一个给定的混合
+模型我们并没有先验的理由认为线性函数形式是正确的。尽管线性函数形式有可
+能是合适的，我们仍然可以使用非参数方法来诊断和拟合混合模型中的非线性关
+系。这一节我们主要从半参数方法如何融入到混合模型的角度来讨论半参数混合模
+型。我们先给出半参数模型和混合模型的关系，再给出半参数混合模型的模型设
+定，而估计和假设检验问题放在下一节中和广义可加混合模型一起讨论。
+
+## 半参数模型和混合模型的关系
+
+随机效应是解决统计模型中未观测到的异质性一种常见方法。例如，面板数据模
+型就容易受到异质性影响。在面板数据模型中，模型的截距随着数据中的个体而
+变化，随机效应可以用于对这些个体截距中的变异性进行建模。在随机效应模型
+中，一个来自均值为0，方差为$\sigma^{2}$的正态分布的随机冲击加上每一个个
+体截距上。这个随机冲击就可以消除异质性。因此，我们可以使用混合模型来估
+计样条。实际上，光滑样条刚好可以表示为混合模型框架中的最优预测
+量(Ruppert, Wand and Carroll 2003)[@ruppert2003semiparametric]。尽
+管混合模型框架对于样条方法在实际数据分析中没有很大作用，但是从混合模型
+框架的角度来看待样条方法可以提供两点新理解。第一，混合模型为理解为什么
+光滑样条是最优光滑器提供了分析框架。第二，混合模型框架把非线性表示成未
+观测的异质性，这有助于我们理解为什么需要非参数回归技术。接下来，我们非
+常简略地概述混合模型框架并展示如何把光滑样条表示为混合模型。把样条视为
+混合模型的详细讨论参见Ruppert, Wand and
+Carroll(2003)[@ruppert2003semiparametric]。
+
+在混合模型框架中，对$Y$我们可以写出以下线性回归模型： $$\label{eq:112}
+  Y_{ij}=\beta_{0j}+\beta_{1j}X_{ij}+e_{ij}.$$
+对于混合模型，一般地模型公式中每一项都有两个下标(或者更多)。在这种记号
+中，我们有嵌套在$j$个个体当中的$i$个观测值。这可以是嵌套在$j$个学校中
+的$i$个学生或者是嵌套在$j$个郡的$i$个投票者。我们认为在不同的$j$个体之
+间具有异质性，也即斜率和截距随着$j$个体的不同而变化。如果我们怀疑在截
+距和斜率之间存在这样的变异性，那么一个来自正态分布的随机数就可以按照以
+下方式加入到截距和斜率参数中： $$\begin{aligned}
+  \label{eq:113}
+  \beta_{0j}=\gamma_{00}+u_{0j} \nonumber \\
+  \beta_{1j}=\gamma_{10}+u_{1j}\end{aligned}$$
+其中$u_{0j}$和 $u_{1j}$都服从$\mathcal{N}(0,\sigma^{2})$ ，是随机效应，
+$\gamma_{00}$是$j$个个体的平均结果，$\gamma_{10}$是$j$个个体的平均斜率。
+使用ML或者REML估计量，我们对随机效应进行积分以从对数似然函数中移除它们。
+
+混合模型是一种对分组数据进行建模的惩罚方法，它是在简约模型与参数过多模
+型的一种折衷。当数据聚集在个体中时，我们可以估计三种统计模型。在第一个
+模型中，我们忽略$j$个体中的聚集作用，使用聚合之后的数据估计回归模型。
+当$j$个体之间差异很大时，这样得到的聚合模型是有偏的。使用聚合数据，得到
+的拟合没有多少变异性，因为这时我们把所有观测值都放在了一起使用。从参数
+的个数角度来看，使用聚合数据得到的模型是最简约的模型。另一个极端情况是，
+我们可以对$j$个体的每一个个体都估计一个回归模型。这种方法要估计的参数将
+很多，当每个个体中包含的观测值个数不大的情况下，参数$\beta$的变异性很大。
+然而，这些估计是无偏的。混合模型方法代表了这两种极端情况的一个中间方法。
+混合模型中参数$\beta$的估计是完全忽视数据的结构和通过估计$j$个不同的模
+型来全部体现数据结构两种方法的一个折衷方案。混合模型估计从$j$个不同模型
+朝一个聚合模型方向收缩。混合模型得到的估计可以看作是来自个体模型的加权
+评价。收缩得到的估计的均方误差优于聚合模型和个体模型的均方误差。线性混
+合模型估计是最佳线性无偏预测(BLUP)(Pinero and Bates 2000; Ruppert, Wand
+and Carroll
+2003)[@pinheiro2000mixed; @ruppert2003semiparametric]。因此，当$j$个
+体之间具有显著的差异时，依据均方误差原则，混合模型就提供了最佳拟合。
+
+非线性可以看作是另一种形式的组间异质性。节点之间的数据就形成了一个组。
+线性拟合与聚合模型类似，没有考虑可能存在的局部变异性。这个聚合模型忽视
+内在结构，使用一个参数来描述$x$ 与 $y$ 之间的关系。这个拟合是最简约的，但
+其忽视了$x$与 $y$之间关系在不同节点之间的差异。如果变异确实存在，那么线
+性拟合是有偏的。一个标准样条模型就是一个没有聚合的模型。此时，我们对每
+个节点之间的数据都得到一个参数。这样得到的模型将非常确切的反映了局部变
+异性，但是在节点之间的数据不多时，得到的估计将具有较大的变异性。与线性
+模型和标准样条模型不同，光滑样条模型与混合模型具有类型的结构，其考虑了
+局部变异性但同时从所有的节点段之间“借力”。这表明，光滑样条估计是均方
+误差意义上的最佳估计。光滑样条估计是具有非线性导致的异质性模型的最佳线
+性无偏预测(BLUP)，其从一个高度局部性的拟合向全局估计收缩。
+
+样条回归模型(具有线性基)可以表示为： $$\label{eq:114}
+  f(x_{i})=\beta_{0}+\beta_{1}x_{i}+
+  \sum_{k=1}^{K}\beta_{k}^{*}(x_{i}-c_{k})_{+}+\varepsilon$$ 其中
+$$\label{eq:115eq}
+  (x_{i}-c_{k})_{+}= \left \{
+    \begin{array}{lr}
+      0 & x \leq c_{k}\\
+      x-c_{k} & x > c_{k}
+    \end{array}
+    \right.$$ 表示节点在$c_{k}$的分段线性拟合。下面把方程中的每一项写
+成矩阵形式： $$\label{eq:116}
+  \boldsymbol X = \left [
+    \begin{array}{cc}
+      1 & x_{1} \\
+      \vdots & \vdots \\
+      1 & x_{n}
+    \end{array}
+  \right ],
+  \boldsymbol Z = \left [
+    \begin{array}{ccc}
+    (x_{1}-c_{1})_{+} & \ldots & (x_{1}-c_{k})_{+} \\
+    \vdots & \ddots & \vdots \\
+    (x_{n}-c_{1})_{+} & \ldots & (x_{n}-c_{k})_{+}
+  \end{array}
+\right ]$$ $$\boldsymbol \beta= \left [
+    \begin{array}{c}
+      \beta_{0}\\
+      \beta_{1}
+    \end{array}
+  \right],
+  \boldsymbol \beta^{*}= \left [
+    \begin{array}{c}
+    \beta_{1}^{*}\\
+    \vdots\\
+    \beta_{k}^{*}
+  \end{array}
+\right],
+\boldsymbol \varepsilon =
+\left [
+  \begin{array}{c}
+    \varepsilon_{1}\\
+    \vdots\\
+    \varepsilon_{n}
+  \end{array}
+\right].$$
+其中向量$\boldsymbol \beta^{*}$表示分段函数的系数。使用上面的这些记号就可以把
+方程写成矩阵形式 $$\label{eq:117}
+  \boldsymbol {y=X\beta+Z\beta^{*}+\varepsilon}.$$
+为了把线性样条模型改写成混合模型，需要 $$\label{eq:118}
+  \boldsymbol u= \left[
+    \begin{array}{c}
+      u_{1}\\
+      \vdots\\
+      u_{K}
+    \end{array}
+  \right],$$ $\boldsymbol u$是随机效应向量，每一个元素都来自于正态分布
+$\mathcal{N}(0,\sigma_{u_{k}}^{2})$。我们可以把改写成以 下混合模型：
+$$\label{eq:119}
+  \boldsymbol{y=X\beta+Zu+\varepsilon}.$$
+这个两个模型的差异是在每个节点上的系数用随机效应来代替。方程 的解为：
+$$\label{eq:120}
+  \boldsymbol {\widehat f} =\boldsymbol C(\boldsymbol{C'C}+\lambda^{2} \boldsymbol D)^{-1}\boldsymbol{C'y}$$
+其中$\boldsymbol{C=[XZ]}$，$\boldsymbol{D}=\text{diag}(0,0,1,\cdots,1)$，
+$\lambda^{2}=\sigma_{\varepsilon}^{2}/\sigma_{u}^{2}$。Ruppert, Wand and
+Carroll(2003)证明了方程等价于 $$\label{eq:121}
+  \text{SS}(f,\lambda)=\sum_{i=1}^{n}[(y_{1}-f(x_{1}))]^{2}
+  +\lambda \int_{x_{1}}^{x_{n}}f''(x)^{2}\text{d}x$$
+这是光滑样条的表示形式。
+
+光滑样条和混合模型之间的等价性具有重要意义。首先，这表明光滑样条拟合
+是$x$和$y$之间的非线性关系的BLUP。当存在非线性时，光滑样条拟合具有最小
+的均方误差。因此，光滑样条在拟合和使用的参数数量之间提供了一个最佳权衡。
+第二，混合模型框架可以把$x$与$y$之间的非线性关系概念化为未观测的异质性。
+如果存在该未观测的异质性却未被拟合，模型就存在设定误差。非参数回归提供
+了拟合这种异质性的工具。这样，非参数回归背后的逻辑与混合模型背后的逻辑
+就没有多大区别。非线性是一种形式的异质性，对于这种异质性，光滑样条提供
+了平衡拟合与使用参数个数之间的最佳估计。光滑样条的混合模型表示方法容易
+转换为贝叶斯估计框架，并且其更容易把光滑样条集成到标准混合模型中具体可
+以参见Ruppert, Wand and Carroll (2003)[@ruppert2003semiparametric]。
+
+## 半参数混合模型设定
+
+下面我们给出半参数混合模型的模型设定。一般地，半参数混合模型具有以下形
+式 $$\label{eq:additive-mixed}
+  y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
+  + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i},$$
+其中$y_{i}$是因变量，$\boldsymbol{\beta}$是固定效应参数向量，$\boldsymbol{X_{i}}$是固定
+效应设计矩阵，$f_{j}$是自变量$x_{k}$的光滑函数，$\boldsymbol{Z_{i}}$是随机效应
+的设计矩阵，$\boldsymbol{b \sim \mathcal{N} (0, \Psi)}$是随机效应变量，其中方差
+协方差阵$\boldsymbol{\Psi}$一般未知而需要估计，$\boldsymbol{\epsilon \sim
+  N(0,\Lambda)}$是误差向量，其由$\epsilon_{i}$堆积而成，一般假设其方差
+协方差矩阵具有比较简单的形式。
+
+半参数混合模型的估计和假设检验问题放在下一节中和广义可加混合模型一起讨论。
+
+# 广义可加混合模型 {#sec:gamm}
+
+## 广义可加混合模型提出背景
+
+如同线性回归模型可以推广到广义线性模型一样，线性混合模型也可以推广到广
+义线性混合模型(GAMM)。广义线性混合模型(GLMM)(Breslow and Clayton,
+1993)为各种过度离散和相关因变量的参数回归提供了统一的似然框
+架[@breslow1993approximate]。这种类型数据在许多领域研究中都会出现，
+例如纵向数据研究，抽样调查，临床医学和疾病绘图(desease mapping)。GLMM推
+断的主要困难在于完全似然分析中难以解决多重数值积分问题。各种近似推断方
+法(Breslow and Clayton, 1993; Lee and Nelder, 1996; Lin and Breslow,
+1996)和基于EM算法和Gibbs抽样的贝叶斯方法(McCulloch, 1997; Zeger and
+Karim, 1991)被用于解决这个问题
+[@breslow1993approximate; @lee1996hierarchical; @lin1996bias; @mcculloch1997maximum; @zeger1991generalized]
+。关于完全最大似然估计的讨论可以参 见Aitkin(1999)[@aitkin1999general]。
+
+GLMM一个关键特征是其使用参数均值函数来对自变量的效应进行建模，并通过
+向线性预测子添加随机效应来拟合过离散化和相关性。然后，这个参数均值函数
+的假设不一定总是正确的，因为合适的自变量函数形式事先并不知道，因变量和
+自变量之间的依赖关系有可能具有复杂的形式。因此，向GLMM模型中添加非参
+数均值函数项，建立相关数据的非参数回归模型具有实际意义。这将允许因变量和
+自变量之间具有更灵活的函数依赖关系。
+
+对于独立数据，使用核或者样条等方法的非参数回归文献很多(Hardle, 1990;
+Green and Silverman,
+1993)[@hardle1990applied; @green1993nonparametric]。Hastie and
+Tibshirani (1990)的广义可加模型应用非常广
+泛[@hastie1990generalized]。然后，对于相关数据非参数回归的研究却非
+常有限。大部分研究都局限于具有正态因变量的纵向数据并带有一个非参数函
+数(Hart, 1994; Rice and Silverman,
+1991)[@hart1994automated; @rice1991estimating]。还有一些研究在线性混
+合模型中加入一个非参数时间函数(Zeger and Diggle, 1994; Zhang *et al.*,
+1998; Diggle,Verbyla,
+1998)[@zeger1991generalized; @zhang1998semiparametric; @diggle1998nonparametric]
+。对于非正态纵向数据，Wild and Yee (1996)和Berhane and
+Tibshirani(2008)把广义可加模型推广到广义估计方程(Liang and Zeger,
+1986)[@yee1996vector; @berhane2008generalized; @liang1986longitudinal]
+。而在混合模型框架内研究非正态相关自变量的非参数回归文献不多。参
+见Verbyla(2002)关于独立非正态数据广义线性模型中光滑样条的混合模型公式的
+讨论[@verbyla2002analysis]。
+
+相关数据的非参数回归面临许多新的问题。除了必须开发非参数函数的估计程序，
+我们还必须考虑如何估计相关参数。已被许多学者(Green and Silverman, 1994;
+Wahba, 1978)强调过的至关重要的问题是如何选择好的光滑参数和带宽参
+数[@green1993nonparametric; @wahba1978improper]。这些问题的相关研究
+很少，特别是相关参数和光滑参数的估计。传统光滑参数估计方法，数据驱动方
+法面临着许多新的问题。例如，尽管交叉验证方法(Rice and Silverman,
+1991)对于相关数据的光滑参数选择是一个合理的方
+法[@rice1991estimating]，但其通常计算强度很大，而且接下来相关参数
+估计非常困难(Zeger and Diggle, 1994)[@zeger1994semiparametric]。此
+外，交叉验证方法对于交叉设计和空间数据无效。因此，开发同时对模型所有参
+数进行估计的系统方法具有重要意义。
+
+Lin，Zhang(1999)提出广义可加混合模型(GAMM)来解决这些问
+题[@lin1999inference]。GAMM是根据Hastie and Tibshirani (1990)的思
+想对GLMM的可加模型推广[@hastie1990generalized]。这种新类型模型使用
+可加非参数函数来拟合自变量的效应，而通过对可加预测子上增加随机效应来应
+对数据中的过离散化和相关性。GAMM可以用于分组、层次和空间数据。
+
+## 模型设定和估计
+
+假设$n$个个体的第$i$个观测值的因变量$y_{i}$条件独立，并且期望
+为$\mathbb{E}(y_{i}|\boldsymbol{b})=\mu_{i}^{\boldsymbol{b}}$，方差为
+$\text{var}(y_{i}|\boldsymbol{b})=\phi m_{i}^{-1}v(\mu_{i}^{\boldsymbol{b}})$，其中
+$v(\cdot)$是设定的方差函数，$m_{i}$是权重，$\phi$是尺度参数。那么广义
+可加混合模型为 
+
+$$
+  g(\mu_{i}^{\boldsymbol{b}})=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
+  + \cdots + \boldsymbol{Z_{i}b},
+$$
+
+其中$g(\cdot)$是联接函数，$\mu_{i}^{\boldsymbol{b}}$是 $y$
+的条件期望，$\boldsymbol{\beta}$ 是固定效应参数向量，$\boldsymbol{X_{i}}$是固定
+效应设计矩阵，$f_{j}$是自变量$x_{k}$的光滑函数，$\boldsymbol{Z_{i}}$是随机效应
+的设计矩阵，$\boldsymbol{b \sim \mathcal{N} (0, \Psi)}$ 是随机效应变量，其中方差
+协方差阵$\boldsymbol{\Psi}$ 一般未知而需要估计。
+
+在模型中，线性预测子和非参数函数共同来拟合自
+变量的固定效应，而随机效应用来拟合观测值之间的相关关系。当光滑函
+数$f(\cdot)$都为线性函数时，那么此时GAMM就变化为GLMM。GAMM可以用于不同
+的相关数据类型，如纵向数据，分层数据，空间数据等。对于不同的数据类型，
+我们对随机效应$\boldsymbol b$设定不同的方差协方差矩阵结构，具体可以参
+考Zeger，Diggle(1994)，Zhang *et al.*(1998)(纵向数
+据)[@zeger1994semiparametric; @zhang1998semiparametric]，Lin，
+Breslow(1996)(分层数
+据)[@lin1996bias]和Cressie(1993)，Breslow，Clayton(1993)(空间数
+据)[@cressie1993statistics; @breslow1993approximate]。
+
+Lin，Zhang(1999)使用光滑样条来估计非参数函数，使用边际拟似然同时给出光
+滑参数和方差成分的估计[@lin1999inference]。边际拟似然方法是限制最
+大似然(REML)方法的推广。REML方法被Wahba(1985)和Kohn *et
+al.*(1991)用在经典非参数回归模型
+中[@wahba1985comparison; @kohn1991performance]，被Zhang *et
+al.*(1998)，Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模型 中
+[@zhang1998semiparametric; @brumback1998smoothing; @wang1998smoothing]
+，这些学者把光滑参数看作是额外的方差成分。因为在最大化目标函数时需要求
+数值积分，双重惩罚拟似然(DPQL)被用来作近似推断。上面方法的一个关键特征
+是在统一的参数混合模型框架下对GAMMs的所有部分同时进行了系统推断。具体地
+讲，GAMM的非参数函数、光滑参数和方差成分的估计可以通过已有的统计软件拟
+合一个GLMM来得到。当数据是稀疏的时候(例如二分类数据)，方差成分的DPQL估
+计具有一定的偏倚，这个偏倚可以通过一定的方法修正以改进这个估计。关于广
+义可加混合模型的估计和推断更详细的讨论可以参 考Lin，Zhang(1999)和
+Wood(2006)[@lin1999inference; @wood2006generalized]。\
+总之，半参数回归方法容易推广到混合模型。考虑到混合模型中交互项的普遍存
+在，非参数技术为描述第一层和第二层之间的非线性交互效应提供了灵活的方法。
+但是，半参数的这种推广并不是没有代价的。混合模型与标准模型相比，是一种
+计算强度更大的方法，而GAMM更是增加了这种计算强度。一般地，我们注意到的
+差别就是在计算时间上多花几秒而已。然而，在估计GAMM经常碰到的一个问题就
+是收敛问题。由于在估计GAMM时计算变得更困难，模型可能不能收敛。如果发生
+这种情况，我们必须采取更简单的模型来拟合数据。
+
+到目前为止，我们已经比较完整的讨论了半参数回归模型及其推广模型，包括广
+义可加模型(GAM)，半参数混合模型和广义可加混合模型(GAMM)。下面我们将转
+向实证部分。我们将利用这些模型来拟合中国宏观经济数据并利用统计诊断方法
+来检验中国全国及地区GDP数据准确性问题。
+
+[^1]: 多水平模型实际上混合模型的一种特殊情况。混合模型可以
+    有多种形式的变形，而多水平模型是其中一种形式。
+
+
+<!-- # 参考文献 {-} -->
+[//]: # (\bibliography{Bibfile}) (\bibliography{thesis})

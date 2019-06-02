@@ -1,0 +1,13 @@
+--- 
+title: "A Minimal Book Example"
+author: "Yihui Xie"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+bibliography: [Bibfile.bib, thesis.bib]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
