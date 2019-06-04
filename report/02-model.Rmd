@@ -433,13 +433,13 @@ Carroll(2003)证明了方程等价于 $$\label{eq:121}
 如同线性回归模型可以推广到广义线性模型一样，线性混合模型也可以推广到广
 义线性混合模型(GAMM)。广义线性混合模型(GLMM)(Breslow and Clayton,
 1993)为各种过度离散和相关因变量的参数回归提供了统一的似然框
-架[@breslow1993approximate]。这种类型数据在许多领域研究中都会出现，
+架[@Breslow1993]。这种类型数据在许多领域研究中都会出现，
 例如纵向数据研究，抽样调查，临床医学和疾病绘图(desease mapping)。GLMM推
 断的主要困难在于完全似然分析中难以解决多重数值积分问题。各种近似推断方
 法(Breslow and Clayton, 1993; Lee and Nelder, 1996; Lin and Breslow,
 1996)和基于EM算法和Gibbs抽样的贝叶斯方法(McCulloch, 1997; Zeger and
 Karim, 1991)被用于解决这个问题
-[@breslow1993approximate; @lee1996hierarchical; @lin1996bias; @mcculloch1997maximum; @zeger1991generalized]
+[@Breslow1993; @lee1996hierarchical; @lin1996bias; @mcculloch1997maximum; @zeger1991generalized]
 。关于完全最大似然估计的讨论可以参 见Aitkin(1999)[@aitkin1999general]。
 
 GLMM一个关键特征是其使用参数均值函数来对自变量的效应进行建模，并通过
@@ -459,7 +459,7 @@ Tibshirani (1990)的广义可加模型应用非常广
 1991)[@hart1994automated; @rice1991estimating]。还有一些研究在线性混
 合模型中加入一个非参数时间函数(Zeger and Diggle, 1994; Zhang *et al.*,
 1998; Diggle,Verbyla,
-1998)[@zeger1991generalized; @zhang1998semiparametric; @diggle1998nonparametric]
+1998)[@zeger1991generalized; @Zhang1998; @diggle1998nonparametric]
 。对于非正态纵向数据，Wild and Yee (1996)和Berhane and
 Tibshirani(2008)把广义可加模型推广到广义估计方程(Liang and Zeger,
 1986)[@yee1996vector; @berhane2008generalized; @liang1986longitudinal]
@@ -480,7 +480,7 @@ Wahba, 1978)强调过的至关重要的问题是如何选择好的光滑参数�
 数进行估计的系统方法具有重要意义。
 
 Lin，Zhang(1999)提出广义可加混合模型(GAMM)来解决这些问
-题[@lin1999inference]。GAMM是根据Hastie and Tibshirani (1990)的思
+题[@Lin1999]。GAMM是根据Hastie and Tibshirani (1990)的思
 想对GLMM的可加模型推广[@hastie1990generalized]。这种新类型模型使用
 可加非参数函数来拟合自变量的效应，而通过对可加预测子上增加随机效应来应
 对数据中的过离散化和相关性。GAMM可以用于分组、层次和空间数据。
@@ -510,18 +510,18 @@ $$
 的相关数据类型，如纵向数据，分层数据，空间数据等。对于不同的数据类型，
 我们对随机效应$\boldsymbol b$设定不同的方差协方差矩阵结构，具体可以参
 考Zeger，Diggle(1994)，Zhang *et al.*(1998)(纵向数
-据)[@zeger1994semiparametric; @zhang1998semiparametric]，Lin，
+据)[@zeger1994semiparametric; @Zhang1998]，Lin，
 Breslow(1996)(分层数
 据)[@lin1996bias]和Cressie(1993)，Breslow，Clayton(1993)(空间数
-据)[@cressie1993statistics; @breslow1993approximate]。
+据)[@cressie1993statistics; @Breslow1993]。
 
 Lin，Zhang(1999)使用光滑样条来估计非参数函数，使用边际拟似然同时给出光
-滑参数和方差成分的估计[@lin1999inference]。边际拟似然方法是限制最
+滑参数和方差成分的估计[@Lin1999]。边际拟似然方法是限制最
 大似然(REML)方法的推广。REML方法被Wahba(1985)和Kohn *et
 al.*(1991)用在经典非参数回归模型
 中[@wahba1985comparison; @kohn1991performance]，被Zhang *et
 al.*(1998)，Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模型 中
-[@zhang1998semiparametric; @brumback1998smoothing; @wang1998smoothing]
+[@Zhang1998; @brumback1998smoothing; @wang1998smoothing]
 ，这些学者把光滑参数看作是额外的方差成分。因为在最大化目标函数时需要求
 数值积分，双重惩罚拟似然(DPQL)被用来作近似推断。上面方法的一个关键特征
 是在统一的参数混合模型框架下对GAMMs的所有部分同时进行了系统推断。具体地
@@ -529,7 +529,8 @@ al.*(1998)，Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模�
 合一个GLMM来得到。当数据是稀疏的时候(例如二分类数据)，方差成分的DPQL估
 计具有一定的偏倚，这个偏倚可以通过一定的方法修正以改进这个估计。关于广
 义可加混合模型的估计和推断更详细的讨论可以参 考Lin，Zhang(1999)和
-Wood(2006)[@lin1999inference; @wood2006generalized]。\
+Wood(2006)[@Lin1999; @wood2006generalized]。
+
 总之，半参数回归方法容易推广到混合模型。考虑到混合模型中交互项的普遍存
 在，非参数技术为描述第一层和第二层之间的非线性交互效应提供了灵活的方法。
 但是，半参数的这种推广并不是没有代价的。混合模型与标准模型相比，是一种
