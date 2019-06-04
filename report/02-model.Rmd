@@ -6,7 +6,7 @@ css: ./style/markdown.css
 autoEqnLabels: true
 eqnPrefixTemplate: ($$i$$)
 linkReferences: true
-bibliography: [Bibfile.bib, thesis.bib]
+bibliography: [Bibfile.bib, ]
 notice: '@*'
 csl: ./style/chinese-gb7714-2005-numeric.csl
 link-citations: true
@@ -519,8 +519,8 @@ Lin，Zhang(1999)使用光滑样条来估计非参数函数，使用边际拟似
 滑参数和方差成分的估计[@Lin1999]。边际拟似然方法是限制最
 大似然(REML)方法的推广。REML方法被Wahba(1985)和Kohn *et
 al.*(1991)用在经典非参数回归模型
-中[@wahba1985comparison; @kohn1991performance]，被Zhang *et
-al.*(1998)，Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模型 中
+中[@wahba1985comparison; @kohn1991performance]，被Zhang *et al.*(1998)，
+Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模型 中
 [@Zhang1998; @brumback1998smoothing; @wang1998smoothing]
 ，这些学者把光滑参数看作是额外的方差成分。因为在最大化目标函数时需要求
 数值积分，双重惩罚拟似然(DPQL)被用来作近似推断。上面方法的一个关键特征
@@ -547,5 +547,5 @@ Wood(2006)[@Lin1999; @wood2006generalized]。
 [^1]: 多水平模型实际上混合模型的一种特殊情况。混合模型可以有多种形式的变形，而多水平模型是其中一种形式。
 
 
-<!-- # 参考文献 {-} -->
-<!--[//]: # (\bibliography{Bibfile}) (\bibliography{thesis})-->
+# 参考文献 {-}
+<!--[//]: # (\bibliography{Bibfile})-->
