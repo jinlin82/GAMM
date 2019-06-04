@@ -33,9 +33,9 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-# 模型设定
+# 参数估计 
 
 
 
-# 参考文献 {-}
+<!--# 参考文献 {-}-->
 [//]: # (\bibliography{Bibfile})

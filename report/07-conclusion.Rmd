@@ -33,9 +33,18 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-# 模型设定
+# 结论
 
 
 
-# 参考文献 {-}
+\cleardoublepage
+
+\pagestyle{emptypage}
+
+\renewcommand{\chapterlabel}{\bibname}    % 设置页眉
+
+<!-- # 参考文献 {-} -->
 [//]: # (\bibliography{Bibfile})
+
+
+
