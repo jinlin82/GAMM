@@ -1,0 +1,160 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+#引言
+
+广义加性混合模型（GAMM）为涉及横截面，纵向和空间数据时的现实复杂情况下的
+回归分析提供了广泛而灵活的框架。它们扩展了广义线性模型的类，通过将未知的
+度量协变量，时间尺度和空间协变量的平滑函数以及随机效应添加到预测器的一般
+线性固定效应部分。在完全贝叶斯GAMM中，所有这些影响因素以及平滑参数或其他
+超参数都被认为是随机的，并且通过为它们设置适当的先验来获得特定模型。
+
+贝叶斯非参数函数估计和贝叶斯半参数函数估计的快速发展中，两个主要概念是基
+于（i）自适应基函数方法和（ii）平滑先验。在基函数方法中，先验被设计用于控
+制基函数系数的显着性（例如Smith和Kohn，1996;Yau，Kohn和Wood，2000），分段
+常数函数或回归样条的节点的数量和位置（benison等。，1998; 
+Biller，2000，或者一个空间背景下空间域的划分（Heikkinen和Arjas，1998; 
+Knorr-Held和Raf3er，1999）。
+
+平滑先验方法是惩罚似然法的随机类似物。它们设置适当的先验，其功能值或参数
+的平滑类型和程度不同，这些函数值和参数在度量协变量、时间尺度、或空间数据
+中是类似的。这些概念已经在动态模型（Know-Held，1999）、空间平滑马尔可夫随
+机模型（Besag等，1991）中被用于贝叶斯平滑样条（Hastie和Tibshirani，2000。
+Fahrmeir和Lang（2001a，b）将这些概念结合起来，对GAMM进行统一处理。其中平
+滑先验服从一般的多元高斯分布，而且后验推断可以通过有效的MCMC技术进行。 
+最后，Lang和Brezger（2001）开发了贝叶斯P样条模型，可以将其视为基函数和平
+滑先验方法的组合。
+
+贝叶斯GAMM为时间或空间类数据的回归分析提供了强大的工具。但是，在应用中，
+通常会出现以下一些问题：基于观察到的数据，基础结构（包括协变量，时间和空
+间的加性效应）在模型中能体现多少？是否有可能区分建立平滑空间结构的空间相
+关随机效应和应该捕获未观察到的异质性的不相关的随机效应？假设有一个正确的
+基础回归函数，关于估计偏差和方差，我们可以得出什么？ 信噪比或方差 - 
+方差比的影响是什么？ 不同类型的响应变量所带来的影响有多大？
+
+要为实际中的复杂模型找到这些问题的答案，仅分析结果是不够的。因此，需要进
+行彻底的模拟研究，其可以在经验基础上给出部分答案。但文献中明显缺乏此类研
+究，仅有的研究人员是Smith，Wong和Kohn（1998），Smith和Kohn（1996）以及Ber
+nardinelli，Clayton和Montomoli（1995）。
+
+本文的目的是探讨上面提到的Fahrmeir和Lang（2001a，b）的文章中关于贝叶斯GAMM
+模型的一些开放性问题。我们关注的是高斯和（多）分类probit模型，该模型的预测器
+包括文章开头以加成形式描述的所有不同类型的影响。本文结果有利于对这些模型的后
+验推断特性有更为深入的了解，并为实际应用中的工具使用和遇到的限制提供了指导。
+
+#Bayes 广义可加混合模型
+
+
+广义线性模型假设，给定协变量 $w$ ，响应变量 $y$ 的分布属于指数族，并且
+$\mu = E（y | w）$ ，线性预测器为 $\eta =\gamma ^ {\prime} w$，连接函数
+$\mu = h（\eta）$将 $\mu$ 与 $\eta$ 连接起来。这里$ h $是一个已知的连接或响
+应函数，并且 $\gamma =\left(\gamma_1，\ldots，\gamma_q\right)$是要估计的未知
+回归系数的向量。GAMM通过灵活的半参数可加性预测器替换简单的参数线性预测器来
+扩展GLM模型。
+
+$$\eta=f_{1}\left(x_{1}\right)+\cdots+f_{p}\left(x_{p}\right)+
+\gamma^{\prime} w+b_{g}$$
+
+其中未知函数 $f_{1}, \ldots, f_{p}$ 是可度量协变量、时间尺度和空间数据
+的光滑函数。参数 $b_{g}, g\in\{1,\ldotsG\},$代表互不相关的随机效应，主要用来
+捕捉未观测到的异质性。在大多数情况下，分组变量是标识不同单元或集群的索引。它
+也可以是表示不同空间位点的指标，最后形成空间异质性。一种常见的方法是将空间效
+应 $f_{spat}（s）$ ( $s \in\{1, \ldots, S\}$表示一个空间内的不同位置)分解成平
+滑的结构化部分 $f_{str}（s）$ 和非结构化的随机效应 $b_{s}$ 。加法分解的合理性
+ $f_{spat}(s)=f_{str}(s)+b_{s}$ 在于空间效应通常是许多潜在的未观察到的影响
+因素的替代。其中一些可能具有强大的空间结构（结构化部分），其他可能仅在某个空间
+点存在（随机效应）。这些模型在空间流行病学中很常见（Besag等，1991;Knorr-Held和
+Besag，1998），并且也用于Fahrmeir和Lang（2001b）。借鉴其方法，我们也可以将时间
+尺度的函数或一个可度量协变量分解成为一个平滑的部分和一个不相关的随机效应。第3节
+中模拟研究的主要焦点是研究在给定数据和先验的情况下这种分解是否可识别。 
+（注意，分解不是可识别的！）
+
+未知函数 $f_{1}, \ldots, f_{p}$ 的平滑先验取决于协变量的类型。可度量协变量和
+时间尺度的先验可以是随机游走先验（Fahrmeir和Lang，2001a），P样条系数先验（Lang
+和Brezger，2001）和平滑样条先验（Hastie和Tibshirani，2000）。总之，一个未知的平
+滑函数f是可以表达的 ，更确切地说是对应的函数向量
+$f=\left(f\left(x_{1}\right), \ldots, f\left(x_{n}\right)\right)$，它是设计矩阵
+$\boldsymbol X$ 和未知参数向量 $\boldsymbol \beta$ 的乘积，即 
+$f =\boldsymbol X \boldsymbol \beta$ 。系数向量 $\boldsymbol \beta$ 的所有先
+验都具有相同的一般高斯形式
+
+$$\beta | \tau^{2} \propto \exp \left(-\frac{1}{2 \tau^{2}} \beta^{\prime} K \beta\right)$$ #[eq:m1]
+
+这意味着尽管T2遵循部分不正确的高斯先验
+
+$$\beta | \tau^{2} \sim N\left(0, \tau^{2} K^{-}\right)$$ #[eq:m2]
+
+其中 $K^{-}$ 是惩罚矩阵 $K$ 的广义逆。函数 $f$ 的平滑量由方差参数 $\tau^{2}$ 控制。 
+对于一个完全贝叶斯的分析中，在层次结构的另一个阶段引入 $\tau^{2}$ 的超先验。
+这允许同时估计未知函数和平滑量。一个常见的选择是高度分散但适当的反伽马先验
+$\tau^{2}\sim IG（a，b）$ 。（在高斯加法混合模型 $y=\eta+\epsilon$中，
+先验也选择为 $var（\epsilon）=\sigma ^2$ ）。
+
+空间协变量的光滑函数 $f(x)$ 中，$x_{i}$ 表示在一个空间域内观测对象 $i$ 的位置，该光滑
+函数也可以表示 $f=X \beta$ 。最简单的情况中， $\beta$ 的一个 具体值 $\beta_{s}$ 与 $f(s)$
+是相等的，即在 $f(\cdot)$ 在 $s$ 点的值。并且在 Besag et al. (1991) 中，$\boldsymbol \beta$
+的先验被假设是马尔科夫随机先验，这同样可以用在 @eq:{m1} 的一般形式中。
+
+对于非结构化的随机效应，一个常用的先验假设是 $b_{g}$ 符合独立同分布，并服从高斯形式，其
+中需要有关于 $v^2$ 的高度离散的超先验。
+
+显然，可加性平滑影响函数$f_{1}, \ldots, f_{p}$间的差别是微小。事实上，不是为函数 $f$ 
+的随机游走指定例如一阶或二阶的先验，随机效应 @eq:{m2} 的先验也可以指定。二者之间的
+区别在于函数 $f$ 所允许的平滑量。对于随机效应先验的指定，允许连续参数或多或少地不受
+限制地变化，而随机游走先验需保证连续参数在x的范围内平滑地变化。正如在某些情况下已经
+提到的那样。甚至可能需要将结构化和非结构化影响都包括在预测器中。
+
+贝叶斯推断是基于模型的后验分布，在所有实际情况中，后验分布在数值上是难以处理的，并且
+一般使用MCMC模拟进行后验分析。所使用的精确MCMC模拟技术在Fahrmeir和Lang（2001b）中有
+详细描述，参见Hastie和Tibshirani（2000）关于高斯响应的部分。对于高斯和分类probit模型，
+这是本文的重点，使用Gibbs采样可以进行后验模拟。在其他情况下，基于条件先验（Know-Held 
+1999）或迭代加权最小二乘方法（Gamerman，1997）的MH法也可以使用。所有的计算都是用
+BayesX进行的，这是一个用MCMC技术进行贝叶斯推理的软件包。该程序和用户手册可通过互联网获
+取，网址为：http：// www .stat .uni-muenchen.de /~lang/。BayesX的用户手册还包含对本文中使用的MCMC技术的简短调查。
+
