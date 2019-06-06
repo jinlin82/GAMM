@@ -131,8 +131,9 @@ sims %>%
   {.<0.05} %>%
   mean()
 
-######线性混合模型:yt=μ+(bs)t+et
+########################## 线性混合模型:yt=μ+(bs)t+et #######################
 ###yt是第t次的观测值，μ是总体均值，bs是随机效应，服从正态分布,et是水平观测的随机效应
+### https://aosmith.rbind.io/2018/04/23/simulate-simulate-part-2/
 
 set.seed(16)
 
@@ -218,29 +219,63 @@ slope<-runif(nstand*nplot,2,75)
 resp2<-b0+b1*elevation+b2*slope+standeff*slope+ploteff   ###根据方程产生y
 lmer(resp2~elevation+slope+(slope|stand))
 
-###R语言构建分块对角阵
-m <- matrix(c(1:6),3,2)
-m
-n <- 3
-n
-list2 <- NULL
-list2
-for (i in 1:n){
-  list2[[i]] <- m
-}
-library(Matrix)
-tar.m <- as.matrix(bdiag(list2))
-tar.m
+######拟合混合模型yt=b0+b1*(elevations)t+b2*slopet+(bs)t*slopet+(bs)t+et
+nstand<-5
+nplot<-6
+b0<--1
+b1<-0.005
+b2<-0.1
+sds1<-2
+sds2 <- 1.5
+sd<-1
+set.seed(16)
+stand<-rep(LETTERS[1:nstand],each=nplot)
+standeff1<-rep(rnorm(nstand,0,sds1),each=nplot)
+standeff2<-rep(rnorm(nstand,0,sds2),each=nplot)
+ploteff<-rnorm(nstand*nplot,0,sd)
+elevation<-rep(runif(nstand,1000,1500),each=nplot)  ###固定效应设计矩阵
+slope<-runif(nstand*nplot,2,75) 
+resp3<-b0+b1*elevation+b2*slope+standeff1+standeff2*slope+ploteff   ###根据方程产生y
 
-### 随机效应设计矩阵(一个截距项，一个自变量)
-list<-NULL
-for(i in 1:nstand){
-  list[[i]]<-cbind(matrix(rep(1,nplot),nplot,1),slope[(4*i-3):(4*i)])
-}
-list
+cbind(stand, resp3, elevation, slope)
+
+fit3 <- lmer(resp3~elevation+slope+(slope|stand)+(1|stand))
+fit4 <- lmer(resp3~elevation+slope+(1+slope|stand))
+fit5 <- lmer(resp3~elevation+slope+(0+slope|stand))
+
+t(as.matrix(fit3@pp$Zt))
+t(as.matrix(fit4@pp$Zt))
+t(as.matrix(fit5@pp$Zt))
+
+
+### 利用矩阵模拟模型yt=b0+b1*(elevations)t+b2*slopet+(bs)t*slopet+(bs)t+et
 library(Matrix)
-tar.m<-as.matrix(bdiag(list))
-tar.m
+nstand<-5
+nplot<-6
+b0<--1
+b1<-0.005
+b2<-0.1
+sds1<-2
+sds2 <- 1.5
+sd<-1
+set.seed(16)
+stand<-rep(LETTERS[1:nstand],each=nplot)
+standeff1<-rep(rnorm(nstand,0,sds1),each=nplot)
+standeff2<-rep(rnorm(nstand,0,sds2),each=nplot)
+ploteff<-rnorm(nstand*nplot,0,sd)
+elevation<-rep(runif(nstand,1000,1500),each=nplot)  ###固定效应设计矩阵
+slope<-runif(nstand*nplot,2,75)
+
+X <- cbind(rep(1, nstand*nplot), elevation, slope)
+beta <- c(b0, b1, b2)
+Z <- as.matrix(bdiag(by(X[,c(1,3)], stand, as.matrix)))
+u <- as.vector(unlist(by(cbind(standeff1, standeff2), stand, function(x) x[1,])))
+e <- ploteff
+
+y <- X%*%beta+Z%*%u+e
+
+
+
 
 ###### yt~poisson(λt)（GLMM） 
 ###yt是第t次观测的数据，λt是第t次观测不可观测的均值，log(λt)=β0+β1xt+β2xt^2

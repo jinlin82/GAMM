@@ -12,9 +12,6 @@ csl: ./style/chinese-gb7714-2005-numeric.csl
 link-citations: true
 ---
 
-**TODO**
-
-
 
 
 ```{r setup, echo=F}
@@ -33,7 +30,18 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-# 参数估计 
+# 广义可加混合模型参数估计 
+
+## 基于双重惩罚拟似然方法的参数估计
+### 惩罚拟似然估计方法
+
+## 基于切片抽样MCMC贝叶斯方法的参数估计
+
+### 切片抽样
+
+### 基于切片抽样的MCMC方法
+
+
 
 
 

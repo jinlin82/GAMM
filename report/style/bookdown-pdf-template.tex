@@ -70,6 +70,11 @@ $endif$
 $if(title)$
 \maketitle
 $endif$
+
+\cleardoublepage
+\frontmatter
+\pagestyle{plain}
+
 $if(abstract)$
 \begin{abstract}
 $abstract$
@@ -77,8 +82,7 @@ $abstract$
 $endif$
 
 
-\mainmatter
-\pagestyle{mpage}
+
 
 $for(include-before)$
 $include-before$
@@ -114,6 +118,8 @@ $if(lof)$
 \listoffigures          % 如果要生成图目录
 $endif$
 
+\mainmatter
+\pagestyle{mpage}
 
 $body$
 
