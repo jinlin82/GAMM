@@ -4,7 +4,7 @@ author: "金林"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 css: ./style/markdown.css
-autoEqnLabels: true
+autoEqnLabels: false
 eqnPrefixTemplate: ($$i$$)
 linkReferences: true
 csl: ./style/chinese-gb7714-2005-numeric.csl

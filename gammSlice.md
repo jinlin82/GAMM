@@ -408,7 +408,7 @@ x_{1i}\overset{ind}\sim Bernoulli(\frac{1}{2}),\quad x_{2i}\overset{ind}\sim Uni
 u_k|\sigma^2 \overset{ind}\sim N(0,\sigma^2),\quad \beta_0,\beta_{x1},\beta_{x2} \overset{ind}\sim N(0,10^{10}),\quad \sigma \sim Half-Cauchy(10^5)
 \end{array}$$ {#eq:model8}
 
-考虑数据集 $n=500$，$f(x)=sin(2\pi x)$：
+考虑数据集 $n=500$ ， $ f(x)=sin(2\pi x)$ ：
 
 ```
 set.seed(981127)
@@ -596,9 +596,9 @@ summary(fitTN)
 
 ### 说明性优比总结
 
-优比，以每个对象的随机截距为条件，$terb=1$，则$months=$月份的中位数，值为 $Q_2$；$terb=0$，
+优比，以每个对象的随机截距为条件，$terb=1$，则$months=$月份的中位数，值为 $Q_2$ ；$terb=0$，
 则$months=$ 0，优比 $OR_{terb}=exp(\beta_{terb} Q_2)$。通过类比3.1.4中的计算，$OR_{terb}$
-的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$。这个结果和图\@ref(fig:fig10)、11中统计
+的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$ 。这个结果和图\@ref(fig:fig10)、11中统计
 显著交互效应是一致的。
 
 <div class="figure">
@@ -623,7 +623,7 @@ summary(fitTN)
 之后由Diggle等（2002）使用。响应变量是呼吸道感染（0表示没有感染，1表示感染），
 潜在的预测变量是年龄，维生素A缺少的指标，性别，身高，发育不良的指标和每个孩子
 门诊就诊的次数。这里，我们使用门诊就诊次数的指标，需要5个这样的指标。让 $x_{ij}$ 
-表示$9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子，$1 \leq j \leq n_i$
+表示 $9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子， $1 \leq j \leq n_i$
 表示对每个孩子重复的测量。一个可加混合模型如下：
 
 $$logit(P(respiratory infection_{ij}=1))=U_i+\beta^{T}x_{ij}+f(age_{ij}),\quad U_i \overset{ind}\sim N(0,\sigma^2)$$  {#eq:model13}
