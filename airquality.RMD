@@ -73,7 +73,8 @@ knitr::kable(tab1, row.names =F, align = "l", caption="环境空气污染物基�
 指数（air quality index，AQI）是定量描述空气质量状况的无量纲指数，是空气质量分指数中的最大
 值。空气质量分指数（individual air quality index，IAQI）指单项污染物的空气质量指数。用数学
 语言表述即为：$\mathrm{AQI}=\max \left\{\mathrm{IAQI}_{1}, \mathrm{IAQI}_{2}, \ldots, \mathrm{IAQI}_{\mathrm{n}}\right\}$，
-其中 $n$ 表示污染物项目。 $AQI$ 大于50时 $IAQI$ 最大的污染物为首要污染物指，若 $IAQI$ 最大的污染物为两项或两项以上，则并列为首要污染物。 $IAQI$ 大于100的污染物为超标污染物。
+其中 $n$ 表示污染物项目。 $AQI$ 大于50时 $IAQI$ 最大的污染物为首要污染物指，若
+$IAQI$ 最大的污染物为两项或两项以上，则并列为首要污染物。 $IAQI$ 大于100的污染物为超标污染物。
 
 空气质量指数相关信息如表2所示。当空气质量为优时，空气质量令人满意，基本无空气污染，各类人群
 可正常活动。当空气质量为良时，空气质量可接受，但某些污染物可能对极少数异常敏感人群健康有较
