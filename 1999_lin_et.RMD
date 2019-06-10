@@ -380,8 +380,6 @@ $$l_{\mathrm{M}}(y ; \tau, \theta) \approx-\frac{1}{2} \log |V|-\frac{1}{2} \log
 $\theta$ 。
 
 
-
-
 ## 双重惩罚拟似然方法下广义可加混合模型的推断汇总
 
 # 偏差校正的双重惩罚拟似然
