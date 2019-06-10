@@ -1,0 +1,387 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# 广义可加线性模型
+
+假如 $n$个单位中的第 $i$ 个观测对象包含一个因变量$y_i$,和 $p$ 个与固定效应相联系的协变量
+$x_{i}=\left(1, x_{i 1}, \ldots, x_{i p}\right)^{\mathrm{T}}$ 和 $q$ 个与随机效应相联系的
+协变量 $z_{i}$ .给定1个 $q\times 1$ 维的随机效应向量$b$，并且假定响应变量 $y_i$ 满足
+条件独立，其均值为 $E\left(y_{i} | b\right)=\mu_{i}^{b}$ ,方差为 $\operatorname{var}\left(y_{i} | b\right)=\phi m_{i}^{-1} v\left(\mu_{i}^{b}\right)$,
+ $v(\cdot)$ 表示一个具体的方差函数，$m_i$ 表示先验权重（例如一个二项分母），$\phi$ 是一个尺度参数，以下给出的是一个广义可加模型
+ 
+$$g\left(\mu_{i}^{b}\right)=\beta_{0}+f_{1}\left(x_{i 1}\right)+\ldots+f_{p}\left(x_{i p}\right)+z_{i}^{\mathrm{T}} b$$ {#eq:m1}
+
+其中 $g(\cdot)$ 表示一个单调可导连接函数，$f_j(\cdot)$ 是一个中心化的二阶可导平滑函数，随
+机效应 $b$ 被假定服从分布 $N\sim {0,D(\theta)}$ 并且 $\theta$ 是一个 $c\times1$ 的方差成分
+向量。
+
+GAMM(1)的一个关键特征是，用加性非参数函数来构建协变量效应，用随机效应来描述观测之间的相关
+性。如果 $f_j(\cdot)$ 是一个线性函数，GAMM(1)约等于Breslow和Clayton的GLMM(1993)。Zeger和
+Diggle(1994)和Zhang等人(1998)考虑了GAMM(1)的一个特例，一个半参数混合模型，他们假设了一个
+单非参数时间函数 $f(\cdot)$ 和具有正态分布响应变量的纵向数据。
+
+模型形式(1)包括各种研究设计，如聚类、层次和空间设计。这是因为我们可以指定随机效应b的灵活
+协方差结构。例如，对于纵向数据，随机效应b可以分解为随机截距和随机过程(Zeger and Diggle, 
+1994;Zhang等人，1998)对于分层(多水平)数据，可以将其划分为代表分层的不同水平，例如，多中
+心临床试验中的中心、医生和患者(Lin和Breslow1996)。对于疾病制图和生态研究中常见的空间数据，
+它们可以用来构建空间相关性，空间相关性通常被假设为每两个区域之间的欧氏距离的函数(Cressie, 
+1993)，或者每两个相邻区域之间的常数(Breslow和Clayton, 1993)。
+
+$\left\{\beta_{0}, f_{1}(\cdot), \ldots, f_{p}(\cdot), \theta\right\}$完整的对数拟似然
+（相比Breslow 和Clayton(1993),公式（2））是：
+
+$$\exp \left[l\left\{y ; \beta_{0}, f_{1}(\cdot), \ldots, f_{p}(\cdot), \theta\right\}\right] \propto|D|^{-1 / 2} \int \exp \left\{-\frac{1}{2 \phi} \sum_{i=1}^{n} d_{i}\left(y_{i} ; \mu_{i}^{b}\right)-\frac{1}{2} b^{\mathrm{T}} D^{-1} b\right\} \mathrm{d} b$$ {#eq:m2}
+
+其中$y=\left(y_{1}, \ldots, y_{n}\right)^{\mathrm{T}}$和
+
+$$d_{i}\left(y_{i} ; \mu_{i}^{b}\right) \propto-2 \int_{y_{i}}^{\mu_{i}^{b}} m_{i}\left(y_{i}-u\right) / v(u) \mathrm{d} u$$
+
+定义了给定 $b$ 时$\left\{\beta_{0}, f_{1}(\cdot), \ldots, f_{p}(\cdot)\right\}$的条件偏差
+函数。假设 $D$ 是一个满秩矩阵可以使以上简单化。如果 $D$ 不是一个满秩矩阵，则可以用 
+$Moore-Penrose$ 的广义逆。
+
+GAMM(1)中的统计推理涉及对非参数函数 $f_j(\cdot)$ 的推理，通常需要估计平滑参数，如 
+$\lambda$，以及推断方差成分 $\theta$ 。在接下来的两部分中。我们将首先讨论
+如何构造已知 $\lambda$ 和 $\theta$ 时 $f_j(\cdot)$ 的自然立方平滑样条估计量;
+然后我们提出利用边际拟似然估计 $\lambda$ 和 $\theta$ 。
+
+
+# 非参数函数的推断
+
+## 自然立方平滑样条估计
+
+由于 $f_j(\cdot)$ 是无穷维数的未知参数，我们考虑用自然立方平滑样条估计它们。利用
+O'Sullivan et al.(1986)的结果，注意到方程(2)是 $f_j(\cdot)$ 的一个连续线性函数。
+可以表明，对于给定的 $\lambda$ 和 $\theta$ ，使惩罚对数拟似然值最大化的 $f_j(\cdot)$ 
+自然立方平滑样条估计器满足：
+
+$$l\left\{y ; \beta_{0}, f_{1}(\cdot), \ldots, f_{p}(\cdot), \theta\right\}-\frac{1}{2} \sum_{j=1}^{p} \lambda_{j} \int_{s_{j}}^{t_{j}} f_{j}^{\prime \prime}(x)^{2} \mathrm{d} x=l\left(y ; \beta_{0}, f_{1}, \ldots, f_{p}, \theta\right)-\frac{1}{2} \sum_{j=1}^{p} \lambda_{j} f_{j}^{\mathrm{T}} K_{j} f$$ {#eq:m3}
+
+其中 $(s_j,t_j)$ 定义了第 $j$ 个协变量的范围，并且 $\lambda=(\lambda_1,\cdots,\lambda_p)$ 
+是平滑参数的一个向量，权衡拟合优度和被估计函数的平滑度。这里 $f_j$ 是 $f_j(\cdot)$ 在
+$x_{ij}(i=1,\cdots,n)$ 的 $r_j$ 阶不同值处取值的一个 $r_j \times 1$ 的未知向量，$K_j$ 
+是相应的非负且维数确定的平滑矩阵。（Green 和 Silverment(1994),公式（2.3））
+
+用矩阵可以表示为, 
+$\mu^{b}=\left(\mu_{1}^{b}, \ldots, \mu_{n}^{b}\right)^{\mathrm{T}}, g\left(\mu^{b}\right)=\left\{g\left(\mu_{1}^{b}\right)\right\}^{\mathrm{T}}$ 
+$Z=\left(z_{1}, \ldots ，z_{n} \right)^{\mathrm{T}}$ ,则GAMM $(1)$ 可写为：
+
+$$g\left(\mu^{b}\right)=\mathbf{1} \beta_{0}+N_{1} f_{1}+\ldots+N_{p} f_{p}+Z b$$ {#eq:m4}
+
+$\boldsymbol 1$ 是一个$n\times 1$ 维的向量，$N_j$ 是一个$n\times r_j$ 的关联矩阵，其定义
+方式与Green 和 Silverman (1994)中4.3.1节的相似，如 $N_j\,f_j$的第 $i$ 个成分是$f_j(x_{ij})$.
+
+由于 [@eq:m2] 中求得 $l\left(y ; \beta_{0}, f_{1}, \ldots, f_{p}, \theta\right)$   
+的值要求数值积分。除了高斯分布的情况，直接求出 [@eq:m3] 的最大值来计算 $f_j$ 的全自然
+三次平滑样条估计量往往是困难的。因此将在下一节中提出另外一种方法。通过蒙特卡罗模拟讨论
+全三次平滑样条的计算，见第8部分。
+
+## 双重惩罚拟似然
+
+最大化 [@eq:m3] 通常要求复杂的数值积分，所以本文对 [@eq:m3] 的
+$l\left(y ; \beta_{0}, f_{1}, \ldots, f_{p}, \theta\right)$ 应用拉普拉斯方法来近似计算
+（(Tierney and Kadane, 1986）。Tierney和Kadane, 1986)。将 [@eq:m3] 的最终近似值最大化，
+就会得到近似的 $f_j$ 的自然三次样条估计量。注意，这种逼近对于具有恒等连接函数的正态分布
+结果是精确的。具体地说，我们通过对被积函数的指数进行二次展开式，求出积分前的最大值，从而
+近似 [@eq:m2] 。忽略由此得到的拉普拉斯近似的第一行列式项(Breslow和Clavton. 1993)，一些计算
+表明，近似的自然三次平滑样条估计量 $\left(\hat \beta_{0},\hat f_{1},\ldots,\hat f_{p} \right)$
+可以通过最大化以下的关于对$\left(\beta_{0}, f_{1}, \ldots, f_{p},\right)$ 及 $b$ 的DPQL:
+
+$$-\frac{1}{2 \phi} \sum_{i=1}^{n} d_{i}\left(y_{i} ; \mu_{i}^{b}\right)-\frac{1}{2} b^{\mathrm{T}} D^{-1} b-\frac{1}{2} \sum_{j=1}^{p} \lambda_{j} f_{j}^{\mathrm{T}} K_{j} f_{j}$$ {#eq:m5}
+
+关于式 [@eq:m5] 详细的导数见附录A.第一惩罚项$b^{\mathrm{T}}D^{-1}b/2$
+来自于公式 [@eq:m2] 的拉普拉斯近似，第二惩罚项 $\lambda_{j}f_{j}^{\mathrm{T}}K_{j}f_{j}/2$
+来自于 $f_j$ 的自然三次平滑样条性质。
+
+对式 [@eq:m5] 求关于 $\left(\beta_{0}, f_{1}, \ldots, f_{p}\right)$ 和 $b$  的导数，
+可以得到它们的估计量：
+
+$$\begin{aligned} 1^{\mathrm{T}} W \Delta\left(y-\mu^{b}\right)=0 & \\ N_{j}^{\mathrm{T}} W 
+\Delta\left(y-\mu^{b}\right)-\lambda_{j} K_{j} f_{j}=0 \,\,&(j=1, \ldots, p) \\ Z^{\mathrm{T}} W
+\Delta\left(y-\mu^{b}\right)-D^{-1} b=0 \end{aligned}$$ {#eq:m6}
+
+其中$\Delta=\operatorname{diag}\left\{g^{\prime}\left(\mu_{i}^{b}\right)\right\}, W=\operatorname{diag}\left[\left\{\phi m_{i}^{-1} v\left(\mu_{i}^{b}\right) g^{\prime}\left(\mu_{i}^{b}\right)^{2}\right\}^{-1}\right]$ 
+是一个改进的广义可加模型的权重矩阵，$f_{j}$ 需满足 $f_{j}^{\mathrm{T}} \mathbf{1}=0$
+以得到中心化的 $f_{j}$ 。[@eq:m6] 可以通过用Fisher得分算法来求解(与Hastie和Tibshirani (1990)的公式6.16对比)，即
+
+$$\left(\begin{array}{ccccc}{1} & {S_{0} N_{1}} & {\cdots} & {S_{0} N_{p}} & {S_{0} Z} \\ {S_{1} \mathbf{1}} & {I} & {\cdots} & {S_{1} N_{p}} & {S_{1} Z} \\ {\vdots} & {\vdots} & {\ddots} & {\vdots} & {\vdots} \\ {S_{p} \mathbf{1}} & {S_{p} N_{1}} & {\cdots} & {I} & {S_{p} Z} \\ {S_{b} \mathbf{1}} & {S_{b} N_{1}} & {\cdots} & {S_{b} N_{p}} & {I}\end{array}\right)\left(\begin{array}{c}{\beta_{0}} \\ {f_{1}} \\ {\vdots} \\ {f_{p}} \\ {b}\end{array}\right)=\left(\begin{array}{c}{S_{0} Y} \\ {S_{1} Y} \\ {\vdots} \\ {S_{p} Y} \\ {S_{b} Y}\end{array}\right)$$ {#eq:m7}
+其中
+
+$$Y=\beta_{0} \mathbf{1}+\sum_{j=1}^{p} N_{j} f_{j}+Z b+\Delta\left(y-\mu^{b}\right)$$
+是一个改进的广义可加模型的工作权向量，$S_j$ 是 $f_j$ 的中心化平滑器，并且满足
+$S_{j}^{\mathrm{T}} \mathbf{1}=0$ ，$S_{j}$ 和 $S_{b}$ 被定义为：
+
+$$\begin{array}{c}{S_{0}=\left(\mathbf{1}^{\mathrm{T}} W \mathbf{1}\right)^{-1} 
+\mathbf{1}^{\mathrm{T}} W} \\ {S_{j}=\left(I-\frac{1 
+\mathbf{1}^{\mathrm{T}}}{r_{j}}\right)\left(N_{j}^{\mathrm{T}} W N_{j}+\lambda_{j} 
+K_{j}\right)^{-1} N_{j}^{\mathrm{T}} W}，j=(1,\cdots,p) \\ {S_{b}=\left(Z^{\mathrm{T}} W 
+Z+D^{-1}\right)^{-1} Z^{\mathrm{T}} W}\end{array}$$
+由此得到的估计值 $\hat f_j$ 是中心化的。
+
+## 广义线性混合模型表示
+
+我们在本节中说明，通过使用现有的统计软件拟合GLMM，可以很容易地获得第3.2节中定义的DPQL估计
+值 $\hat f_j$ 。这种GLMM表示为我们在第4节中对平滑参数$\lambda$和方差分量 $\theta$ 
+的联合估计过程提供了基础。
+
+根据Green(1987)，式(4.2)，Zhang等人(1998)，式(10)，并注意到 $f_j$ 是一个中心参数向量
+，我们可以根据 $\beta$ (标量)和$a_{j}((r_{j}-2) \times 1)$,通过一对一转化
+
+$$f_{j}=X_{j} \beta_{j}+B_{j} a_{j}$$ {#eq:m8}
+来重新参数化 $f_j$ ;其中 $X_j$ 是一个 $r_j\times 1$ 维的向量，包含以 $r_j$ 为中心的有
+序的不同的 $x_{ij}(i=1,\cdots,n)$ 值，并且 $B_{j}=L_{j}\left(L_{j}^{1} L_{j}\right)^{-1}$ 
+和 $L_{j}$ 是 $r_{j} \times\left(r_{j}-2\right)$ 满秩矩阵，满足
+ $K_{j}=L_{j}L_{j}^{\mathrm{T}}$ 和 $L_{j}^{\mathrm{T}} X_{j}=0$ 。
+利用等式 $f_{j}^{\mathrm{T}} K_{j} f_{j}=a_{j}^{\mathrm{T}} a_{j}, \mathrm{DPQL}(5)$,
+DPQL公式 [@eq:m5] 可以写成(Breslow和Clayton (1993), 式(6), and Zhang等人. (1998),式(11)比较)：
+
+$$-\frac{1}{2 \phi} \sum_{i=1}^{n} d_{i}\left(y ; \mu_{i}^{b}\right)-\frac{1}{2} 
+b^{\mathrm{T}} D^{-1} b-\frac{1}{2} a^{\mathrm{T}} \Lambda^{-1} a$$ {#eq:m9}
+其中， $a=\left(a_{1}^{\mathrm{T}}, \ldots, a_{p}^{\mathrm{T}}\right)^{\mathrm{T}}$ 
+并且 $\Lambda=\operatorname{diag}\left(\tau_{1} I, \ldots, \tau_{p} I\right)$ ，
+$\tau_{j}=1 / \lambda_{j} .$ $\tau=\left(\tau_{1}, \ldots, \tau_{p}\right)^{\mathrm{T}}$ 的较小值对应着过平滑。
+
+将 [@eq:m8] 代入 [@eq:m4] 和[@eq:m9] 可以知道，给定 $\lambda$ 和 $\theta$ 的情况下，可以通过
+使用Breslow和Clayton's(1993)的惩罚拟似然方法拟合以下的GLMM模型得到DPQL估计量 $\hat {f_j}$ ：
+
+$$g\left(\mu^{b}\right)=X \beta+B a+Zb$$ {#eq:m10}
+其中 $X$ 在3.2节被定义，$X=\left(1, N_{1} X_{1}, \ldots, N_{p} X_{p}\right)$；
+$B=\left(N_{1} B_{1}, \ldots, N_{p} B_{p}\right)$, 
+$\beta=\left(\beta_{0}, \ldots, \beta_{p}\right)^{\mathrm{T}}$ 是回归系数的
+$(p+1) \times 1$ 维向量。 $a$ 和 $b$ 是分别满足分布 $a \sim N(0, \Lambda)$ 和
+$b\sim N(0, D)$ 的独立随机效应。DPQL估计量 $\hat{f}_{j}$ 的计算可表示为
+$\hat{f}_{j}=X_{j} \hat{\beta}_{j}+B_{j} \hat{a}_{j}$，这是Breslow和Clayton(1993)
+使用惩罚拟似然法估计的固定效应 $\hat{\beta}_{j}$ 与式 [@eq:m10] 所示的GLMM模型中
+$\hat a_j$ 的线性组合，并且可以使用现有的统计软件如SAS macro GLIMMIX(Wolfinger,1996),
+通过拟合式 [@eq:m10] 所示的GLMM模型来得到 $\hat{f}_{j}$ 。
+ 
+具体地，式[@eq:m9]关于 $(\beta,a,b)$ 的最大值用Fisher得分算法可以求得：
+
+$$\left(\begin{array}{ccc}{X^{\mathrm{T}} W X} & {X^{\mathrm{T}} W B} & {X^{\mathrm{T}} W Z} \\ {B^{\mathrm{T}} W X} & {B^{\mathrm{T}} W B+\Lambda^{-1}} & {B^{\mathrm{T}} W Z} \\ {Z^{\mathrm{T}} W X} & {Z^{\mathrm{T}} W B} & {Z^{\mathrm{T}} W Z+D^{-1}}\end{array}\right)\left(\begin{array}{l}{\beta} \\ {a} \\ {b}\end{array}\right)=\left(\begin{array}{c}{X^{\mathrm{T}} W Y} \\ {B^{\mathrm{T}} W Y} \\ {Z^{\mathrm{T}} W Y}\end{array}\right)$$ {#eq:m11}
+
+其中$Y$ 是3.2节定义的工作向量。可以很容易地看出，如果$X$ 是满秩矩阵，式[@eq:m11] 
+有对$\hat{f}_{j}=X_{j} \hat{\beta}_{j}+B_{j} \hat{a}_{j}(j=1, \ldots, p)$
+的唯一解，并且从式 [@eq:m11] 计算得到的$f_j$ 与用式 [@eq:m7] 计算的结果相同。
+
+由式(11)考察可知，它对应于线性混合模式下$\beta$和$(a,b)$的最佳线性无偏预测量(BLUPs)的
+正态方程 ,其线性混合模型为：
+
+$$Y=X \beta+B a+Z b+\epsilon$$ {#eq:m12}
+其中 $a$ 和 $b$ 是分别满足分布 $a\sim N(0, \Lambda)$ 和 $b\sim N(0, D)$ 的独立随机效应。并且
+$\epsilon \sim N\left(0, W^{-1}\right)$。这表明DPQL的估计量 $\hat \f_j$ 和随机效应估计量 $b$ 可以使用BLUP预测量， 通过迭代拟合工作向量 $Y$ 的模型 [@eq:m12] 来得到。
+
+为了计算 $\hat f_j$ 的协方差矩阵，通过以下公式计算 $\beta$ 和 $a$：
+
+$$\left(\begin{array}{cc}{X^{\mathrm{T}} R^{-1} X} & {X^{\mathrm{T}} R^{-1} B} 
+\\ {B^{\mathrm{T}} R^{-1} X} & {B^{\mathrm{T}} R^{-1} 
+B+\Lambda^{-1}}\end{array}\right)\left(\begin{array}{l}{\beta} \\ 
+{a}\end{array}\right)=\left(\begin{array}{c}{X^{\mathrm{T}} R^{-1} Y} \\ {B^{\mathrm{T}} 
+R^{-1} Y}\end{array}\right)$$ {#eq:m13}
+
+其中 $R=W^{-1}+Z D Z^{\mathrm{T}}$。由式 [@eq:m13] 左侧系数矩阵 $H$ 和式
+$H_{0}=(X,B)^{\mathrm{T}}R^{-1}(X,B)$ 表示，$\hat{\beta}$ 和 $\hat{a}$的近似协方差矩阵为：
+
+$$\operatorname{cov}(\hat{\beta}, \hat{a})=H^{-1} H_{0} H^{-1}$$ {#eq:m14}
+从而得到$\hat{f}_{j}$ 的近似协方差矩阵是 
+$\left(X_{j}, B_{j}\right) \operatorname{cov}\left(\hat{\beta}_{j}, \hat{a}_{j}\right)\left(X_{j}, B_{j}\right)^{\mathrm{T}}$ ，
+其中 $\operatorname{cov}\left(\hat{\beta}_{j}, \hat{a}_{j}\right)$ 可以从相应的 
+$H^{-1}H_{0}H^{-1}$ 模块获得。这里假设 $f_{j}(\cdot)$ 是计算 $f_{j}$ 协方差的固定平滑函数。
+
+## Beyes 函数及推断
+
+本节研究如何从贝叶斯的角度推导在3.1-3.3节中讨论的 $f_j$ 的自然三次光滑样条估计
+量;以及如何像Wahba(1983)和Zhang等人(1998)一样，推导 $f_j$ 的贝叶斯标准误差，作
+为 $3.3$ 节末尾计算的频域标准误差的替代。这些标准误差将用于构造 $f_j$ 的置信区间，并
+且比较他们的性能。
+
+我们首先考虑在Bayes框架下推导f的自然三次平滑样条估计量。假设 $f_j$ 已作中心化处
+理，并有先验对数密度，其核为$-\lambda_{j} f_{j}^{\mathrm{T}} K_{j} f_{j} / 2$ 。 由
+式 [@eq:m3] 可以很容易地看出，f的全自然三次平滑样条估计量，是积分拟似然函数
+$l\left(y ; \beta_{0}, f_{1}, \ldots, f_{p}, \theta\right)$ 的后验模态。
+ $\hat {f_j}$ 的DPQL估计器是这些后验模态的近似。或者遵循Wahba(1978)的做法，通过假设中
+心化的，部分不正确的 $f_j$ 积分Wiener 先验，可以得到 $\hat {f_j}$ 
+的后验模态性质。部分积分Wiener先验的设定与式 [@eq:m8] 有相同形式，除了
+
+$$B_{j}=\left(I-11^{\mathrm{T}}/r_{j}\right)\Sigma_{j}^{1/2}$$
+其中 $\Sigma_{j}$ 是在 $X_j$ 计算的积分Wiener过程的 $r_j\times r_j$ 协方差矩阵，并
+且 $a_j$ 有正态先验 $N\left(0, \tau_{I}\right)$ ,$\beta_j$ 有平坦先验。部分积分Wiener
+公式提供了GLMM表达式的一种替代，与式 [@eq:m10] 相比，除了设计矩阵 $B_j$ 被代替为
+$\left(I-11^{\mathrm{T}}/r_{j}\right) \Sigma_{j}^{1 / 2}$，其他形式都相同的。
+
+这种Bayes平滑样条公式促使我们考虑计算 $f_j$ 的贝叶斯标准误差，类似于Wahba(1983)和Zhang等
+人(1998)给出的贝叶斯标准误差。为了说明，首先考虑经典的非参数回归模型：
+
+$$y_{i}=f\left(x_{i}\right)+\epsilon_{i}$$ {@eq:m15}
+其中，$\epsilon_{i}$ 是服从正态分布 $N\left(0,\sigma^{2}\right)$ 的独立随机效应。 Wahba 
+(1983)曾建议在给定以上先验的条件下，用 $\hat{f}$ 的后验协方差来估计 自然三次平滑样条估计
+量 $\hat{f}$ 的协方差。令 $A=\left(I+\sigma^{2} \lambda K\right)^{-1}$， $K$ 是平滑矩阵。
+ $\hat f$ 的贝叶斯协方差矩阵为 $\sigma^{2}A$ ，而它的频域对应矩阵为$\sigma^{2} A^{2}$，并通
+过假设真实的 $f(\cdot)$ 为一个固定的光滑函数来计算(Hastie and Tibshirani(1990)，第3.8.1节)。
+Wahba(1978)指出，与频域标准误差相比，$\hat f$ 的贝叶斯标准误差可以解释 $\hat f$ 的偏倚。
+Wahba(1983)表明，当真实的是固定平滑函数时，使用贝叶斯标准误差计算 $f(x)$ 的置信区间具有良
+好的收敛性。
+
+Zhang等人(1998)扩展了Wahba(1983)的贝叶斯置信区间计算，用于估计纵向高斯数据半参数线性混合
+模型中非参数时间函数的置信区间。如第2节所示，他们的模型可以被看作是GAMM(1)模型的一种特例。
+张er(1998)的模拟研究结果表明,当真正的时间函数是一个固定的光滑函数时，$f$ 的贝叶斯置
+信区间的收敛性相当于甚至有时优于频域置信区间的收敛性。
+
+因此，推导GAMM(1)下DPOL估计值 $\hat {f_j}$ 的贝叶斯标准误差，并将其性能与3.3节末尾计
+算的频域标准误差(假设 $f_j(\cdot)$ 为固定光滑函数)进行比较，具有潜在的意义。假设 $f_j$ 
+的先验已知,一些计算显示 $(\hat \beta,\hat a)$ 的DPQL估计量，其近似贝叶斯协方差矩阵是：
+
+$$\operatorname{cov}_{\mathrm{B}}(\hat{\beta}, \hat{a})=H^{-1}$$ {#eq:m16}
+这比它在式 [@eq:14] 中对应的频域协方差矩阵有更简单的形式。它显示 $\hat{f}_{j}$ 的近似
+贝叶斯协方差协方差是
+$\left(X_{j}, B_{j}\right) \operatorname{cov}_{\mathrm{B}}\left(\hat{\beta}, \hat{a}_{j}\right)\left(X_{j}, B_{j}\right)^{\mathrm{T}}$，其中
+$\operatorname{cov}_{\mathrm{B}}\left(\hat{\beta}_{j}, \hat{a}_{j}\right)$ 可以通过
+ $H^{-1}$ 的相应模块得到。如果感兴趣的话，可以通过第7节的模拟比较 $f_j$ 的频率置信区间
+和贝叶斯置信区间的收敛性(此时 $f_j(\cdot)$ 是固定平滑函数)。
+
+# 平滑参数和方差成分的推断
+
+在第3节中，我们假设在对非参数函数 $f_j$进行推理时，平滑参数 $\lambda$ 和方差分量 $\theta$ 
+是已知的。但它们通常需要根据数据进行估计。在本节中，我们提出通过扩展Wahba(1985)、Kohn等人
+(1991)和Zhang等人(1998)的REML方法，利用边缘拟似然联合估计 $\lambda$ 和 $\theta$ 。该方法
+的一个关键特征是，通过使用REML对工作线性混合模型，式 [@eq:m12] 进行迭代拟合，将 
+$\tau=\left(1 / \lambda_{1}, \ldots, 1 / \lambda_{p}\right)^{\mathrm{T}}$ 作为除 $\theta$ 
+外的额外方差分量，通过对工作GLMM， 式[@eq:m10] 进行拟合，很容易得到 $\lambda$ 和 $\theta$ 。
+
+## 边际拟似然的动机：限制最大似然的回顾
+
+在本节中，我们将简要回顾使用REML估计响应变量是正态分布时的平滑参数A和方差分量。这将为我们
+在下一节用边际拟似然联合估计 $\lambda$ 和 $\theta$ 提供一个动机。
+
+在经典的非参数回归模型 [@eq:m15] 下，Wahba(1985)和Kohn等人(1991)提出通过最大化边际似然估计
+平滑参数 $\lambda$ 。通过假设 $f(x)$ 有一个特定先验(3.4节)来构造$\tau=1 / \lambda$的边际似
+然，该特定先验如式 [@eq:m8] 的形式，其中
+$a\sim N(0,\tau I)$ ，$\beta$ 有平坦先验，并且对 $a$ 和 $\beta)$ 积分如式 [@eq:m17]：
+
+$$\exp \left\{l_{\mathrm{M}}\left(y ; \tau, \sigma^{2}\right)\right\} \propto \tau^{-1 / 2} 
+\int \exp \left\{l\left(y ; \beta, a, \sigma^{2}\right)-\frac{1}{2 \tau} a^{\mathrm{T}} 
+a\right\} \mathrm{d} a \mathrm{d} \beta$$ {#eq:m17}
+其中$l\left(y ; \beta, a, \sigma^{2}\right)$ 为模型 [@eq:m15]下 $f$ 的对数似然(正态)。
+Wahba(1985)将 $\tau$ 的最大边际似然估计量称为广义最大似然估计量。Speed(1991)和Thompson
+(1985)指出 $\tau$ 的这种边际似然([@eq:m15])实际上是线性混合模型下的REML：
+
+$$y=\mathbf{1} \beta_{0}+X \beta_{1}+B a+\epsilon$$ 
+其中 $a \sim N(0, \tau I)$ ， $\epsilon \sim N\left(0, \sigma^{2} I\right)$ ，并且 $B$ 在 
+3.3-3.4节被定义 ; $\tau$ 被看作方差成分。因此 $\tau$ 的最大边际似然估计量是一个REML估计量。
+Kohn等人(1991)的大量模拟研究表明，在估计非参数函数时， $\tau$ 的最大边际似然估计量与其
+广义交叉验证(GCV)估计量有相似的性质，而且前者常常具有更好的性能。
+
+Zhang等人(1998)将这些研究结果扩展为：对响应变量为正态分布且具有非参数均值函数的纵向数据，
+使用REML联合估计平滑参数 $\lambda$ 和 $\theta$ 。其模型的一个有代表性的特例可以
+写成：
+
+$$y=f(X)+Z b+\epsilon$$ {#eq:m18}
+其中 $f(X)$ 表示非参数函数 $f(\cdot)$ 在$X(n \times 1), b \sim N\{0, D(\theta)\}$ 和
+$\epsilon \sim N\{0, G(\theta)\}$ 设计点处的取值。如果 $f(\cdot)$ 
+是由自然三次平滑样条估计的，使用了式 [@eq:m8] ，则Zhang等人(1998)可将模型 [@eq:m18] 
+改写为线性混合模型
+
+$$y=1 \beta_{0}+X \beta_{1}+B a+Z b+\epsilon$$ {#eq:m19}
+其中 $a \sim N(0, \tau I)$ ，$b$ 和 $\epsilon$ 的分布与 [@eq:m18] 中的相同。
+因此，他们提出将模型[@eq:m19]中的 $\tau$ 作为 $\theta$ 之外的一个额外方差分量，并利用
+REML联合估计 $\lambda$ 和 $\theta$ 。利用Harville(1974)的结果，这个REML对应
+$(\tau, \theta)$ 的边际似然，即假设 $f$ 为[@eq:m8]形式，$a \sim N(0, \tau I)$ ，$\beta$ 
+有平坦先验，并且对 $a$ 和 $\beta)$ 积分可得到:
+
+$$\exp \left\{l_{\mathrm{M}}(y ; \tau, \theta)\right\} \propto|D|^{-1 / 2} \tau^{-1 / 2} \int \exp 
+\left\{l(y ; \beta, a, b)-\frac{1}{2} b^{\mathrm{T}} D^{-1} b-\frac{1}{2 \tau} a^{\mathrm{T}} 
+a\right\} \mathrm{d} b \mathrm{d} a \mathrm{d} \beta$$ {@eq:m20}
+其中 $l(y ; \beta, a, b)=l(y ; f, b)$ 为模型 [@eq:m18] 中，给定随机效应 $b$时，$f$ 的条件对
+数似然(正态)。注意表达式 [@eq:m20] 中的边际对数似然 $l_{M}(y ; \tau, \theta)$ 有一个相似形式
+的表达式。Zhang等人(1998)的模拟结果表明，REML在估计非参数函数 $f(\cdot)$ 和方差分量 $\theta$ 
+方面都有很好的性能。Brumback和Rice(1998)以及Wang(1998)也考虑了类似的REML方法。
+
+## 边际拟似然
+
+针对在高斯非参数混合模型[@eq:m18]下使用REML对 $\tau$ 和 $\theta$ 进行联合估计时，其过程
+表现出的显著性能，我们提出扩展Wahba(1985)、Kohn等人(1991)和Zhang等人(1998)对GAMM(1)的边际
+似然方法，并通过最大化边缘拟似然联合估计 $\tau$ 和 $\theta$ 。具体地说，GLMM表达式
+[@eq:m10]表明，我们可以将 $\tau$ 视为和 $\theta$ 之外的额外方差分量。与[@eq:m20]相似，假设
+$f_j$ 为[@eq:m8]形式，$a_j \sim N(0, \tau_j I)(j=1,\cdots,p)$ ，$\beta$ 有平坦先验，并且对 
+$a_j$ 和 $\beta$ 积分可得到如下表达式:
+
+$${\exp \left\{l_{\mathrm{M}}(y ; \tau, \theta)\right\} \propto|\Lambda|^{-1 / 2} \int \exp 
+\left\{l(y ; \beta, a, \theta)-\frac{1}{2} a^{\mathrm{T}} \Lambda^{-1} a\right\} \mathrm{d} a 
+\mathrm{d} \beta} \\ {\propto|D|^{-1 / 2}|\Lambda|^{-1 / 2} \int \sum_{i=1}^{n}-\frac{1}{2 \phi} 
+d_{i}\left(y ; \mu_{i}^{b}\right)-\frac{1}{2} b^{\mathrm{T}} D^{-1} b-\frac{1}{2} a^{\mathrm{T}} 
+\Lambda^{-1} a \} \mathrm{d} b \mathrm{d} a \mathrm{d} \beta}$$ {#eq:m21}
+其中 $l(y ; \beta, a, \theta)=l\left(y ; \beta_{0}, f_{1}, \ldots, f_{p}, \theta\right)$ 在式
+[@eq:m2]中被定义。
+
+在经典的非参数回归模型 [@eq:m15] 下，边际拟似然 [@eq:m21] 被简化为边际似然 [@eq:m17]。在高斯
+非参数混合模型 [@eq:m18] 下，边际拟似然 [@eq:m21]又降为REML [@eq:m20]  。与第4.1节考虑的高斯
+分布不同，非高斯响应变量的边际拟似然 [@eq:m21] ，其评估常常受到难以处理的数值积分的阻碍。因此
+在下一节中提出一种近似方法。
+
+## 近似的边际拟似然推断
+
+由于 [@eq:m21] 式中边际拟似然 $l_{M}(y ; \tau, \theta)$ 的求值往往涉及高维积分，所
+以我们用拉普拉斯方法逼近 $l_{\mathrm{M}}(y ; \tau, \theta)$ 。具体来说，对表达式(21)的被积
+函数的指数在积分前进行二次展开式，用Pearson $\chi^{2}$ 统计量(Breslow and Clayton, 1993)逼
+近偏差统计量$d_{i}\left(y ; \mu_{i}^{b}\right)$，其推导类似于附录A中的推导，给出近似的
+边际对数拟似然为
+
+$$l_{\mathrm{M}}(y ; \tau, \theta) \approx-\frac{1}{2} \log |V|-\frac{1}{2} \log 
+\left|X^{\mathrm{T}} V^{-1} X\right|-\frac{1}{2}(Y-X \hat{\beta})^{\mathrm{T}} V^{-1}(Y-X 
+\hat{\beta})$$ {#eq:m22}
+其中 $V=B \Lambda B^{\mathrm{T}}+Z D Z^{\mathrm{T}}+W^{-1}$ 。由式 [@eq:m22] 可知，它对应线
+性混合模型 [@eq:m12] 下工作向量 $Y$ 的REML对数似然，其中a和b均作为随机效应， $\tau$ 和 $\theta$ 
+作为方差分量 。因此，我们可以通过使用REML迭代拟合模型 [@eq:m12] ，从而很容易估计出 $\tau$ 和 
+$\theta$ 。
+
+
+
+
+## 双重惩罚拟似然方法下广义可加混合模型的推断汇总
+
+# 偏差校正的双重惩罚拟似然
