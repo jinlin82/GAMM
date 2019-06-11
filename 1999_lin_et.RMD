@@ -388,7 +388,7 @@ d_{i}\left(y ; \mu_{i}^{b}\right)-\frac{1}{2} b^{\mathrm{T}} D^{-1} b-\frac{1}{2
 近偏差统计量$d_{i}\left(y ; \mu_{i}^{b}\right)$，其推导类似于附录A中的推导，给出近似的
 边际对数拟似然为
 
-$$l_{\mathrm{M}}(y ; \tau, \theta) \approx-\frac{1}{2} \log |V|-\frac{1}{2} \log 
+$$l_{\mathrm{M}}(y;\tau, \theta) \approx-\frac{1}{2} \log |V|-\frac{1}{2} \log 
 \left|X^{\mathrm{T}} V^{-1} X\right|-\frac{1}{2}(Y-X \hat{\beta})^{\mathrm{T}} V^{-1}(Y-X 
 \hat{\beta})$$ {#eq:m22}
 
