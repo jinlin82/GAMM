@@ -195,10 +195,10 @@ $p(\sigma)=\frac{2A}{\pi(\sigma^2+A^2)},\sigma>0,A>0$。
 为了阐述在gammSlice中拟合[@eq:model2]，我们按照如下方法产生了一些数据，
 $m=100,n=2,\beta_0=0.5,\beta_x=1.7,\sigma^2=0.8$：
 
-```
+```{r eval=F}
 set.seed(39402) 
-m<-100 
-n<-2 
+m<-100 # m 为组数
+n<-2 # n 为每组观测数
 beta0True<-0.5 
 betaxTrue<-1.7 
 sigsqTrue<-0.8 
@@ -211,14 +211,16 @@ y<-rbinom((m*n),1,mu)
 
 之后使用如下命令进行拟合：
 
-```
-fit1<-gSlc(y~x,random=list(idnum=~1),family="binomial")
+```{r eval=F}
+library(gammSlice)
+fit1<-gSlc(y~x,random=list(idnum=~x),family="binomial")
 ```
 
 为了获得切片抽样输出的结果，我们使用：
 
-```
+```{r eval=F}
 summary(fit1)
+plot(fit1)
 ```
 
 结果显示在图1中。第二列包含了MCMC样本的跟踪图，通常称其为链，是通过时间顺序绘制的值。
@@ -340,7 +342,7 @@ $$f(x)=cos(4\pi x)+2x-1$$
 
 如下：
 
-```
+```{r eval=F}
 set.seed(53902)
 n<-400 
 x<-runif(n) 
@@ -349,7 +351,7 @@ y<-rpois(n,exp(cos(4*pi*x)+2*x-1))
 
 为了拟合[@eq:model5]，我们使用gSlc()如下：
 
-```
+```{r eval=F}
 fit2<-gSlc(y~s(x),family="poisson")
 ```
 
@@ -371,7 +373,7 @@ $$C=[1\quad x_i \quad z_1(x_i) \cdots z_k(x_i)]_{1 \leq i \leq n},\quad D=diag(0
 
 通过有效自由度测量的MCMC收敛可以通过如下命令进行检查：
 
-```
+```{r eval=F}
 summary(fit2)
 ```
 
@@ -380,7 +382,7 @@ summary(fit2)
 10.5为中心，这就显示出高度的非线性性——与使用我们产生的数据的均值函数一致。$f$
 估计的可视化在图 \@ref(fig:fig3) 中显示，通过以下命令获得：
 
-```
+```{r eval=F}
 plot(fit2) 
 plot(fit2,responseScale=TRUE) 
 points(x,y)
@@ -415,7 +417,7 @@ x_{1i}\overset{ind}\sim Bernoulli(\frac{1}{2}),\quad x_{2i}\overset{ind}\sim Uni
 u_k|\sigma^2 \overset{ind}\sim N(0,\sigma^2),\quad \beta_0,\beta_{x1},\beta_{x2} \overset{ind}\sim N(0,10^{10}),\quad \sigma \sim Half-Cauchy(10^5)
 \end{array}$$ {#eq:model8}
 
-考虑数据集 $n=500$，$f(x)=sin(2\pi x)$：
+考虑数据集 $n=500$ ， $ f(x)=sin(2\pi x)$ ：
 
 ```
 set.seed(981127)
@@ -482,7 +484,7 @@ $$\{z_{1k}(\cdot):1\leq k \leq K_1\},\quad \{z_{2k}(\cdot):1 \leq k \leq K_2\}$$
 
 $$f_1(x)=cos(4\pi x)+2x,\quad f_2(x)=sin(2\pi x^2)$$
 
-```
+```{r eval=F}
 set.seed(2966703)
 m<-100
 n<-10
@@ -497,13 +499,13 @@ y<-rpois(m*n,mu)
 
 为了拟合模型，我们使用：
 
-```
-fit4<-gSlc(y~s(x1)+s(x2),random=list(idnum=~1),family="Poisson")
+```{r eval=F}
+fit4<-gSlc(y~s(x1)+s(x2),random=list(idnum=~1), family = "Poisson")
 ```
 
 如之前所述，总结信息和函数拟合图由以下命令得到：
 
-```
+```{r eval=F}
 summary(fit4)
 plot(fit4)
 ```
@@ -599,9 +601,9 @@ summary(fitTN)
 
 ### 说明性优比总结
 
-优比，以每个对象的随机截距为条件，$terb=1$，则$months=$月份的中位数，值为 $Q_2$；$terb=0$，
+优比，以每个对象的随机截距为条件，$terb=1$，则$months=$月份的中位数，值为 $Q_2$ ；$terb=0$，
 则$months=$ 0，优比 $OR_{terb}=exp(\beta_{terb} Q_2)$。通过类比3.1.4中的计算，$OR_{terb}$
-的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$。这个结果和图\@ref(fig:fig10)、11中统计
+的后验均值是0.767,95%的置信集是 $(1.87\times10^{-7},0.670)$ 。这个结果和图\@ref(fig:fig10)、11中统计
 显著交互效应是一致的。
 
 ```{r fig10,eval=T, echo=F,fig.cap="基于切片MCMC抽样拟合logistic混合模型的信息汇总",dev="png",results='markup', cache=F}
@@ -625,7 +627,7 @@ knitr::include_graphics(".\\results\\fig5-toenail.png")
 之后由Diggle等（2002）使用。响应变量是呼吸道感染（0表示没有感染，1表示感染），
 潜在的预测变量是年龄，维生素A缺少的指标，性别，身高，发育不良的指标和每个孩子
 门诊就诊的次数。这里，我们使用门诊就诊次数的指标，需要5个这样的指标。让 $x_{ij}$ 
-表示 $9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子，$1 \leq j \leq n_i$
+表示 $9\times 1$ 的向量，包含这些指标值，$1\leq i \leq 275$ 表示孩子， $1 \leq j \leq n_i$
 表示对每个孩子重复的测量。一个可加混合模型如下：
 
 $$logit(P(respiratory infection_{ij}=1))=U_i+\beta^{T}x_{ij}+f(age_{ij}),\quad U_i \overset{ind}\sim N(0,\sigma^2)$$  {#eq:model13}
