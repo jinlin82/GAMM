@@ -169,6 +169,7 @@ twolevel_fun<-function(nstand=5,nplot=4,mu=10,sigma_s=2,sigma=1){
   dat<-data.frame(stand,resp)    ###怎么只写stand和resp
   lmer(resp~1+(1|stand),data=dat)
 }
+
 set.seed(16)
 twolevel_fun()
 
@@ -180,7 +181,7 @@ tidy(fit1,effects="fixed")   ###提取固定效应
 tidy(fit1,effects="ran_pars",scales="vcov")    ###提取随机效应和误差项
 
 ######拟合混合模型yt=beta0+beta1*(Elevations)t+beta2*slopet+(bs)t+et
-nstand<-5
+nstand<-20
 nplot<-4
 b0<--1
 b1<-0.005
@@ -188,7 +189,7 @@ b2<-0.1
 sds<-2
 sd<-1
 set.seed(16)
-stand<-rep(LETTERS[1:nstand],each=nplot)
+stand<-rep(1:nstand,each=nplot)
 stand
 standeff<-rep(rnorm(nstand,0,sds),each=nplot)
 standeff   ###在正态分布中抽取bi
@@ -199,8 +200,14 @@ elevation   ###相当于x1
 slope<-runif(nstand*nplot,2,75)   ###固定效应设计矩阵
 slope   ###相当于x2
 resp2<-b0+b1*elevation+b2*slope+standeff+ploteff   ###根据方程产生y
+library(lme4)
 lmer(resp2~elevation+slope+(1|stand))
+library(gammSlice)
+idnum <- rep(1:nstand, each = nplot)
+gSlc(resp2~elevation+slope, random = list(idnum =~1), family = "gaussian")
 
+library("blme")
+blmer(resp2~elevation+slope+(1|stand), cov.prior = wishart, fixef.prior = normal)
 ######拟合混合模型yt=b0+b1*(elevations)t+b2*slopet+(bs)t*slopet+et
 
 nstand<-5
