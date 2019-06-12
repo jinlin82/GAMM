@@ -69,7 +69,8 @@ p(\boldsymbol{y} | \boldsymbol{\beta}, \boldsymbol{u}) \propto \exp \left(\bolds
 $$
 b(x)=\left\{\begin{array}{ll}{\log \left(1+e^{x}\right),} & {\text { if the } y_{i} \text { are Bernoulli }} \\ {e^{x},} & {\text { if the } y_{i} \text { are Poisson. }}\end{array}\right.
 $$
-请注意，$Z$ 矩阵可能包含组成员资格和样条基函数的指示符。 例如，在3.4节中处理的泊松加法混合模型中，$Z$ 是 
+请注意，$Z$ 矩阵可能包含组成员资格和样条基函数的指示符。 
+例如，在3.4节中处理的泊松加法混合模型中，$Z$ 是 
 $\boldsymbol {I} _ {m} \bigotimes \ \mathbf{I}_{n}$ 的横向连接，
 其中 $\mathbf{I}_{n}$ 是1的$ n \times 1 $向量，并且两个样条基设计矩阵分别包含
 $ z_ {1 k} \ left（x_ {1 ij} \ right）$ 和 $z_{2 k}\left(x_{2 i j}\right)$ 。
