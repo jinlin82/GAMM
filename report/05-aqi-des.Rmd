@@ -167,7 +167,7 @@ write.csv(aqi.y17, "./results/aqi.y17.csv", row.names=F)
 library("kableExtra")
 knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气质量概况",
              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header"),
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     footnote(general ="通过生态环境部城市空气质量状况月报数据整理计算得到",
@@ -179,36 +179,121 @@ knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气�
 
 #### 社会经济因素变量描述性分析
 
-```{r eval=T, results='markup'}
+```{r tab-eco, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
-ecovar <- 
-eco.y17 <- dat.y[dat.y$year==2017, c(1, 17:28)]
+ecovar <- names(dat.y)[c(1, 17:28)]
+eco.y17 <- dat.y[dat.y$year==2017, ecovar]
 
-
+varinfo <- varlist[match(ecovar[-1], as.character(varlist$var_code)), c(1,2,7)]
 
 eco.stat <- as.data.frame(t(apply(eco.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
+eco.stat <- cbind(varinfo, eco.stat)
+eco.stat <- eco.stat[order(eco.stat[,1]),][,-1]
 
-row.names(eco.stat)
-names(eco.stat) <- c("均值", "最小值", "最大值", "标准差")
-varname <- c()
-
+names(eco.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
+write.csv(eco.stat, "./results/eco.stat.csv", row.names=F)
 
 library("kableExtra")
-knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气质量概况",
+knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
+             digits=2,
+             caption="2017年35城市社会经济统计变量描述统计",
              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header"),
-                  stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)")%>%
-    footnote(general ="通过生态环境部城市空气质量状况月报数据整理计算得到",
+    kable_styling(full_width = T) %>%
+    column_spec(1:2, width = c("4cm","2cm"))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="2018年《中国统计年鉴》，各城市统计年鉴的数据整理计算得到。",
              general_title = "数据来源：")
 
 ```
 
 #### 气象因素变量描述性分析
 
+```{r tab-wea, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+weavar <- names(dat.y)[c(1, 32:39)]
+wea.y17 <- dat.y[dat.y$year==2017, weavar]
+
+varinfo <- varlist[match(weavar[-1], as.character(varlist$var_code)), c(1,2,7)]
+
+wea.stat <- as.data.frame(t(apply(wea.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
+wea.stat <- cbind(varinfo, wea.stat)
+wea.stat <- wea.stat[order(wea.stat[,1]),][,-1]
+
+names(wea.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
+write.csv(wea.stat, "./results/wea.stat.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(wea.stat, row.names =F, align = c("l","l",rep("r", 4)),
+             digits=2,
+             caption="2017年35城市气象变量描述统计",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = "4cm")%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="2018年《中国统计年鉴》重点城市气象数据，中国气象局2017年各城市气象数据库数据整理计算得到",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
+
 #### 地理因素变量描述性分析
 
 是否临海，冬天是否集体供暖对AQI的影响检验
+
+```{r tab-geo, eval=T, results='markup'}
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+
+geovar <- names(dat.y)[c(1,3,10,15, 40,41)]
+geo.y17 <- dat.y[dat.y$year==2017, geovar]
+
+varinfo <- varlist[match(geovar[-1], as.character(varlist$var_code)), c(1,2,7)]
+
+geo.stat <- as.data.frame(rbind(
+apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$heating)
+    c(temp$esti, temp$stat, temp$p.v)
+}),
+apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$coast)
+    c(temp$esti, temp$stat, temp$p.v)
+})))
+
+geo.count <- c(as.vector(table(geo.y17[,5])),NA,NA,
+               as.vector(table(geo.y17[,6])),NA,NA)
+
+geo.factor <- c("是否集体供暖", NA,"t统计量值","P值", "是否临海", NA,"t统计量值","P值")
+geo.factor2 <- c("是", "否", rep(NA, 2), "是", "否", rep(NA, 2))
+geo.stat <- cbind(geo.factor, geo.factor2, geo.count, geo.stat)
+
+
+names(geo.stat) <- c("属性", "取值", "城市数量", "AQI均值", "为优的平均天数", "严重污染平均天数")
+write.csv(geo.stat, "./results/geo.stat.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(geo.stat, row.names =F, align = c("l","l","c", rep("r", 3)),
+             digits=2,
+             caption="2017年35城市空气质量与地理环境关系检验",
+             longtable = TRUE, booktabs = TRUE, linesep  = c("", "", "", "\\hline"), escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:3, width = c("3.5cm", "1.1cm", "2cm"))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="城市是否集中供暖来自各城市政府网站，城市是否临海根据城市地理位置确定",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
 
 ## 空气质量指数时空分布特征
 
