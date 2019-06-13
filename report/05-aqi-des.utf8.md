@@ -17,45 +17,43 @@ autoEqnLabels: yes
 
 
 
-```{r setup, echo=F, message=F}
-knitr::opts_knit$set(root.dir = getwd())
-knitr::opts_chunk$set(echo = FALSE, results = 'hide')
-knitr::opts_chunk$set(warning = FALSE, message=FALSE)
-options(knitr.kable.NA = '')
-```
 
-```{r prepare}
-rm(list=ls())
-options(digits=4)
-options(scipen=100)
-graphics.off()
-Sys.setlocale("LC_ALL", "Chinese")
-library("kableExtra")
-```
+
+
 
 
 
 # 城市空气质量状况描述及时空分布特征
 
-## 空气质量指数简介
+## 空气质量简介
 
-### 空气质量指数定义和分级
+### 空气质量指数简介
 
 在《环境空气质量标准》中，将环境空气定义为人群、植物、动物和建筑物所暴露的室外空气。环境空气
 功能区分为二类：一类为自然保护区、风景名胜区和其他需要特殊保护的区域；二类区为居住区、商业交
 通居民混合区、文化区、工业区和农村地区。一类区适用一级浓度限值，二类区适用二级浓度限值。环境
 空气常规污染物基本浓度限值如下表所示。
 
-```{r tab1, eval=T,results='markup', cache=F}
-tab1 <- read.csv('./result/airpollution.csv')
-knitr::kable(tab1, row.names =F, align = "l", caption="环境空气污染物基本项目浓度限值",
-      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)%>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header"),
-                  stripe_index = c(1:3,7:8,11:12))%>%
-    kable_styling(font_size = 11)%>%
-    footnote(general ="生态环境部发布《环境空气质量指数（AQI）技术规定（试行）》",
-             general_title = "数据来源：")
-```
+
+Table: (\#tab:tab1)环境空气污染物基本项目浓度限值
+
+序号   污染物项目                平均时间          浓度限值   浓度限值.1   单位        
+-----  ------------------------  ----------------  ---------  -----------  ------------
+                                                   一级       二级                     
+1      二氧化硫（SO2）           年平均            20         60           $\mu g/m^3$ 
+                                 24小时平均        50         150          $\mu g/m^3$ 
+                                 1小时平均         150        500          $\mu g/m^3$ 
+2      二氧化氮（NO2）           年平均            40         40           $\mu g/m^3$ 
+                                 24小时平均        80         80           $\mu g/m^3$ 
+                                 1小时平均         200        200          $\mu g/m^3$ 
+3      一氧化碳（CO）            24小时平均        4          4            $m g/m^3$   
+                                 1小时平均         10         10           $m g/m^3$   
+4      臭氧（O3）                日最大8小时平均   100        160          $\mu g/m^3$ 
+                                 1小时平均         160        200          $\mu g/m^3$ 
+5      颗粒物（粒径小于等于10    年平均            40         70           $\mu g/m^3$ 
+       ）                        24小时平均        50         150          $\mu g/m^3$ 
+6      颗粒物（粒径小于等于2.5   年平均            15         35           $\mu g/m^3$ 
+       ）                        24小时平均        35         75           $\mu g/m^3$ 
 
 注：颗粒物（粒径小于等于10 $\mu m$）指的是环境空气中空气动力学当量直径小于等于10
 $\mu m$ 的颗粒物，也称可吸入颗粒物；颗粒物（粒径小于等于2.5 $\mu m$ ）指的是环境
@@ -83,15 +81,17 @@ IAQI 最大的污染物为两项或两项以上，则并列为首要污染物。
 群也需要减少户外运动。当空气质量为严重污染时，健康人群运动耐受力降低，有明显强烈的症状，会
 提前出现某些疾病，儿童、老年人和病人应当留在室内，避免体力消耗，一般人群也应避免户外活动。
 
-```{r tab2, eval=T,results='markup', cache=F}
-tab2 <- read.csv('./result/airindex.csv')
-knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其等级划分",
-             longtable = TRUE, booktabs = TRUE, linesep  = "")%>%
-    kable_styling(full_width = T) %>%
-    column_spec(1:3, width = "4cm")%>%
-    footnote(general ="生态环境部发布《环境空气质量指数（AQI）技术规定（试行）》",
-             general_title = "数据来源：")
-```
+
+Table: (\#tab:tab2)空气质量指数及其等级划分
+
+空气质量指数   空气质量指数级别   空气质量指数级别及表示颜色   X      
+-------------  -----------------  ---------------------------  -------
+0~50           一级               优                           绿色   
+51~100         二级               良                           黄色   
+101~150        三级               轻度污染                     橙色   
+151~200        四级               中度污染                     红色   
+201~300        五级               重度污染                     紫色   
+>300           六级               严重污染                     褐红色 
 
 2013年起，环境保护部要求对六种常规污染物进行监测，包括二氧化硫、二氧化氮、一氧化
 碳、臭氧、PM10 和 PM2.5 。《2017中国生态环境状况公报》指出，2017 年，全国 338 个
@@ -117,21 +117,20 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 
 #### 气象因素
 
-气象因素是影响空气质量的主要因素之一。通常影响空气质量的气象因素包括气温、气压、
-风向、风速、降水量、相对湿度等。大气污染在垂直方向的扩散主要取决于气温的垂直分布，
-当气温较高时，大气处于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会
-变好；反之，当气温较低时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变
-差。一般来讲，当低压控制时，大气处于中性或不稳定状态，低层空气辐合上升，近地面的
-污染物随空气上升到高空，有利于近地面污染物向高空扩散；当高压控制时，空气作下沉运
-动，并常形成下沉逆温，阻止污染物的向上扩散。风是边界层内影响污染物稀释的重要因子，
-风速是造成快速水平输送或平流的主要原因，而风向则决定大气污染物浓度的分布。风速对
-污染物的浓度环境浓度具有双重影响，在一定范围内，风速越大越有利于空气污染物的扩散
-和稀释，空气质量越优；超过这一范围，风速增大将使空气中可吸入颗粒物浓度明显增加，
-导致空气污染加重。针对降水量，大气降水不仅可以冲刷空气中的部分颗粒物，也可以在一
-定程度上抑制地面扬尘发生，从而有效控制颗粒物的排放，对空气质量有较好的净化作用。
-相对湿度能够促进一次污染物向二次颗粒污染物转化，相对湿度较大时，由于常规污染物周
-围被水分包裹，质量加重，重力增大造成一定程度沉降，从而减小污染物浓度，空气质量相
-对较好。
+气象因素是影响空气质量的主要因素之一。通常影响空气质量的气象因素包括气温、气压、风向、
+风速、降水量、相对湿度等。大气污染在垂直方向的扩散主要取决于气温的垂直分布，当气温较高
+时，大气处于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会变好；反之，当
+气温较低时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变差。一般来讲，当低
+压控制时，大气处于中性或不稳定状态，低层空气辐合上升，近地面的污染物随空气上升到高空，
+有利于近地面污染物向高空扩散；当高压控制时，空气作下沉运动，并常形成下沉逆温，阻止污
+染物的向上扩散。风是边界层内影响污染物稀释的重要因子，风速是造成快速水平输送或平流的
+主要原因，而风向则决定大气污染物浓度的分布。风速对污染物的浓度环境浓度具有双重影响，
+在一定范围内，风速越大越有利于空气污染物的扩散和稀释，空气质量越优；超过这一范围，风
+速增大将使空气中可吸入颗粒物浓度明显增加，导致空气污染加重。针对降水量，大气降水不仅
+可以冲刷空气中的部分颗粒物，也可以在一定程度上抑制地面扬尘发生，从而有效控制颗粒物的
+排放，对空气质量有较好的净化作用[1]。相对湿度能够促进一次污染物向二次颗粒污染物转化[2]，
+相对湿度较大时，由于常规污染物周围被水分包裹，质量加重，重力增大造成一定程度沉降，从而
+减小污染物浓度，空气质量相对较好[3]。
 
 #### 经济社会因素
 
@@ -185,11 +184,36 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 最高气温、降水量、平均气压、平均风速、平均气温、平均相对湿度、日照时数。最终选的地理
 因素有：是否供暖、是否临海、经度、纬度、海拔。具体的指标体系如表\@ref(tab:tab3) 所示。
 
-```{r tab3, eval=T,results='markup', cache=F}
-tab3 <- read.csv('./result/variable.csv')
-knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
-      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
-```
+
+Table: (\#tab:tab3)空气质量影响因素指标体系
+
+一级指标       二级指标     三级指标             单位     
+-------------  -----------  -------------------  ---------
+社会经济因素   经济增长     固定资产投资额       亿元     
+                            地区生产总值         亿元     
+                            地区生产总值增长率   %        
+               人口因素     常住人口             万人     
+               绿化建设     建成区绿化覆盖率     %        
+               交通运输     城市公路客运量       万人     
+               固定污染源   房屋建筑施工面积     万平方米 
+               移动污染源   私人汽车拥有量       辆       
+               能源消耗     全社会用电量         亿千瓦时 
+               废气排放     工业二氧化硫排放量   吨       
+                            工业烟粉尘排放量     吨       
+               污染治理     废气治理完成投资额   亿元     
+气象因素                    最低气温             ℃        
+                            最高气温             ℃        
+                            降水量               毫米     
+                            平均气压             百帕     
+                            平均风速             米/秒    
+                            平均气温             ℃        
+                            平均相对湿度         %        
+                            日照时数             小时     
+地理因素                    是否供暖                      
+                            是否临海                      
+                            经度                          
+                            纬度                          
+                            海拔                 0.1m     
 
 ### 数据来源及预处理
 
@@ -200,11 +224,46 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 显示在表 \@ref(tab:tab4) 中。其中，城市基本数据中的经度、纬度、海拔来源于中国气象局发布的中国地面国际
 交换站气候资料月值数据集，是否供暖根据国家公布的全国供暖时间表进行判断。
 
-```{r tab4, eval=T,results='markup', cache=F}
-tab4 <- read.csv('./result/city.csv')
-knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述",
-      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
-```
+
+Table: (\#tab:tab4)城市基本情况概述
+
+序号   城市名称   所属省份   经度            纬度           海拔    是否临海   是否供暖   X  
+-----  ---------  ---------  --------------  -------------  ------  ---------  ---------  ---
+1      北京       北京       东经116度28分   北纬39度48分   313     否         是            
+2      天津       天津       东经117度04分   北纬39度05分   25      是         是            
+3      石家庄     河北       东经114度21分   北纬38度04分   1036    否         是            
+4      太原       山西       东经112度33分   北纬37度47分   7783    否         是            
+5      呼和浩特   内蒙古     东经111度41分   北纬40度49分   10630   否         是            
+6      沈阳       辽宁       东经123度31分   北纬41度44分   490     否         是            
+7      大连       辽宁       东经121度38分   北纬38度54分   915     是         是            
+8      长春       吉林       东经125度13分   北纬43度54分   2368    否         是            
+9      哈尔滨     黑龙江     东经126度46分   北纬45度45分   1423    否         是            
+10     上海       上海       东经121度27分   北纬31度24分   55      是         否            
+11     南京       江苏       东经118度48分   北纬32度00分   71      否         否            
+12     杭州       浙江       东经120度10分   北纬30度14分   417     否         否            
+13     宁波       浙江       东经122度06分   北纬30度02分   357     是         否            
+14     合肥       安徽       东经117度18分   北纬31度47分   270     否         否            
+15     福州       福建       东经119度17分   北纬26度05分   840     是         否            
+16     厦门       福建       东经118度04分   北纬24度29分   1394    是         否            
+17     南昌       江西       东经115度55分   北纬28度36分   467     否         否            
+18     济南       山东       东经117度03分   北纬36度36分   1703    否         是            
+19     青岛       山东       东经120度20分   北纬36度04分   760     是         是            
+20     郑州       河南       东经113度39分   北纬34度43分   1104    否         是            
+21     武汉       湖北       东经114度08分   北纬30度37分   231     否         否            
+22     长沙       湖南       东经113度05分   北纬28度12分   449     否         否            
+23     广州       广东       东经113度20分   北纬23度10分   410     是         否            
+24     深圳       广东       东经114度00分   北纬22度33分   630     是         否            
+25     南宁       广西       东经108度13分   北纬22度38分   1216    否         否            
+26     海口       海南       东经110度15分   北纬20度00分   635     是         否            
+27     重庆       重庆       东经106度28分   北纬29度35分   2591    否         否            
+28     成都       四川       东经103度50分   北纬30度42分   5393    否         否            
+29     贵阳       贵州       东经106度44分   北纬26度35分   12238   否         否            
+30     昆明       云南       东经102度41分   北纬25度01分   18924   否         否            
+31     西安       陕西       东经108度58分   北纬34度26分   4100    否         是            
+32     兰州       甘肃       东经103度56分   北纬36度21分   16685   否         是            
+33     西宁       青海       东经101度45分   北纬36度43分   22952   否         是            
+34     银川       宁夏       东经106度13分   北纬38度29分   11114   否         是            
+35     乌鲁木齐   新疆       东经873度39分   北纬43度47分   9350    否         是            
 
 由于空气质量是实时数据，年度数据分析可以了解基本概况，月度数据分析可能会使结果更加
 准确，因此，本文从年度和月度两个角度对空气质量状况进行分析。考虑到数据的可获得性，
@@ -251,150 +310,9 @@ knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述"
 
 ## 城市空气质量状况描述
 
-### 城市空气质量状况描述
-下面给出2017年35个城市年平均AQI及其对应等级，空气质量为优的天数及占比，严重污染发生的天数。
+### 城市空气污染状况描述
 
-
-```{r eval=T, results='markup'}
-dat.y <- read.csv("./data/yearly.csv")
-
-aqi.y17 <- dat.y[dat.y$year==2017, c(1,3,10,15)]
-aqi.y17$grade <- cut(aqi.y17$AQI, c(0,50,100,150), labels = c("优","良","轻度污染"))
-aqi.y17$excellent.ratio <- aqi.y17$excellent/365*100
-aqi.y17 <- aqi.y17[,c(1:2,5,3,6,4)]
-names(aqi.y17) <- c("城市","年均AQI","等级","等级为优天数","等级为优百分比","严重污染天数")
-write.csv(aqi.y17, "./results/aqi.y17.csv", row.names=F)
-
-library("kableExtra")
-knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气质量概况",
-             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)")%>%
-    footnote(general ="通过生态环境部城市空气质量状况月报数据整理计算得到",
-             general_title = "数据来源：")
-
-```
-
-### 城市空气质量影响因素描述性分析
-
-#### 社会经济因素变量描述性分析
-
-```{r tab-eco, eval=T, results='markup'}
-
-varlist <- read.csv("./data/var_list.csv")
-dat.y <- read.csv("./data/yearly.csv")
-ecovar <- names(dat.y)[c(1, 17:28)]
-eco.y17 <- dat.y[dat.y$year==2017, ecovar]
-
-varinfo <- varlist[match(ecovar[-1], as.character(varlist$var_code)), c(1,2,7)]
-
-eco.stat <- as.data.frame(t(apply(eco.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
-eco.stat <- cbind(varinfo, eco.stat)
-eco.stat <- eco.stat[order(eco.stat[,1]),][,-1]
-
-names(eco.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
-write.csv(eco.stat, "./results/eco.stat.csv", row.names=F)
-
-library("kableExtra")
-knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
-             digits=2,
-             caption="2017年35城市社会经济统计变量描述统计",
-             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-    kable_styling(full_width = T) %>%
-    column_spec(1:2, width = c("4cm","2cm"))%>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)",
-                  )%>%
-    footnote(general ="2018年《中国统计年鉴》，各城市统计年鉴的数据整理计算得到。",
-             general_title = "数据来源：")
-
-```
-
-#### 气象因素变量描述性分析
-
-```{r tab-wea, eval=T, results='markup'}
-
-varlist <- read.csv("./data/var_list.csv")
-dat.y <- read.csv("./data/yearly.csv")
-weavar <- names(dat.y)[c(1, 32:39)]
-wea.y17 <- dat.y[dat.y$year==2017, weavar]
-
-varinfo <- varlist[match(weavar[-1], as.character(varlist$var_code)), c(1,2,7)]
-
-wea.stat <- as.data.frame(t(apply(wea.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
-wea.stat <- cbind(varinfo, wea.stat)
-wea.stat <- wea.stat[order(wea.stat[,1]),][,-1]
-
-names(wea.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
-write.csv(wea.stat, "./results/wea.stat.csv", row.names=F)
-
-library("kableExtra")
-knitr::kable(wea.stat, row.names =F, align = c("l","l",rep("r", 4)),
-             digits=2,
-             caption="2017年35城市气象变量描述统计",
-             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-    kable_styling(full_width = T) %>%
-    column_spec(1, width = "4cm")%>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)",
-                  )%>%
-    footnote(general ="2018年《中国统计年鉴》重点城市气象数据，中国气象局2017年各城市气象数据库数据整理计算得到",
-             general_title = "数据来源：",
-             threeparttable = T)
-
-```
-
-#### 地理因素变量描述性分析
-
-是否临海，冬天是否集体供暖对AQI的影响检验
-
-```{r tab-geo, eval=T, results='markup'}
-varlist <- read.csv("./data/var_list.csv")
-dat.y <- read.csv("./data/yearly.csv")
-
-geovar <- names(dat.y)[c(1,3,10,15, 40,41)]
-geo.y17 <- dat.y[dat.y$year==2017, geovar]
-
-varinfo <- varlist[match(geovar[-1], as.character(varlist$var_code)), c(1,2,7)]
-
-geo.stat <- as.data.frame(rbind(
-apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$heating)
-    c(temp$esti, temp$stat, temp$p.v)
-}),
-apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$coast)
-    c(temp$esti, temp$stat, temp$p.v)
-})))
-
-geo.count <- c(as.vector(table(geo.y17[,5])),NA,NA,
-               as.vector(table(geo.y17[,6])),NA,NA)
-
-geo.factor <- c("是否集体供暖", NA,"t统计量值","P值", "是否临海", NA,"t统计量值","P值")
-geo.factor2 <- c("是", "否", rep(NA, 2), "是", "否", rep(NA, 2))
-geo.stat <- cbind(geo.factor, geo.factor2, geo.count, geo.stat)
-
-
-names(geo.stat) <- c("属性", "取值", "城市数量", "AQI均值", "为优的平均天数", "严重污染平均天数")
-write.csv(geo.stat, "./results/geo.stat.csv", row.names=F)
-
-library("kableExtra")
-knitr::kable(geo.stat, row.names =F, align = c("l","l","c", rep("r", 3)),
-             digits=2,
-             caption="2017年35城市空气质量与地理环境关系检验",
-             longtable = TRUE, booktabs = TRUE, linesep  = c("", "", "", "\\hline"), escape = F) %>%
-    kable_styling(full_width = T) %>%
-    column_spec(1:3, width = c("3.5cm", "1.1cm", "2cm"))%>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)",
-                  )%>%
-    footnote(general ="城市是否集中供暖来自各城市政府网站，城市是否临海根据城市地理位置确定",
-             general_title = "数据来源：",
-             threeparttable = T)
-
-```
+### 城市空气质量影响因素描述
 
 ## 空气质量指数时空分布特征
 
