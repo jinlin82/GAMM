@@ -47,7 +47,7 @@ library("kableExtra")
 空气常规污染物基本浓度限值如下表所示。
 
 ```{r tab1, eval=T,results='markup', cache=F}
-tab1 <- read.csv('./result/airpollution.csv')
+tab1 <- read.csv('./results/airpollution.csv')
 knitr::kable(tab1, row.names =F, align = "l", caption="环境空气污染物基本项目浓度限值",
       longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)%>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header"),
@@ -84,7 +84,7 @@ IAQI 最大的污染物为两项或两项以上，则并列为首要污染物。
 提前出现某些疾病，儿童、老年人和病人应当留在室内，避免体力消耗，一般人群也应避免户外活动。
 
 ```{r tab2, eval=T,results='markup', cache=F}
-tab2 <- read.csv('./result/airindex.csv')
+tab2 <- read.csv('./results/airindex.csv')
 knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其等级划分",
              longtable = TRUE, booktabs = TRUE, linesep  = "")%>%
     kable_styling(full_width = T) %>%
@@ -186,7 +186,7 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 因素有：是否供暖、是否临海、经度、纬度、海拔。具体的指标体系如表\@ref(tab:tab3) 所示。
 
 ```{r tab3, eval=T,results='markup', cache=F}
-tab3 <- read.csv('./result/variable.csv')
+tab3 <- read.csv('./results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
       longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
 ```
@@ -201,7 +201,7 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 交换站气候资料月值数据集，是否供暖根据国家公布的全国供暖时间表进行判断。
 
 ```{r tab4, eval=T,results='markup', cache=F}
-tab4 <- read.csv('./result/city.csv')
+tab4 <- read.csv('./results/city.csv')
 knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述",
       longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
 ```
