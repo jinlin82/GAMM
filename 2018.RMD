@@ -1,0 +1,124 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# 附录
+
+## 抽样计划详情
+
+如第1节所述，Zhao等(2006)给出了gammSlice支持的贝叶斯GAMM的详细数学描述。但是，他们没有讨论
+gammSlice使用的切片采样方案。因此，我们在这里给出一些细节。
+
+由gammSlice支持的模型有如下一般形式：
+
+$$\begin{array}{ccccc}{1}
+p(\boldsymbol{y} | \boldsymbol{\beta}, \boldsymbol{u}) \propto \exp \left(\boldsymbol{y}^{T}(\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{u})-\mathbf{1}^{T} b(\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{u})\right)
+\\\boldsymbol{u}=\left[\begin{array}{c}{\boldsymbol{u}_{1}} \\ {\boldsymbol{u}_{2}} \\ {\vdots} \\ {\boldsymbol{u}_{L}}\end{array}\right] | \sigma_{1}^{2}, \ldots, \sigma_{L}^{2} \sim N\left(\mathbf{0},\left[\begin{array}{cccc}{\sigma_{1}^{2} \boldsymbol{I}_{q_{1}}} & {\mathbf{0}} & {\cdots} & {\mathbf{0}} \\ {\mathbf{0}} & {\sigma_{2}^{2} \boldsymbol{I}_{q_{2}}} & {\cdots} & {\mathbf{0}} \\ {\vdots} & {\vdots} & {\ddots} & {\mathbf{0}} \\ {\mathbf{0}} & {\mathbf{0}} & {\cdots} & {\sigma_{L}^{2} \boldsymbol{I}_{q_{L}}}\end{array}\right]\right)
+\\ \beta \sim \mathrm{N}\left(0, \sigma_{\beta}^{2} \boldsymbol{I}\right), \quad \sigma_{\ell}^{\mathrm{ind}} \text { Half-Cauchy }\left(A_{\ell}\right), 1 \leqslant \ell \leqslant L \end{array}$$ {#eq:m14}
+
+[@eq:m14]中的符号意义如下：$\boldsymbol \beta$ 是所有固定效应参数的向量，$\boldsymbol{X}$ 表示
+固定效应设计矩阵，$\boldsymbol{u}$ 是所有随机效应参数的向量， $\boldsymbol{Z}$ 是随机效应设计矩
+阵， $\boldsymbol{I}_{d}$ 表示 $d \times d$ 单位矩阵，$q_{\ell}$ 是 $\boldsymbol{u}_{\ell}$ 
+的长度，并且
+
+$$
+b(x)=\left\{\begin{array}{ll}{\log \left(1+e^{x}\right),} & {\text { if the } y_{i} \text { are Bernoulli }} \\ {e^{x},} & {\text { if the } y_{i} \text { are Poisson. }}\end{array}\right.
+$$
+请注意，$Z$ 矩阵可能包含组成员资格和样条基函数的指示符。 
+例如，在3.4节中处理的泊松加法混合模型中，$Z$ 是 
+$\boldsymbol {I} _ {m} \bigotimes \ \mathbf{I}_{n}$ 的横向连接，
+其中 $\mathbf{I}_{n}$ 是1的$ n \times 1 $向量，并且两个样条基设计矩阵分别包含
+$ z_ {1 k} \ left（x_ {1 ij} \ right）$ 和 $z_{2 k}\left(x_{2 i j}\right)$ 。
+
+在模型(14)中，MCMC抽样方案获益于以下结果
+
+$$\sigma \sim \text { Half-Cauchy }(A) \quad \text { if and only if 
+}\left\{\begin{array}{l}{\sigma^{2} | a \sim \text { Inverse-Gamma }(1 / 2,1 / a)} \\ {a \sim 
+\text { Inverse-Gamma }\left(1 / 2,1 / A^{2}\right)}\end{array}\right.$$ {#eq:m15}
+
+其中，$x \sim$ Inverse-Gamma($\kappa$,$\lambda$) 意味着 $x$  有一个形状参数为 $k$ ,比率参数
+为 $\lambda$ 的逆伽马分布。逆伽马分布的密度函数为：
+
+$$p(x)=\lambda^{\kappa} \Gamma(\kappa)^{-1} x^{-\kappa-1} \exp (-\lambda / x), \quad x>0$$ 
+因此我们将[@eq:m15]中的 $\sigma_{\ell} \stackrel{\mathrm{ind}}{\sim}$ Half-Cauchy $\left(A_{\ell}\right)$ 替换为：
+
+$$\sigma_{\ell}^{2} | a_{\ell} \sim \text { Inverse-Gamma }\left(1 / 2,1 / a_{\ell}\right), \quad a_{\ell} \sim \text { Inverse-Gamma }\left(1 / 2,1 / A_{\ell}^{2}\right)$$
+
+令
+
+$$\boldsymbol{v}=\left[\begin{array}{l}{\boldsymbol{\beta}} \\ {\boldsymbol{u}}\end{array}\right], \quad \boldsymbol{C}=[\boldsymbol{X} \boldsymbol{Z}]$$
+
+ $v_j$ 表示 $v$ 的第 $j$ 列，$v_{\_j}$ 表示忽略 $v_j$ 时，从 $v$ 中得到的向量。类似地，
+定义 $\boldsymbol{C}_j$ 为 $\boldsymbol{C}$ 的第 $j$ 列，当删除第 $j$ 
+列，$\boldsymbol{C}_{\_j}$便成为了 $\boldsymbol{C}$ 。因此，用
+ 
+$$t | s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{s}_{4} \sim \mathcal{H}_{b}\left(s_{1}, 
+s_{2}, \boldsymbol{s}_{3}, \boldsymbol{s}_{4}\right)$$
+表示随机变量 $t$ ,并以 $\left(S_{1}, S_{2}, S_{3}, S_{4}\right)$ 为条件。$t$的密度函数为
+
+$$p_{b}\left(t | s_{1}, s_{2}, s_{3}, s_{4}\right) \propto \exp \left(s_{1} t-\frac{1}{2}\left(t^{2} / s_{2}\right)-1^{T} b\left(t s_{3}+s_{4}\right)\right), \quad-\infty<t<\infty$$ {#eq:m16}
+
+$\boldsymbol 1_{d}$表示 $d\times 1$ 的单位向量，$p$ 是 $\boldsymbol X$ 
+中的列数，$q=\sum_{\ell=1} q_{\ell}$ 是 $\boldsymbol Z$ 中的列数。 最后，让 $B$ 和 $G$ 
+为正整数，指定老化的大小和保留用于推断的样本数。Gibbs采样方案算法为:
+
+```{r fig-code, echo=FALSE, fig.cap='code', dev='png',results='markup'}
+knitr::include_graphics("./results/code.png")
+```
+
+假设B足够大，达到可接受的收敛水平，则保留的样本可以作为各自后验分布的提取，用于近似贝叶
+斯推理。
+
+对于一般参数$s1、s2、s3、s4$，仍然需要描述来自 $\mathcal{H}_{b}\left(s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{S}_{4}\right)$ 的抽样。因为相应的密度函数[@eq:m16] 
+在归一化因子之前具有一个简单的封闭形式表达式，因此可以使用切片采样获得所需的样本提取。
+Neal(2003)描述了易于实现的过程，他的“逐步退出”方法是gammSlice中使用的默认方法。
+
+切片抽样的这种简单性使得算法实现非常直观和稳健。然而,由于 $\boldsymbol Z$ 矩阵中经
+常出现稀疏形式，导致即使简单的算法实现，效率可能也不高。。在gammSlice中，我们小心地
+避免了由这些稀疏形式引起的多余计算。
+
