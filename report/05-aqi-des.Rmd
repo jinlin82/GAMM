@@ -1,15 +1,15 @@
 ---
 title: "开题报告"
 author: "Li"
-date: "2019-04-15"
-css: ./style/markdown.css
-autoEqnLabels: true
-eqnPrefixTemplate: ($$i$$)
-linkReferences: true
-bibliography: Bibfile.bib
-notice: '@*'
+date: '2019-04-15'
 csl: ./style/chinese-gb7714-2005-numeric.csl
-link-citations: true
+css: ./style/markdown.css
+bibliography: Bibfile.bib
+eqnPrefixTemplate: ($$i$$)
+link-citations: yes
+linkReferences: yes
+notice: '@*'
+autoEqnLabels: yes
 ---
 
 **TODO**
@@ -17,7 +17,7 @@ link-citations: true
 
 
 
-```{r setup, echo=F}
+```{r setup, echo=F, message=F}
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
@@ -30,15 +30,16 @@ options(digits=4)
 options(scipen=100)
 graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
+library("kableExtra")
 ```
 
 
 
 # 城市空气质量状况描述及时空分布特征
 
-## 空气质量简介
+## 空气质量指数简介
 
-### 空气质量指数简介
+### 空气质量指数定义和分级
 
 在《环境空气质量标准》中，将环境空气定义为人群、植物、动物和建筑物所暴露的室外空气。环境空气
 功能区分为二类：一类为自然保护区、风景名胜区和其他需要特殊保护的区域；二类区为居住区、商业交
@@ -48,7 +49,12 @@ Sys.setlocale("LC_ALL", "Chinese")
 ```{r tab1, eval=T,results='markup', cache=F}
 tab1 <- read.csv('./results/airpollution.csv')
 knitr::kable(tab1, row.names =F, align = "l", caption="环境空气污染物基本项目浓度限值",
-      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
+      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header"),
+                  stripe_index = c(1:3,7:8,11:12))%>%
+    kable_styling(font_size = 11)%>%
+    footnote(general ="生态环境部发布《环境空气质量指数（AQI）技术规定（试行）》",
+             general_title = "数据来源：")
 ```
 
 注：颗粒物（粒径小于等于10 $\mu m$）指的是环境空气中空气动力学当量直径小于等于10
@@ -80,7 +86,11 @@ IAQI 最大的污染物为两项或两项以上，则并列为首要污染物。
 ```{r tab2, eval=T,results='markup', cache=F}
 tab2 <- read.csv('./results/airindex.csv')
 knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其等级划分",
-      longtable = TRUE, booktabs = TRUE, linesep  = "")
+             longtable = TRUE, booktabs = TRUE, linesep  = "")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:3, width = "4cm")%>%
+    footnote(general ="生态环境部发布《环境空气质量指数（AQI）技术规定（试行）》",
+             general_title = "数据来源：")
 ```
 
 2013年起，环境保护部要求对六种常规污染物进行监测，包括二氧化硫、二氧化氮、一氧化
@@ -107,20 +117,21 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 
 #### 气象因素
 
-气象因素是影响空气质量的主要因素之一。通常影响空气质量的气象因素包括气温、气压、风向、
-风速、降水量、相对湿度等。大气污染在垂直方向的扩散主要取决于气温的垂直分布，当气温较高
-时，大气处于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会变好；反之，当
-气温较低时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变差。一般来讲，当低
-压控制时，大气处于中性或不稳定状态，低层空气辐合上升，近地面的污染物随空气上升到高空，
-有利于近地面污染物向高空扩散；当高压控制时，空气作下沉运动，并常形成下沉逆温，阻止污
-染物的向上扩散。风是边界层内影响污染物稀释的重要因子，风速是造成快速水平输送或平流的
-主要原因，而风向则决定大气污染物浓度的分布。风速对污染物的浓度环境浓度具有双重影响，
-在一定范围内，风速越大越有利于空气污染物的扩散和稀释，空气质量越优；超过这一范围，风
-速增大将使空气中可吸入颗粒物浓度明显增加，导致空气污染加重。针对降水量，大气降水不仅
-可以冲刷空气中的部分颗粒物，也可以在一定程度上抑制地面扬尘发生，从而有效控制颗粒物的
-排放，对空气质量有较好的净化作用[1]。相对湿度能够促进一次污染物向二次颗粒污染物转化[2]，
-相对湿度较大时，由于常规污染物周围被水分包裹，质量加重，重力增大造成一定程度沉降，从而
-减小污染物浓度，空气质量相对较好[3]。
+气象因素是影响空气质量的主要因素之一。通常影响空气质量的气象因素包括气温、气压、
+风向、风速、降水量、相对湿度等。大气污染在垂直方向的扩散主要取决于气温的垂直分布，
+当气温较高时，大气处于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会
+变好；反之，当气温较低时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变
+差。一般来讲，当低压控制时，大气处于中性或不稳定状态，低层空气辐合上升，近地面的
+污染物随空气上升到高空，有利于近地面污染物向高空扩散；当高压控制时，空气作下沉运
+动，并常形成下沉逆温，阻止污染物的向上扩散。风是边界层内影响污染物稀释的重要因子，
+风速是造成快速水平输送或平流的主要原因，而风向则决定大气污染物浓度的分布。风速对
+污染物的浓度环境浓度具有双重影响，在一定范围内，风速越大越有利于空气污染物的扩散
+和稀释，空气质量越优；超过这一范围，风速增大将使空气中可吸入颗粒物浓度明显增加，
+导致空气污染加重。针对降水量，大气降水不仅可以冲刷空气中的部分颗粒物，也可以在一
+定程度上抑制地面扬尘发生，从而有效控制颗粒物的排放，对空气质量有较好的净化作用。
+相对湿度能够促进一次污染物向二次颗粒污染物转化，相对湿度较大时，由于常规污染物周
+围被水分包裹，质量加重，重力增大造成一定程度沉降，从而减小污染物浓度，空气质量相
+对较好。
 
 #### 经济社会因素
 
@@ -135,17 +146,550 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 
 ### 变量选择
 
+空气质量的好坏反映了空气污染的程度，空气质量指数是反映空气质量好坏最重要的指标之一，
+根据空气质量指数划分的空气质量等级可以对空气质量进行更加直观的判断。严重的空气污染会
+导致健康人群运动耐受力降低，有明显强烈的症状，身体出现各种不适，对机体的健康产生一定
+的影响，提前出现某些疾病。空气质量为优是我们所期待出现的结果，空气质量令人满意，基本
+无空气污染，各类人群可正常活动。这就为我们在进行空气质量的研究时提供了一个全新的视角。
+进而结合数据特征，我们可以选取月均空气质量指数、每月是否存在严重污染及月度空气质量为
+优的天数作为因变量进行相应分析。
+
+在自变量的选取过程中，通过查阅相关文献，结合空气质量的影响因素及数据的可获得性，可以
+初步从经济社会因素、气象因素和地理因素中选取以下指标进行具体分析。经济社会因素中，经
+济增长、人口因素、绿化建设、交通运输、能源消耗、废气排放等都会对空气质量产生影响。地
+区生产总值是衡量一个地区经济发展的重要指标，固定资产投资在一定程度上也会拉动经济增长。
+因此，初步选取地区生产总值和固定资产投资作为城市经济增长的指标。有研究表明，人口集聚
+会对空气质量产生一定的影响，人口密度可以反映人口地理分布的疏密程度，但是考虑到市辖区
+人口较多，郊区人口较少，从某种意义上讲，人口密度会将市辖区和郊区对空气质量的影响视为
+等同，因此，选取年末常住人口表示人口因素。空气质量的两大污染源包括固定污染源和移动污
+染源，固定污染源是指向环境排放或释放有害物质或对环境产生有害影响的场所、设备和装置，
+用房屋建筑施工面积代表。移动污染源主要指空气排放污染物的交通工具，用私人汽车拥有量和
+城市公路客运量进行表示。能源消耗产生的废气严重污染了空气，尤其是煤炭消耗，电能是清洁
+高效的二次能源，用全社会用电量代表能源消耗，同时选取工业二氧化硫排放量和工业烟粉尘排
+放量作为废气排放的指标。绿化建设可以吸附灰尘、净化空气、减少微粒并减少空气中细菌含量，
+对空气的净化有重要的作用。同时，废气治理力度的大小也会对空气质量的好坏产生重要的影响。
+因此，选取建成区绿化覆盖率和废气治理完成投资作为绿化建设和污染治理的指标。
+
+经济社会因素可以视为影响空气质量好坏的人为因素，这些因素可以根据实际情况做出相应改变。
+而气象因素及地理因素则是影响空气质量好坏的固定因素，气温、降水量、气压、风速、相对湿度、
+日照时数都会对空气质量产生一定的影响。同时，城市的地形、南北方差异，北方供暖会产生大量
+废气排放，沿海城市因为有海风有利于污染物扩散都会对空气质量产生相应的影响。
+
+根据以上分析，鉴于数据的可获得性，选取比较有代表性的指标，最终确定空气质量印象因素为：
+社会经济因素、气象因素和地理因素。其中社会经济因素表现在经济增长、人口因素、绿化建设、
+交通运输、固定污染源、移动污染源、能源消耗、废气排放、污染治理这些方面。其中，固定资产
+投资、地区生产总值、地区生产总值增长率表示经济增长；常住人口表示人口因素；建成区绿化
+覆盖率表示绿化建设；城市公路客运量表示交通运输；房屋建筑施工面积表示固定污染源；私人
+汽车拥有量表示移动污染源；全社会用电量表示能源消耗；工业二氧化硫排放量、工业烟粉尘排
+放量表示废气排放；废气治理完成投资表示污染治理。最终选定的气象因素包括：最低气温、
+最高气温、降水量、平均气压、平均风速、平均气温、平均相对湿度、日照时数。最终选的地理
+因素有：是否供暖、是否临海、经度、纬度、海拔。具体的指标体系如表\@ref(tab:tab3) 所示。
+
+```{r tab3, eval=T,results='markup', cache=F}
+tab3 <- read.csv('./results/variable.csv')
+knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
+      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
+```
+
 ### 数据来源及预处理
+
+（一）数据来源
+
+省会城市和计划单列市一向是我们研究的重点。在数据采集过程中，由于拉萨数据存在严重缺失，
+因此本文研究范围为除拉萨以外的30个省会城市及5个计划单列市共35个城市。各城市基本情况
+显示在表 \@ref(tab:tab4) 中。其中，城市基本数据中的经度、纬度、海拔来源于中国气象局发布的中国地面国际
+交换站气候资料月值数据集，是否供暖根据国家公布的全国供暖时间表进行判断。
+
+```{r tab4, eval=T,results='markup', cache=F}
+tab4 <- read.csv('./results/city.csv')
+knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述",
+      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    ## kable_styling(full_width = T) %>%
+    ## column_spec(3:2, width = c("3.5cm","3.5cm"))%>%
+    footnote(general ="《中国气象年鉴2017》",
+             general_title = "数据来源：")
+
+```
+
+由于空气质量是实时数据，年度数据分析可以了解基本概况，月度数据分析可能会使结果更
+加准确，因此，本文从年度和月度两个时间频率对空气质量状况进行分析。考虑到数据的可
+获得性，选取2014年1月到2017年12月的城市月度数据，相应的选取2014-2017年的年度数据
+进行相应分析。在数据获取过程中，空气质量相关数据及气象指标可以直接获得月度数据，
+其中，空气质量相关数据（空气质量指数、PM2.5、PM10、SO2、NO2、CO、O3）来源于中华
+人民共和国生态环境部发布的2014年1月到2017年12月的《城市空气质量状况月报》，气象
+相关数据（最低气温、最高气温、降水量、平均气压、平均风速、平均气温、平均相对湿度、
+日照时数）来源于2015-2018年《中国统计年鉴》、2015-2017年《中国气象年鉴》及中国气
+象局发布的中国地面国际交换站气候资料月值数据集。对于经济社会指标相关数据，在所涉
+及的指标中，表示经济增长的地区生产总值季度数据及固定资产投资月度数据均来自于各城
+市2014年2月到2017年12月的月度统计公报，数据可以从各城市的统计局官网获得。对于年
+末常住人口、房屋建筑施工面积、城市公路客运量、私人汽车拥有量、全社会用电量、工业
+二氧化硫、工业烟粉尘排放等年度数据，均来自2014-2018年相应的城市统计年鉴，对于部
+分缺失数据，在各城市年度统计公报中查找。
+
+
+（二）数据预处理
+
+由于各城市月度固定资产投资数据均为累计值，非单月指标，因此，对于固定资产投资，采用
+后一期减前一期的计算方法，得出本月值。同时由于1-2月为累计值，春节期间不单独对单月
+数据进行统计，因此，文本采用取平均值的方法，用1-2月累计值的平均值作为1、2月单月数据。
+
+对于部分缺失数据，比如太原市2017年城市公路客运量，乌鲁木齐市2017年常住人口，由于城市
+公路客运量和常住人口在不同年度变化幅度不是太大，因此，直接将2016年太原市城市公路客运量
+和2016年乌鲁木齐市的常住人口作为2017年的数据进行填充。对于私人汽车拥有量这一指标，比如
+呼和浩特市，已有的数据为2014年私人汽车拥有量和2014、2017年民用汽车拥有量，用2014年私人
+汽车拥有量在民用汽车拥有量中的占比乘以2017年民用汽车拥有量作为2017年私人汽车拥有量的
+数据，2014年私人汽车拥有量加2014-2017年的平均增长量作为2015年的数据，同样2016年的数据
+也是在2014年数据的基础上加两年平均增长量。对于全社会用电量这一指标，比如昆明市，已有
+2014、2017年的数据，用2014、2017年数据的平均值作为2015年和2016年的数据。其他城市这些
+指标的缺失值均采用类似的方法进行处理。对于气象因素中缺失数据的处理，均采用上年同期数据
+对本年当期数据进行填充。
+
+对于废气污染治理投资，各城市并未公布具体数据，但其对空气质量的好坏有很大程度的影响。
+我们可以从统计年鉴中获得各省份的废气污染治理投资，直观上可以将其视为地区生产总值的一
+部分。因此，将各城市地区生产总值占所在省份生产总值的比重乘以所在省份废气治理投资作为
+各城市废气污染治理投资的数据。
+
+由于要进行月度分析，在所获得的数据中，针对非月度数据，需要采用合适的频率转化方法进行频率
+转化，转为月度数据进行分析。经济指标的数据类型可以分为存量与流量数据，对于地区生产总值、
+城市公路客运量、房屋建筑施工面积、全社会用电量、工业二氧化硫排放量、工业烟粉尘排放量、
+废气污染治理投资这些流量数据，季度地区生产总值除以3作为月度地区生产总值的近似，其他年度
+数据均采用年度数据除以12的方法将数据平均分配到各月中。对于常住人口、建成区绿化覆盖率、
+私人汽车拥有量这些存量数据，均将年末值作为各月值进行分析。
 
 ## 城市空气质量状况描述
 
-### 城市空气污染状况描述
+### 城市空气质量状况描述
 
-### 城市空气质量影响因素描述
+根据空气质量等级划分标准，当空气质量指数为0~50时，空气质量为优；当空气质量指数
+在51~100时，空气质量为良；当空气质量指数在101~150时，空气质量为轻度污染；空气
+质量指数为151~200时，空气质量为中度污染；当空气质量指数为201~300时，空气质量为
+重度污染；当空气质量指数大于300时，为严重污染。清洁的空气是人们生产生活的基础，
+空气污染会对人们的身体和生活产生负面影响，影响人们的健康和正常活动。为了直观来
+看所研究的35所城市的空气质量状况，我们选取2017年的空气质量相关数据，计算了各城
+市2017年年均AQI，并根据空气质量等级划分标准划分了各城市2017年的空气质量等级。
+同时为了观察各城市2017年空气质量最好和最差的情况，下面给出2017年35个城市年均AQI、
+空气质量等级为优的天数及其在当年所有天数中所占百分比和空气质量为严重污染的天数，
+具体结果如表 \@ref(tab:tab-aqi-year) 所示。
+
+```{r tab-aqi-year, eval=T, results='markup'}
+dat.y <- read.csv("./data/yearly.csv")
+
+aqi.y17 <- dat.y[dat.y$year==2017, c(1,3,10,15)]
+aqi.y17$grade <- cut(aqi.y17$AQI, c(0,50,100,150), labels = c("优","良","轻度污染"))
+aqi.y17$excellent.ratio <- aqi.y17$excellent/365*100
+aqi.y17 <- aqi.y17[,c(1:2,5,3,6,4)]
+names(aqi.y17) <- c("城市","年均AQI","等级","等级为优天数","等级为优百分比","严重污染天数")
+write.csv(aqi.y17, "./results/aqi.y17.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气质量概况",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    footnote(general ="通过生态环境部城市空气质量状况月报数据整理计算得到",
+             general_title = "数据来源：")
+
+```
+
+根据表 \@ref(tab:tab-aqi-year) 可知，在2017年，海口是唯一一个年均AQI小于50的城市，其年均空气质量为优
+的天数达到168天，占全年总天数的46.027%，这就表明2017年，海口有一半左右的时间空气
+质量都为优，空气质量很好，且在我们所研究城市中其空气质量最好，当然这与海口的气象
+条件和地理位置也比较相关。相反，北京、天津、石家庄、太原、济南、西安、兰州、乌鲁
+木齐年均AQI在100~150之间，处于轻度污染的状态，其余城市年均空气质量等级均为良。
+同时可以发现，贵阳、昆明、厦门这三个城市年均空气质量为优的天数大于150天，在全年
+占比大于40%。而石家庄、济南、兰州、银川在2017年全年空气质量为优的天数分别为6、7、
+8、9天，其空气质量为优的天数在全年中占比小于3%。表明贵阳、昆明、厦门这些城市的空气
+质量在所有城市中相对较好，而石家庄、济南、兰州、银川这四个城市的空气质量相对较差。
+在2017年全年，石家庄严重污染的天数达到了18天，西安、乌鲁木齐严重污染的天数达到了15天，
+且结合原始数据可以发现，石家庄的空气质量往往表现的都比较差，这也许是因为石家庄作为
+我国北方的内陆城市，西邻太行山，且盛行北温带亚湿润大陆季风气候，当工业大气污染物随
+东南风飘到太行山脉时，无法翻过山而停留在石家庄无法稀释，进而使空气中污染物浓度过高，
+造成环境污染。且部分工业发展迅速，化学工业、煤炭工业亦占有重要地位，这些工业废气也
+导致大气污染日益严重且难以治理。然而，像沈阳、大连、上海、杭州、宁波、合肥、福州、
+厦门、南昌、青岛、广州、深圳、南宁、海口、重庆、成都、贵阳、昆明这些城市全年无严重
+污染天气，这与其地理位置也有一定的关系。比如，像大连、厦门、青岛、深圳、海口这些沿海
+城市，空气流通好，且沿海城市由于靠海，海水也会吸附一部分空气中的杂质，具有一定的环境
+净化作用。再如，像贵阳、昆明这些空气质量较好的城市，除了受到政府政策的影响外，其均
+处于云贵高原，虽然两者的气候不同，但其地理位置对空气质量的好坏还是具有很大的影响。
+
+### 城市空气质量影响因素描述性分析
+
+在对城市空气质量基本状况进行描述之后，进一步结合指标体系对城市空气质量影响因素进行
+描述性分析，直观判断空气质量与各影响因素之间的关系。下面分别从社会经济因素、气象
+因素、地理因素三个方面进行说明。
+
+#### 社会经济因素变量描述性分析
+
+根据已有的研究结果可以发现，社会经济因素是影响空气质量好坏的最重要的因素之一。为了
+对所有城市的整体社会经济发展及其之间的差异做出直观判断，根据本文的所建立的指标体系，
+对2017年35所城市的社会经济统计变量进行描述性分析，计算各指标的均值、最小值、最大值
+及相应的标准差。计算结果如表 \@ref(tab:tab-eco) 所示。
+
+```{r tab-eco, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+ecovar <- names(dat.y)[c(1, 17:28)]
+eco.y17 <- dat.y[dat.y$year==2017, ecovar]
+
+varinfo <- varlist[match(ecovar[-1], as.character(varlist$var_code)), c(1,2,7)]
+
+eco.stat <- as.data.frame(t(apply(eco.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
+eco.stat <- cbind(varinfo, eco.stat)
+eco.stat <- eco.stat[order(eco.stat[,1]),][,-1]
+
+names(eco.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
+write.csv(eco.stat, "./results/eco.stat.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
+             digits=2,
+             caption="2017年35城市社会经济统计变量描述统计",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:2, width = c("4cm","2cm"))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="2018年《中国统计年鉴》，各城市统计年鉴的数据整理计算得到。",
+             general_title = "数据来源：")
+
+```
+
+根据表 \@ref(tab:tab-eco) 可以发现，2017年35所城市的地区生产总值及固定资产投资
+额均值分别为9465.48亿元、5277.06亿元，其中地区生产总值最小的是西宁，为1284.91
+亿元，最大的是上海，为30632.99亿元；固定资产投资额最大的是重庆，为17537.05亿元，
+最小的是海口为489.3亿元。地区生产总值是衡量一个地区经济发展最重要的指标之一，由
+以上结果可以直观看出上海的经济发展最好，其地区生产总值大概是35所城市经济发展
+的3.24倍，而西宁的经济发展最差，只有35所城市平均发展水平的13.57%。同时结合
+空气质量相关数据，可以发现，2017年上海年均空气质量为良，无严重污染天气，而
+西宁的年均空气质量也为良，但其有4天严重污染。理论上我们认为，经济发展越好的
+城市其空气质量越差，但从数据中可以看出，上海经济发展比西宁经济发展好很多，但
+其空气质量相差并不大，直观来看，社会经济因素并不是决定空气质量好坏的唯一原因。
+
+除了表示经济增长的因素之外，人口因素、移动污染源等也是空气质量好坏的重要影响因素。
+2017年35所城市人口最多的是重庆，为3075万人，人口最少的是银川，为222.54万人。城市
+公路客运量最多的是广州，为91323万人，最少的是呼和浩特，为435万人。私人汽车拥有量
+最多的是北京，为466.61万辆，最少的是西宁，为33.59万辆。全社会用电量最多的是北京，
+为1066.89万千瓦时，最少的是海口，为70.34万千瓦时。工业二氧化硫排放量最多的是重庆，
+为139880吨，工业烟粉尘排放量最多的是呼和浩特，为111036吨，两者排放最少的城市均为
+海口，分别为502吨和113吨。作为固定污染源的代表，房屋建筑施工面积最多的是上海，为
+41197.5万平方米，最少的是南宁，为1847.32万平方米。且对于污染的各种治理，建成区绿化
+覆盖率最多的是北京，为48.42%，最少的是兰州，为30.93%。35个城市2017年年均废气治理
+完成投资为4.32亿元，其中废气治理完成投资额最多的是上海，为13.35亿元，最少的是西宁，
+为0.29亿元。
+
+根据以上信息可以发现，重庆的固定资产投资最多，人口最多，工业二氧化硫排放也最多，其
+建成区绿化面积为40.32%，废气污染治理投资额为5亿元，2017年空气质量等级为良，无严重
+污染天气。表明虽然重庆污染物排放比较多，但及时采取有效的环境保护措施使得其空气质量
+并没有表现太差。同时，北京的私人汽车拥有量和全社会用电量在35个城市中最多，虽然其建成区
+绿化覆盖率也是最多，废气污染治理投资额为7.85亿元，远高于各城市年均水平，但是其年均空气
+质量等级为轻度污染。结合原始数据可以发现，35个城市中，北京在各种污染源及经济发展指标
+中排名都比较靠前，这或许也是由于北京是政治、经济中心决定的。房屋建筑施工面积最多的是
+上海，废气污染治理投资最多的也是上海，上海的经济发展比较靠前，各种污染物排放也比较多，
+但是其废气治理投资额也相对较多，因此，其2017年年均空气质量等级为良或许是因为其大力度
+的污染治理。相反，海口的空气质量等级为优也可以从以上数据明显看出，海口的全社会用电量
+最少，工业二氧化硫和烟粉尘排放也最少，这表明其污染源排放较少，其空气质量为优也得益于
+这些条件。总的来说，污染物排放和废气治理对空气质量的好坏具有复杂的交互作用。
+
+#### 气象因素变量描述性分析
+
+与此同时，为了观察各城市气象因素的总体概况，进而对各城市的平均气温、最低气温、最高
+气温、降水量、平均相对湿度、平均风速、平均气压及日照时数进行描述性分析，同样计算各
+指标的均值、最小值、最大值及相应的标准差。计算结果如表 \@ref(tab:tab-wea) 所示。
+
+```{r tab-wea, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+weavar <- names(dat.y)[c(1, 32:39)]
+wea.y17 <- dat.y[dat.y$year==2017, weavar]
+
+varinfo <- varlist[match(weavar[-1], as.character(varlist$var_code)), c(1,2,7)]
+
+wea.stat <- as.data.frame(t(apply(wea.y17[,-1], 2, function(x) c(mean(x), min(x), max(x), sd(x)))))
+wea.stat <- cbind(varinfo, wea.stat)
+wea.stat <- wea.stat[order(wea.stat[,1]),][,-1]
+
+names(wea.stat) <- c("变量", "单位", "均值", "最小值", "最大值", "标准差")
+write.csv(wea.stat, "./results/wea.stat.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(wea.stat, row.names =F, align = c("l","l",rep("r", 4)),
+             digits=2,
+             caption="2017年35城市气象变量描述统计",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = "4cm")%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="2018年《中国统计年鉴》重点城市气象数据，中国气象局2017年各城市气象数据库数据整理计算得到",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
+
+根据表 \@ref(tab:tab-wea) 可以发现，2017年35个城市中平均气温最小的是哈尔滨，为
+5.13℃，最大的是海口，为24.63℃，相应的最低气温的最小值和最大值也分别是哈尔滨和
+海口，取值分别为-27.7℃和11.1℃。最高气温的最小值是29.7℃，为昆明的最高气温，最
+大值是42℃，为重庆的最高气温。2017年35所城市年均降水量973.74毫米，其中最小的是
+银川，降水量为211.3毫米，最大的是广州，降水量为2067.4毫米，且由标准差也可以看出，
+各城市间2017年降水量差异很大。平均相对湿度最小的是呼和浩特，为44%，最大的是海口，
+为82.17%。平均风速和平均气压最小的都是西宁，分别为1.05米/秒、771.49百帕，两者
+最大的分别是呼和浩特和上海，取值分别为3.39米/秒、1016.76百帕。全年年均日照时数
+2096.13小时，最小的是贵阳，为1100.7小时，最大的是银川，为2894.5小时，同样由标准差
+可以看出，各城市间日照时数也存在很大差异。
+
+如前所述，气温较高、气压较低、降水较多、相对湿度较大、一定范围内风速越大时，空气
+质量越好。相对应的，由以上分析可得，35所城市中，海口的平均气温最高，最低气温也最高，
+平均相对湿度最大，因此，海口的气象条件有利于污染物的扩散，其空气质量相对最优。同时
+可以发现，西宁的平均风速和平均气压在35所城市中都是最小的，结合之前的分析可以知道，
+西宁的地区生产总值在35所城市中排名最后，只占各城市年均地区生产总值的13.57%，根据
+地区生产总值可以知道其经济发展比较落后，但是其空气质量并没有比某些比它发展的好城市
+更好，这也与西宁的气象因素有关，其气象条件不利于污染物的扩散。
+
+#### 地理因素变量描述性分析
+
+地理因素对空气质量的好坏同样具有很大的影响。在我们研究的变量中，地理因素中的主要变量
+是是否集中供暖及是否临海。我们知道集中供暖煤炭燃烧的污染物排放是影响空气质量的重要因
+素之一，临海城市由于海风的作用也比较利于污染物的扩散。为了探究城市空气质量与地理环境
+之间的关系，对2017年35个城市的空气质量相关数据与地理环境相关数据进行了t检验，检
+验结果显示在表 \@ref(tab:tab-geo) 中。
+
+
+```{r tab-geo, eval=T, results='markup'}
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+
+geovar <- names(dat.y)[c(1,3,10,15, 40,41)]
+geo.y17 <- dat.y[dat.y$year==2017, geovar]
+
+varinfo <- varlist[match(geovar[-1], as.character(varlist$var_code)), c(1,2,7)]
+
+geo.stat <- as.data.frame(rbind(
+apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$heating)
+    c(temp$esti, temp$stat, temp$p.v)
+})[c(2,1,3,4),],
+apply(geo.y17[2:4], 2, function(x) {temp <- t.test(x~geo.y17$coast)
+    c(temp$esti, temp$stat, temp$p.v)
+})[c(2,1,3,4),]))
+
+geo.count <- c(as.vector(table(geo.y17[,5]))[2:1],NA,NA,
+               as.vector(table(geo.y17[,6]))[2:1],NA,NA)
+
+geo.factor <- c("是否集体供暖", NA,"t统计量值","P值", "是否临海", NA,"t统计量值","P值")
+geo.factor2 <- c("是", "否", rep(NA, 2), "是", "否", rep(NA, 2))
+geo.stat <- cbind(geo.factor, geo.factor2, geo.count, geo.stat)
+
+
+names(geo.stat) <- c("属性", "取值", "城市数量", "AQI均值", "为优的平均天数", "严重污染平均天数")
+write.csv(geo.stat, "./results/geo.stat.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(geo.stat, row.names =F, align = c("l","l","c", rep("r", 3)),
+             digits=2,
+             caption="2017年35城市空气质量与地理环境关系检验",
+             longtable = TRUE, booktabs = TRUE, linesep  = c("", "", "", "\\hline"), escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:3, width = c("3.5cm", "1.1cm", "2cm"))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="城市是否集中供暖来自各城市政府网站，城市是否临海根据城市地理位置确定",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
+
+由 \@ref(tab:tab-geo) 可以看出，在我们所研究的35所城市中，集中供暖的有17个，剩下
+的18所城市不采取集中供暖。在集中供暖的17所城市中，其年均AQI为99.79，按照空气质量
+等级划分标准，其空气质量平均来讲整体为良，但空气质量指数已经几乎接近100，近似为
+轻度污染。在集中供暖的城市中，2017年空气质量为优的平均天数为34.82天，严重污染
+天数为6.18天。而在没有集中供暖的18所城市中，其空气质量年均指数为72.94，空气质量
+为优的平均天数为102.72天，严重污染的平均天数只有0.28天。且根据表5-8可以发现，在
+5%的显著性水平下，检验结果通过显著性检验，说明集中供暖的城市与没有集中供暖的城市
+其空气质量存在显著差异。同样，在5%的显著性水平下，临海和不临海的城市的空气质量
+之间也存在显著差异。在我们的研究范围内，临海城市有10个，内陆城市有25个，临海城市
+的年均AQI为71.21，空气质量为优的平均天数为98.90天，严重污染的平均天数为0.4天。
+内陆城市的年均AQI为91.89，空气质量为优的平均天数为58.08天，严重污染的平均天数为
+4.24天。以上分析表明，城市空气质量与地理因素有关，是否集中供暖和是否临海其城市的
+空气质量差异较大。
 
 ## 空气质量指数时空分布特征
 
 ### 空气质量指数时间分布特征
+
+#### 城市空气质量年度变化趋势分析
+ 
+```{r fig-aqi-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年平均AQI变化趋势图", dev=c("pdf"), dev.args=list(family="GB1")}
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+
+dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
+
+library(lattice)
+
+xyplot(AQI ~ year | city, data=dat.y,
+layout = c(5,7), type = c("o"),
+as.table = TRUE, grid = F,
+abline=c(list(h=c(75, 100, 125)),trellis.par.get("reference.line")),
+strip = strip.custom(bg="grey", strip.levels = T),
+par.strip.text=list(cex=0.8),
+digits=0, cex=0.7, cex.axis = 0.8, pch=20,
+scales=list(x=list(at=2014:2017, labels=c(14:17)),
+            y=list(at=seq(50, 150, 50))),
+xlab=list(label="年份",cex=0.9, digits=0), ylab = ""
+)
+
+```
+
+
+```{r fig-excel-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年空气质量为优天数点阵图", dev=c("pdf"), dev.args=list(family="GB1")}
+varlist <- read.csv("./data/var_list.csv")
+dat.y <- read.csv("./data/yearly.csv")
+
+dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
+
+library(lattice)
+
+dotplot(reorder(city, excellent) ~ excellent, data=dat.y,
+        jitter.y = F, pch = c("4","5", "6", "7"), cex=1,
+        xlab = list(label="空气质量为优天数",cex=0.9),
+        xlim=c(-15, 280),
+        scales=list(x=list(at=seq(0, 270, 30))),
+        type = c("p", "a"), lwd=0.5, col=1:4)
+
+```
+
+注意空气质量为优天数的排序与平均AQI的排序并不严格一致，表明一部分地区AQI变化差异
+很大，另一部分地区AQI相对较为稳定。
+
+#### 城市空气质量月度变化趋势分析
+代表性城市（西安，北京，上海， 武汉，深圳）月平均AQI变化趋势图
+
+```{r fig-aqi-month, eval=T, fig.height=7.4, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "7个代表性城市2014-2017年月度平均AQI变化趋势图", dev=c("pdf"), dev.args=list(family="GB1")}
+varlist <- read.csv("./data/var_list.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+dat.m$city <- factor(as.character(dat.m$city), levels=dat.m$city[(0:34)*48+1])
+
+select.city <- c("北京","上海", "深圳","武汉","西安", "青岛", "昆明")
+select.m <- dat.m[dat.m$city %in% select.city,c(1:4,13,18)]
+select.m$city <- factor(as.character(select.m$city), levels=select.m$city[(0:34)*48+1])
+
+library(zoo)
+aqi.select.m <- tapply(select.m$AQI, select.m$city, rep)
+aqi.select.m <- as.zoo(ts(sapply(aqi.select.m, rep), start=c(2014,1), frequency = 12))
+
+library(lattice)
+xyplot(aqi.select.m, type="o", pch=20,
+       layout = c(1,7), as.table = T,
+       ylim=c(20,250),
+       strip.left = T, strip = F, grid=T,
+       scales=list(x=list(at=2014:2018),
+                   y=list(at=c(50, 150, 250))
+                   ),
+       xlab=list(label="年份",cex=0.9, digits=0),
+       ## ylab = "AQI"
+       )
+
+```
+
+时间序列因素分解(乘法模型)得到季节性因子
+
+```{r tab-season, eval=T, results='markup'}
+varlist <- read.csv("./data/var_list.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+dat.m$city <- factor(as.character(dat.m$city), levels=dat.m$city[(0:34)*48+1])
+
+select.city <- c("北京","上海", "深圳","武汉","西安", "青岛", "昆明")
+select.m <- dat.m[dat.m$city %in% select.city,c(1:4,13,18)]
+select.m$city <- factor(as.character(select.m$city), levels=select.m$city[(0:34)*48+1])
+
+aqi.select.m <- tapply(select.m$AQI, select.m$city, rep)
+aqi.select.season <- sapply(aqi.select.m,
+                            function(x) decompose(ts(x, start=c(2014,1), frequency = 12), type = "multi")$figure)
+
+
+aqi.select.trend <- sapply(aqi.select.m,
+                           function(x) {temp <- decompose(ts(x, start=c(2014,1), frequency = 12), type = "multi")
+                               temp$x/temp$seasonal
+                           })
+
+library("tseries")
+
+dimnames(aqi.select.season)[[1]] <- paste0(1:12, "月")
+write.csv(aqi.select.season, "./results/aqi.select.season.csv", row.names=T)
+
+library("kableExtra")
+knitr::kable(aqi.select.season, row.names =T, align = "c",
+             digits=2,
+             caption="7个代表性城市月度季节指数",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:8, width = "1.4cm")%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="对每个城市月度平均AQI建立时间序列因素分解乘法模型计算得到",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
+
+```{r tab-box, eval=T, results='markup'}
+varlist <- read.csv("./data/var_list.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+dat.m$city <- factor(as.character(dat.m$city), levels=dat.m$city[(0:34)*48+1])
+
+select.city <- c("北京","上海", "深圳","武汉","西安", "青岛", "昆明")
+select.m <- dat.m[dat.m$city %in% select.city,c(1:4,13,18)]
+select.m$city <- factor(as.character(select.m$city), levels=select.m$city[(0:34)*48+1])
+
+aqi.select.m <- tapply(select.m$AQI, select.m$city, rep)
+aqi.select.season <- sapply(aqi.select.m,
+                            function(x) decompose(ts(x, start=c(2014,1), frequency = 12), type = "multi")$figure)
+
+aqi.select.box <- sapply(aqi.select.m,
+                           function(x) {temp <- decompose(ts(x, start=c(2014,1), frequency = 12), type = "multi")
+                               box.res <- Box.test(temp$x/temp$seasonal, type = "Ljung")
+                               c(48, box.res$stat, box.res$p.v)
+                           })
+
+temp.name <- dimnames(aqi.select.box)[[2]]
+aqi.select.box <- matrix(as.character(round(aqi.select.box,3)),3)
+dimnames(aqi.select.box)[[1]] <- c("样本数", "卡方统计量", "P值")
+dimnames(aqi.select.box)[[2]] <- temp.name
+
+write.csv(aqi.select.box, "./results/aqi.select.box.csv", row.names=T)
+
+library("kableExtra")
+knitr::kable(aqi.select.box, row.names =T, align = "c",
+             digits=3,
+             caption="7个代表性城市剔除季节性因素后月均AQI自相关检验",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:8, width = c("2.2cm", rep("1.3cm", 7)))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="对7个代表性城市剔除季节性因素后月均AQI数据进行 Ljung-Box 检验结果整理得到",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
 
 ### 空气质量指数空间分布特征
 
