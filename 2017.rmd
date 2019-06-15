@@ -147,7 +147,7 @@ $\hat{\mu}_{i}=y_{i}+\delta_{i}$ 和 $\hat{\eta}_{i}=g\left(\hat{\mu}_{i}\right)
 并且迭代权重
 $w_{i}=\alpha\left(\hat{\mu}_{i}\right) /\left\{g^{\prime}\left(\hat{\mu}_{i}\right)^{2} V\left(\hat{\mu}_{i}\right)\right\}$
 
-3.计算 $\hat b$ 和 $\hat \beta$ ，使得以下的加权最小二乘对象最小，
+3.计算 $\hat{\boldsymbol b}$ 和 $\hat {\boldsymbol\beta}$ ，使得以下的加权最小二乘对象最小，
 
 $$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b$$
 然后更新$\hat{\boldsymbol \eta}=\boldsymbol X\hat{\boldsymbol \beta}+ \boldsymbol Z\boldsymbol b$ 和 $\hat{\mu_i}=g^{-1}(\hat{\eta_i})$。
