@@ -1,0 +1,229 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# 广义线性混合模型
+
+回顾GLMM模型，其中 $Y_i$ 是指数族随机变量，并有期望均值 $\mu_i$ ,可表示为：
+
+$$
+g\left(\mu_{i}\right)=\mathbf X_{i} \mathbf \beta+\mathbf Z_{i} \mathbf b, \quad \mathbf \sim N\left(\mathbf{0}, \psi_{\theta}\right)
+$$
+也就是说，GLMM是一个GLM，其中线性预测子依赖于一些高斯随机效应 $\mathbf b$ 乘以随机效
+应模型矩阵 $\mathbf Z$ 。从线性混合模型过渡到GLMMs模型的主要困难是不再可能准
+确地评估对数似然，因为从 $\mathbf y$ 和 $\mathbf b$ 的联合密度中积分 $\mathbf b$ 
+来获得似然函数通常在分析上是不可处理的。
+
+一个有效的解决办法是用2.4节中的办法，用在 $\hat {\mathbf b}$ 点的泰勒展
+开式，则$f(\mathbf{y}, \mathbf{b} | \boldsymbol{\beta})$可以写成
+
+$$
+f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq \int \exp \left\{\log f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta})+\frac{1}{2}(\boldsymbol{b}-\hat{\boldsymbol{b}})^{\top} \frac{\partial^{2} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})}{\partial \boldsymbol{b} \partial \boldsymbol{b}^{\top}}(\boldsymbol{b}-\hat{\boldsymbol{b}})\right\} d \boldsymbol{b}
+$$
+
+这与第2.4节的近似不同，因为我们忽略了泰勒展开式中的高阶项，而不是那些项等于零。然
+而,在接受了这个近似之后，积分的其余部分的求值遵循第2.4节。在当前情况下所需的Hessian
+是 $-\mathbf{Z}^{\top} \mathbf{W} \mathbf{Z} / \phi-\psi^{-1}$ ,其中 $\mathbf{W}$ 
+是IRLS权向量，基于由$\hat {\mathbf b}$ 和 $\mathbf \beta$ 表示的 $\mathbf \mu$ 。因此有：
+
+$$
+f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta}) \frac{(2 \pi)^{p / 2}}{\left|\boldsymbol{Z}^{\top} \boldsymbol{W} \boldsymbol{Z}^/\phi+\psi_{\theta}^{-1}\right|^{1 / 2}}
+$$
+
+这种积分近似称为“拉普拉斯近似”，用显式形式代替随机效应密度并取对数
+
+$$l(\theta, \boldsymbol \beta) \simeq \log f(\boldsymbol y | \boldsymbol {\hat{b}}, \boldsymbol \beta)-\boldsymbol {\hat{b}}^{\top} \psi_{\theta}^{-1} \boldsymbol{\hat{b}} / 2-\log \left|\psi_{\theta}\right| / 2-\log \left|\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z/ \phi+\psi_{\theta}^{-1}\right| / 2 $$ {#eq:m3.16}
+
+注意式中的直接依赖关系，等式右边通过 $\mathbf {\hat{b}}$ 和 $\mathbf{W}$ 依赖于 $\boldsymbol  {\beta}$
+和 $\theta$ 。$\mathbf{W}$ 对 $\boldsymbol \beta$ 的依赖意味着相比LMM的情况， $\boldsymbol \beta$ 
+的MAP估计和极大似然估计MLE不再完全对应。尽管如此，使用MAP估计值还是很方便的，因为
+使用GLMs中使用的IRLS方法的惩罚版本，可以很容易地计算出各参数值和相应的 $\boldsymbol{\hat b}$。
+如果我们这样做，我们也可以定义拉普拉斯近似剖面似然
+$l_{p}(\boldsymbol{\theta})=l(\boldsymbol{\theta}, \hat{\boldsymbol{\beta}})$，
+其中 $\hat{\boldsymbol{\beta}}$ 是给定 $\theta$ 时的MAP估计量。
+
+2.4.5节中线性模型的拉普拉斯近似REML也遵循类似的方法。如果 $\hat{\boldsymbol{\beta}}$ 是给定
+$\theta$ 时的MAP估计量，则有：
+
+$$\begin{aligned} l_{r}(\theta) \simeq & \log f(\boldsymbol y | \hat{\boldsymbol b} , \hat{\boldsymbol \beta})-\hat{\boldsymbol b}^{\top} \psi_{\theta}^{-1} \hat{\boldsymbol b} / 2-\log \left|\psi_{\theta}\right| / 2 \\ &-\log \left|\begin{array}{cc}{\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z^{\prime} \phi+\psi_{\theta}^{-1}} & {\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z^{\prime} \phi} \\ {\boldsymbol X^{\top} \boldsymbol W \boldsymbol Z^{\prime} \phi} & {\boldsymbol X^{\top} \boldsymbol W \boldsymbol Z^{\prime} \phi}\end{array}\right| / 2+M \log (2 \pi) / 2 \end{aligned}$$ {#eq:3.17}
+
+正如在LMM模型中，可以数值优化 $l_{p}$ 或 $l_{r}$ 来得到 $\hat{\theta}$ 一样， $\theta$ 的每次迭代值都要求计算相应的 
+$\hat{\boldsymbol{\beta}},\hat{\boldsymbol{b}}$ 。与线性情况相反，这些计算不再是
+直接的，但也需要迭代，且惩罚IRLS方案通常在使用时是快速和可靠的。
+
+拉普拉斯近似在Davison(2003)或Wood(2015)中有更详细的讨论。Shum和McCullagh(1995)表明，
+如果随机效应的数量以不高于 $n^{l/3}$ 的速度增长，那么它通常提供了有充分根据的推断。
+例如。考虑以下情况：数据是每个受试者有两三个非高斯观测值，对应的模型是每个受试者有
+一个随机效应。显然拉普拉斯近似很可能给出有效的结果。在这种情况下，可以使用数值积分
+(有时称为“求积”)来计算(受限的)似然函数，前提是所需的积分分解为一组数值上容易处理的
+低维积分。
+
+## 惩罚IRLS
+
+3.1.2节中IRLS算法的惩罚版本被用来计算 $\hat {\mathbf b}$ 和 $\boldsymbol \beta$ 。
+通过以下方式计算 $\hat {\mathbf b}$ 和 $\boldsymbol \beta$ 
+
+$$\hat{\boldsymbol{\beta}}, \hat{\boldsymbol{b}}=\underset{\beta, \boldsymbol{b}}{\operatorname{argmax}} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})=\underset{\beta, \boldsymbol{b}}{\operatorname{argmax}}\left\{\log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})-\boldsymbol{b}^{\top} \psi_{\theta}^{-1} \boldsymbol{b} / 2\right\} $$ {#eq:m3.18}
+
+式中不依赖于 $b$ 和 $\beta$ 的项已从最终对象即惩罚似然函数中剔除。为了简化符号，将
+ $\boldsymbol b$ 和 $\boldsymbol \beta$ 写成向量形式：
+$\mathcal{B}^{\top}=\left(\boldsymbol{b}^{\top},\boldsymbol{\beta}^{\top}\right)$，
+并定义相应的模型矩阵和精度矩阵为
+
+$$
+\boldsymbol \chi=(\boldsymbol Z,\boldsymbol X) \text { and } \boldsymbol S=\left[\begin{array}{cc}{\psi_{\theta}^{-1}} & {\boldsymbol0} \\ {\boldsymbol 0} & {\boldsymbol 0}\end{array}\right]
+$$
+类似于第3.1.2节，但现在包括了二次惩罚项，惩罚似然函数的Hessian是
+$-\boldsymbol\chi^{\top} \boldsymbol{W} \boldsymbol \chi/ \phi-\boldsymbol{S}$，其
+中$\boldsymbol{W}$ 是由当前的 $\hat{\boldsymbol \mu}$ 推导出来的诊断权重矩阵(Fisher或full Newton),
+ $\hat{\boldsymbol \mu}$ 反过来依赖于当前$\mathcal{B}^{[k]}$ 的估计值。则相应的梯度向量可以写为：
+$\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})/\phi-\boldsymbol{S} \mathcal{B}^{[k]}$，与3.1.2节相似。
+
+一个牛顿更新步骤有如下形式：
+
+$$\mathcal{B}^{[k+1]}=\mathcal{B}^{[k]}+\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\left\{ \boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})-\phi \boldsymbol{S} \mathcal{B}^{[k]}\right\}$$
+将$\mathcal{B}^{[k]}=\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\left(\boldsymbol \chi^{\top} \boldsymbol{W}\boldsymbol \chi+\phi \boldsymbol{S}\right) \mathcal{B}^{[k]}$
+带入上式可得到
+
+$$\mathcal{B}^{[k+1]}=\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\boldsymbol \chi^{\top}\boldsymbol{W} \{ \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})+\boldsymbol \chi\mathcal{B}^{[k]}\}$$
+它可以立即被识别为惩罚加权最小二乘目标的最小值
+
+$$
+\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\|_{W}^{2}+\phi \mathcal{B}^{\top} S \mathcal{B}= \left\| \boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b \right\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b
+$$
+其中 $z_{i}=g^{\prime}\left(\hat{\mu}_{i}\right)\left(y_{i}-\hat{\mu}_{i}\right)+\hat{\eta}_{i}$ ，与3.1.2节的相同。惩罚IRLS(PIRLS)算法过程如下：
+
+1.初始化
+$\hat{\mu}_{i}=y_{i}+\delta_{i}$ 和 $\hat{\eta}_{i}=g\left(\hat{\mu}_{i}\right)$，
+其中 $\delta_{i}$ 通常为0，但也可以是非零常数以保证 $\hat{\eta}_{i}$ 是有限的。然后
+迭代以下两个步骤直到收敛。
+
+2.计算 $z_{i}=g^{\prime}\left(\hat{\mu}_{i}\right)\left(y_{i}-\hat{\mu}_{i}\right) / \alpha\left(\hat{\mu}_{i}\right)+\hat{\eta}_{i}$ 
+并且迭代权重
+$w_{i}=\alpha\left(\hat{\mu}_{i}\right) /\left\{g^{\prime}\left(\hat{\mu}_{i}\right)^{2} V\left(\hat{\mu}_{i}\right)\right\}$
+
+3.计算 $\hat{\boldsymbol b}$ 和 $\hat {\boldsymbol\beta}$ ，使得以下的加权最小二乘对象最小，
+
+$$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b$$
+然后更新$\hat{\boldsymbol \eta}=\boldsymbol X\hat{\boldsymbol \beta}+ \boldsymbol Z\boldsymbol b$ 和 $\hat{\mu_i}=g^{-1}(\hat{\eta_i})$。
+
+收敛现在根据惩罚的似然/偏差或其梯度来判断。
+
+## PQL方法
+
+优化拉普拉斯近似剖面或有限对数似然所需的嵌套优化有些复杂，而且计算成本很高。因
+此，执行一个PIRLS迭代，每一步都基于以下工作混合模型估计$\theta,\phi$:
+
+$\boldsymbol z | \boldsymbol{b}, \boldsymbol{\beta} \sim N\left(\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{b}, \boldsymbol{W}^{-1} \phi\right), \boldsymbol{b} \sim N\left(\boldsymbol{0}, \psi_{\theta}\right)$
+
+其中用到了Fisher权重。也就是说，PIRLS算法的步骤3中，$\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\phi}}$
+是利用2.4节(p. 78)的方法对上述工作线性混合模型进行拟合得到的。这种方法在混合模型
+的背景下(Breslow和Clayton, 1993)被称为PQL(惩罚拟似然)方法。在样条平滑背景下，这
+种方法被称为“面向性能的迭代”(Gu, 1992)。
+
+一个显而易见的问题是当 $\mathbf{z}|\mathbf{b}, \boldsymbol{\beta}$ 显然不服从高斯
+分布时，为什么使用高斯线性混合模型或受限制的似然函数是有效的。对于工作模型，在假
+定 $\boldsymbol z$ 服从高斯分布时，考虑受限制的似然函数。类似于2.4.5节和2.4.6节，
+可以得到：
+
+$$2 l_{r}=-\left\| \boldsymbol z-\boldsymbol \chi \hat{\mathcal{B}}\right\|_{W} ^{2} /\phi-\hat{\mathcal{B}}^{\top} S \hat{\mathcal{B}}-n \log \phi+\log |S|_{+} -\log \left|\boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi/ \phi+\boldsymbol S\right|-(n-M) \log (2 \pi) $$ {#eq:m3.19}
+其中 $\log |\mathbf{S}|_{+}\left(=-\log |\psi|_{+}\right)$ 是S的非零特征值
+的乘积(广义行列式)，则来自于2.4.6节 (p. 83)的REML估计量 $\phi$ 是
+
+$$\hat{\phi}=\frac{\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B} \right\|_{W}^{2}}{n-\tau} \text { 其中 } \tau=\operatorname{tr}\left\{\left(\boldsymbol\chi^{\top} \boldsymbol W \boldsymbol\chi^{/} \phi+S\right)^{-1} \boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi^{\prime} \phi\right\}$$
+这个估计值也只是第3.1.5节的Pearson估计值，有效自由度(见第2.4.6节)代替了模型
+中系数的个数，也就是说，即使没有任何REML证明，它也是一个合理的估计。
+
+现在考虑QR分解 $\boldsymbol Q \boldsymbol R=\sqrt{\boldsymbol W} \boldsymbol \chi$ ，其中 $\boldsymbol Q$ 是列正交的，R是上三角的(这里用的是
+Fisher权重)，令 $\boldsymbol f=\boldsymbol{Q}^{\top} \sqrt{\boldsymbol W} \boldsymbol z$ ，
+则${\left\|\boldsymbol f-R\mathcal{B}\right\|}^{2}+c=\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\right\|_{W}^{2}$，
+其中 $c=\left\|\boldsymbol z\right\|_{W}^{2}-\left\|\boldsymbol f\right\|^{2}$ 。类似于1.3.2节(p.13),有均值函数
+$\mathrm{E}(\boldsymbol{f})=\boldsymbol{R} \mathcal{B}$，$\boldsymbol f$ 的协方差矩阵是
+$\boldsymbol I \phi$ 。如果$n /(\mathrm{M}+p) \rightarrow \infty$，多元中心极限
+定理表明 $\boldsymbol f$ 具有多元正态分布。所以没有假设$\boldsymbol z$的正态性,我们也可以基于
+高斯线性混合模型合理地推断和 $\mathcal{B}$ 和 $\theta$ 。高斯线性混合为：
+
+$$
+\boldsymbol{f} | \boldsymbol{B} \sim N(\boldsymbol{R} \mathcal{B}, \boldsymbol{I} \phi) \quad \text {其中 } \boldsymbol{b} \sim N\left(\mathbf{0}, \psi_{\theta}\right)
+$$
+并且受限制的似然函数为：
+
+$$2 l_{r}={-\left\|\boldsymbol f-\boldsymbol R \hat{\mathcal{B}} \right\|^{2}}/{\phi}-{\hat{\mathcal{B}}}^{\top}\boldsymbol S \hat{\mathcal{B}}-p \log \phi+\log |\boldsymbol{S}|_{+} -\log \left|\boldsymbol{R}^{\top} \boldsymbol{R}/\phi+\boldsymbol{S}\right|-p \log (2 \pi)$$ {#eq:m3.20}
+对于固定的 $\phi$ ,式 [@eq:m3.20] 和 [@eq:m3.19] 是相同的。除了相差可加的常数项,因此
+他们将被相同的 $\theta$ 和 $\mathcal{B}$ 最大化。另外，不适合基于式 [@eq:m3.20] 作关于 $\phi$ 的推断，因为这将忽略 $\phi$ 包含在 $c$ 中的信息。但是，如果把以上的Pearson估计量 $\hat{\phi}$
+带入式 [@eq:m3.20] ，并最优化 $\theta$ 和 $\mathcal{B}$，那么可以得到使式 [@eq:m3.19] 最优的
+ $\hat \theta$ 和 $\hat {\mathcal{B}}$ 和 $\hat{\phi}$。这就是PQL方法的证明。注意，我们可以以同样的方式使用工作模型的剖面似然来证明。
+
+在许多情况下，PQL是非常有效的，它生成的估计非常接近于基于完全拉普拉斯近似的估计，但对于某些
+类型的数据，它是有问题的。首先，当Pearson 估计值较差时，如对过分散的低均值计数数据进行
+建模时(见3.1.5节)，性能可能较差。其次,有些PQL的实现使用相关标准线性混合模型软件，但不能选
+择固定的 $\phi$ 。在许多情况下,估计一个假定已知的 $\phi$ 不是问题,可以被认为是一个有用的模
+型检查，但对于二分类数据，由于几乎没有可用来估计 $\phi$ 的信息，所以会导致性能较差。第三，
+每个随机效应只有几个观察值的情况破坏了PQL的中心极限定理。最后一个普遍的缺点是，我们不能得到
+模型真正的受限的或剖面似然函数，因此基于这些模型函数的GLR测试或AIC是不可能的。
+
+## 分布结果
+
+证明PQL的论证也证明第2.4.2节（p.80）的（2.16）和（2.17）。
+$ \boldsymbol {A} _ {\theta} ^ { -  1} = \boldsymbol {W} ^ { -  1} \phi $，作为关于
+$ \boldsymbol {\ beta}$ 的近似推断的大样本分布结果，以及 $b$ 的预测分布。 也就是说，（2.16）成为大样本结果
+
+$$
+\hat{\boldsymbol{\beta}} \sim N\left(\boldsymbol{\beta},\left\{\boldsymbol{X}^{T}\left(\boldsymbol{Z} \psi \boldsymbol{Z}^{T}+\boldsymbol{W}^{-1} \phi\right)^{-1} \boldsymbol{X}\right\}^{-1}\right)
+$$
+尽管更倾向于用基于[#eq:m2.7]式的大样本估计结果：
+
+$$\mathcal{B} | \boldsymbol{y} \sim N\left(\hat{\mathcal{B}},\left(\boldsymbol\chi^{T} \boldsymbol{W} \boldsymbol\chi/ \phi+\boldsymbol{S}\right)^{-1}\right)$$ {#eq:m21}
+但由第二个大样本结果推导的 $\boldsymbol{\beta}$ 的协方差矩阵再次对应于第一个大样本结
+果的 $\boldsymbol{\beta}$ 的协方差矩阵。
+
+正如在线性模型的情况下(第2.4.3节)，我们可以使用大样本结果
+
+$$\hat{\boldsymbol{\theta}} \sim N\left(\boldsymbol{\theta}, \hat{\mathscr{I}}^{-1}\right)$$
+其中 $\hat{\mathscr{I}}$ 是基于PQL工作线性混合模型或完全拉普拉斯近似的剖面或受限制的
+极大似然的负Hessian。
