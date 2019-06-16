@@ -118,5 +118,5 @@ $$\boldsymbol\beta \sim N\left(\hat{\boldsymbol\beta},\left(\overline{\boldsymbo
 
 $$\boldsymbol{F}=\left(\overline{\boldsymbol{X}}^{\top} \boldsymbol{V}^{-1} \overline{\boldsymbol{X}}+\boldsymbol{S}\right)^{-1}\left(\overline{\boldsymbol{X}}^{\top} \boldsymbol{V}^{-1} \overline{\boldsymbol{X}}\right)$$
 
-的主对角线给出了 $\boldsymbol \beta$ 每个元素的有效自由度。注意，在计算 $\overline{\boldsymbol X}^{\top} \boldsymbol V^{-1} \overline{\boldsymbol X}$ 
+的主对角线给出了 $\boldsymbol \beta$ 每个元素的有效自由度。注意，在计算 $\overline{\boldsymbol X}^{\top}\boldsymbol V^{-1} \overline{\boldsymbol X}$ 
 时，利用 $\boldsymbol V$ 的特殊结构通常是一个好主意，否则计算过程十分复杂。
