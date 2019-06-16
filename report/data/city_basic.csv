@@ -1,4 +1,4 @@
-city_no,city_name,city_pinyin,city_code,station,longi,lati,height,coast,heating,province
+city_no,city_name,city_pinyin,city_code,station,long,lat,height,coast,heating,province
 1,北京,Beijing,BJ,,3948,11628,313,0,1,北京
 2,天津,Tianjin,TJ,,3905,11704,25,1,1,天津
 3,石家庄,Shijiazhuang,SJZ,,3804,11421,1036,0,1,河北

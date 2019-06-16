@@ -31,8 +31,8 @@ var_no,var_chinese_name,var_code,var_freq,var_cat,if_flow,unit
 30,日照时数,sun,月度,气象因素,,小时
 31,是否供暖,heating,,地理因素,,
 32,是否临海,coast,,地理因素,,
-33,经度,longi,,地理因素,,
-34,纬度,lati,,地理因素,,
+33,经度,long,,地理因素,,
+34,纬度,lat,,地理因素,,
 35,海拔,height,,地理因素,,0.1m
 36,PM2.5,PM2_5,月度,大气污染物,,μg/m3
 37,PM10,PM10,月度,大气污染物,,μg/m3

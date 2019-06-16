@@ -30,6 +30,7 @@ options(digits=4)
 options(scipen=100)
 graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
+windowsFonts(msyh=windowsFont("微软雅黑"))
 library("kableExtra")
 ```
 
@@ -207,9 +208,9 @@ knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述"
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
-    ## kable_styling(full_width = T) %>%
-    ## column_spec(3:2, width = c("3.5cm","3.5cm"))%>%
-    footnote(general ="《中国气象年鉴2017》",
+    kable_styling(full_width = T) %>%
+    column_spec(1:3, width = c("2cm", "2.5cm","2.5cm"))%>%
+    footnote(general ="《中国气象年鉴2017》，其中纬度和经度是该城市气象观测站所在点的纬度和经度",
              general_title = "数据来源：")
 
 ```
@@ -523,13 +524,11 @@ knitr::kable(geo.stat, row.names =F, align = c("l","l","c", rep("r", 3)),
 4.24天。以上分析表明，城市空气质量与地理因素有关，是否集中供暖和是否临海其城市的
 空气质量差异较大。
 
-## 空气质量指数时空分布特征
+## 空气质量指数时间分布特征
 
-### 空气质量指数时间分布特征
+### 城市空气质量年度变化趋势分析
 
-#### 城市空气质量年度变化趋势分析
- 
-```{r fig-aqi-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年平均AQI变化趋势图", dev=c("pdf"), dev.args=list(family="GB1")}
+```{r fig-aqi-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年平均AQI变化趋势图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
 
@@ -537,8 +536,9 @@ dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
 
 library(lattice)
 
+
 xyplot(AQI ~ year | city, data=dat.y,
-layout = c(5,7), type = c("o"),
+layout = c(5,7), type = c("o"), 
 as.table = TRUE, grid = F,
 abline=c(list(h=c(75, 100, 125)),trellis.par.get("reference.line")),
 strip = strip.custom(bg="grey", strip.levels = T),
@@ -552,7 +552,7 @@ xlab=list(label="年份",cex=0.9, digits=0), ylab = ""
 ```
 
 
-```{r fig-excel-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年空气质量为优天数点阵图", dev=c("pdf"), dev.args=list(family="GB1")}
+```{r fig-excel-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年空气质量为优天数点阵图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei")}
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
 
@@ -572,10 +572,11 @@ dotplot(reorder(city, excellent) ~ excellent, data=dat.y,
 注意空气质量为优天数的排序与平均AQI的排序并不严格一致，表明一部分地区AQI变化差异
 很大，另一部分地区AQI相对较为稳定。
 
-#### 城市空气质量月度变化趋势分析
+### 城市空气质量月度变化趋势分析
+
 代表性城市（西安，北京，上海， 武汉，深圳）月平均AQI变化趋势图
 
-```{r fig-aqi-month, eval=T, fig.height=7.4, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "7个代表性城市2014-2017年月度平均AQI变化趋势图", dev=c("pdf"), dev.args=list(family="GB1")}
+```{r fig-aqi-month, eval=T, fig.height=7.4,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "7个代表性城市2014-2017年月度平均AQI变化趋势图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 varlist <- read.csv("./data/var_list.csv")
 dat.m <- read.csv("./data/monthly.csv")
 
@@ -597,7 +598,7 @@ xyplot(aqi.select.m, type="o", pch=20,
        scales=list(x=list(at=2014:2018),
                    y=list(at=c(50, 150, 250))
                    ),
-       xlab=list(label="年份",cex=0.9, digits=0),
+       xlab=list(label="时间",cex=0.9, digits=0),
        ## ylab = "AQI"
        )
 
@@ -691,10 +692,48 @@ knitr::kable(aqi.select.box, row.names =T, align = "c",
 
 ```
 
-### 空气质量指数空间分布特征
 
-### 空气质量指数时空格局演变
+## 城市空气质量空间分布特征
 
+```{r fig-city-map, eval=T, fig.height=7, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "35个城市2017年平均AQI空间分布图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
+library(ggplot2)
+library(ggrepel)
+library(maptools)
+mydat <- readShapePoly('./data/mapdata/bou2_4p.shp')
+china <- fortify(mydat)
+
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+city$lat <- paste(substr(city$lat,1,2), substr(city$lat,3,4))
+city$long <- paste(substr(city$long, 1, nchar(city$long)-2),
+                   substr(city$long, nchar(city$long)-1, nchar(city$long)))
+
+city$lat = as.numeric(measurements::conv_unit(city$lat,
+                                   from = 'deg_dec_min', to = 'dec_deg'))
+city$long = as.numeric(measurements::conv_unit(city$long,
+                                               from = 'deg_dec_min', to = 'dec_deg'))
+
+aqi.y17 <- read.csv("./results/aqi.y17.csv")
+city$aqi <- aqi.y17[,2]
+city$grade <- aqi.y17[,3]
+levels(city$grade) <- c("yellow2", "orange", "green")
+
+ggplot() +
+    geom_polygon(data=china, aes(x = long, y = lat, group = group),
+                 col = '#FD9FA4', fill = NA, lwd=0.15) +
+    geom_point(data = city, aes(x = long, y = lat), cex=city$aqi/20,
+               show.legend = F, alpha = 0.8, color = as.character(city$grade)) +
+    geom_text_repel(data = city, aes(x = long, y = lat, label = city),
+                    cex=3) +
+    labs(x = '经度', y = '纬度') + 
+    theme_bw()+
+    coord_map()+
+  theme(text = element_text(),
+        ## plot.title = element_text(hjust = 0.5)
+        )
+
+```
+
+4个区域： 华北西北， 东北， 长江沿线省份城市(包括浙江), 南方
 
 
 <!--# 参考文献 {-}-->
