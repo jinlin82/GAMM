@@ -607,7 +607,7 @@ xlab=list(label="年份",cex=0.9, digits=0), ylab = ""
 横轴即表示对应年份空气质量为优的天数。图中的折线表示2014-2017年各城市空气质量为优
 天数的四年平均。
 
-```{r fig-excel-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年空气质量为优天数点阵图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei")}
+```{r fig-excel-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="h", fig.cap = "35城市2014-2017年空气质量为优天数点阵图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei")}
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
 
@@ -670,7 +670,7 @@ dotplot(reorder(city, excellent) ~ excellent, data=dat.y,
 所研究的城市中相对较好，北京、上海、青岛、武汉、西安的空气质量在所研究的城市中相对较
 差。之后绘制了7个代表城市的月均AQI趋势图，如图 \@ref(fig:fig-aqi-month) 所示。
 
-```{r fig-aqi-month, eval=T, fig.height=7.4,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "7个代表性城市2014-2017年月度平均AQI变化趋势图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-aqi-month, eval=T, fig.height=7.4,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = "7个代表性城市2014-2017年月度平均AQI变化趋势图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 varlist <- read.csv("./data/var_list.csv")
 dat.m <- read.csv("./data/monthly.csv")
 
@@ -818,7 +818,7 @@ knitr::kable(aqi.select.season, row.names =T, align = "c",
 假设，认为其月均空气质量指数存在相关，即本月的空气质量与之前月份的空气质量存在一定
 的相关性。同时，在10%的显著性水平下，北京的检验结果拒绝原假设，认为其空气质量也与
 之前月份的空气质量存在相关性。如果我们将5%的显著性水平定义为强相关，把10%的显著性
-水平定义为弱相关，则上海、上海、西安季节调整之后的月均空气质量指数存在强相关性，而
+水平定义为弱相关，则上海、西安季节调整之后的月均空气质量指数存在强相关性，而
 北京季节调增之后的月均空气质量存在弱相关性，其他城市季节调整之后的月均空气质量指数
 不存在自相关。
 
@@ -875,7 +875,10 @@ knitr::kable(aqi.select.box, row.names =T, align = "c",
 
 ## 城市空气质量空间分布特征
 
+### 城市空气质量空间地理分布
+
 ```{r fig-city-map, eval=T, fig.height=7, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "35个城市2017年平均AQI空间分布图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
+
 library(ggplot2)
 library(ggrepel)
 library(maptools)
@@ -895,6 +898,7 @@ city$long = as.numeric(measurements::conv_unit(city$long,
 aqi.y17 <- read.csv("./results/aqi.y17.csv")
 city$aqi <- aqi.y17[,2]
 city$grade <- aqi.y17[,3]
+write.csv(city, "./results/city_co.csv")
 levels(city$grade) <- c("yellow2", "orange", "green")
 
 ggplot() +
@@ -915,6 +919,186 @@ ggplot() +
 
 4个区域： 华北西北， 东北， 长江沿线省份城市(包括浙江), 南方
 
+### 城市空气质量空间相关性分析
+
+全域空间相关性一般用Moran’s I进行测度，全域Moran’s I从总体上反映了研究对象的空
+间相关性，其计算公式为：
+$$
+\mathrm{I}=\frac{n \sum_{i=1}^{n} \sum_{j=1}^{n} w_{i j}\left(x_{i}-\overline{x}\right)\left(x_{j}-\overline{x}\right)}{\sum_{i=1}^{n} \sum_{j=1}^{n} w_{i j} \sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{2}}
+$$
+
+其中$i\ne j$， $n$是所研究的空间单元数，${{x}_{i}}$ 和${{x}_{j}}$分别表示某现
+象$x$在空间单元$i$和 $j$上的观测值，${{w}_{ij}}$ 是空间权值矩阵，表示$i$区域和
+$j$区域之间的邻近关系，可以用距离、二进制连接或$K$最近邻来度量。不同的权值矩阵对
+结果会产生不同的影响。
+
+Moran’s I指数的取值范围在[-1,1]之间，$\text{I}>0$表示空间正相关，其值越大表明空
+间相关性越明显，说明相似的观测值在空间集聚；$\text{I}<0$表示空间负相关，其值越小
+表明空间差异性越大，说明相似的观测值在空间分散；$\text{I}=0$表示空间呈随机性，说
+明观测值在空间上没有规律。
+
+局部Moran’s I指数介绍
+
+4年全局Moran’s I指数及其检验结果表
+
+```{r tab-global-moran, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
+
+dat.y <- read.csv("./data/yearly.csv")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+
+dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
+dat.y$lat <- rep(city$lat_d, each=4)
+dat.y$long <- rep(city$long_d, each=4)
+
+### 全局 Moran's I
+library(ape)
+source("./codes/geodistance.R")
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+
+moran.g <- by(dat.y[,c(3, 29:30)], as.factor(dat.y$year), 
+              function(x) Moran.I(x$AQI, city.dists.inv)
+)
+
+moran.g <- sapply(moran.g, function(x) c(x$observed, x$p.v))
+dimnames(moran.g)[[1]] <- c("Moran's I", "P值")
+
+write.csv(moran.g, "./results/moran.g.csv", row.names=T)
+
+library("kableExtra")
+knitr::kable(moran.g, row.names =T, align = "c",
+             digits=3,
+             caption="2014-2017年 35城市Moran's I",
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:5, width = c("3cm", rep("2cm", 4)))%>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)",
+                  )%>%
+    footnote(general ="通过全局Moran's I定义计算得到",
+             general_title = "数据来源：",
+             threeparttable = T)
+
+```
+
+
+
+
+
+4年空间相关图
+
+```{r fig-cor-log, eval=T, fig.height=6,fig.width=6.5,out.width="1.05\\textwidth", fig.pos="h", fig.cap = "2014-2017 年年度平均AQI空间相关图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+
+varlist <- read.csv("./data/var_list.csv")
+
+dat.y <- read.csv("./data/yearly.csv")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+
+dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
+dat.y$lat <- rep(city$lat_d, each=4)
+dat.y$long <- rep(city$long_d, each=4)
+
+### correlogram
+library(ncf)
+
+par(mfrow = c(2,2))
+par(mar = c(4.5, 4.1, 2.8, 2.1))
+cor.log <- by(dat.y[,c(2:3, 29:30)], as.factor(dat.y$year), 
+              function(x){
+                  plot(correlog(x$long, x$lat, z=x$AQI,
+                                increment = 100, latlon = T, resamp=500, quiet=TRUE),
+                       main = x$year[1], ylab="莫兰指数", xlab="距离(km)", ylim=c(-1.0,1.0))
+                  abline(h=0, col="grey")
+              })
+
+```
+
+2017年35城市局部Moran’s I指数图
+
+```{r fig-moran-map, eval=T, fig.height=6.5, fig.width=6.5,out.width="1.05\\textwidth", fig.pos="h", fig.cap = "35个城市2017年平均AQI空间分布图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
+
+varlist <- read.csv("./data/var_list.csv")
+
+aqi.y17 <- read.csv("./results/aqi.y17.csv")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+city$aqi <- aqi.y17$年均AQI
+
+library(ncf)
+
+aqi.lisa <- lisa(city$long_d, city$lat_d, city$aqi,
+                 latlon = T, neigh=1000, resamp=500, quiet=TRUE)
+
+library(maptools)
+mydat <- readShapePoly('./data/mapdata/bou2_4p.shp')
+par(mar = c(4.5, 4.1, 2.8, 2.1))
+plot(mydat, border="gray20", fill=NA, lwd=0.2, xlim=c(73,135), ylim=c(20,40),
+     axes=TRUE, asp = 1.2, xlab="经度", ylab="纬度")
+plot(aqi.lisa, negh.mean=FALSE, add = T, lwd=1, cex=0.8)
+
+```
+
+
+2014-2017城市局部Moran’s I指数指数表
+
+
+```{r tab-local-moran, eval=T, results='markup'}
+
+varlist <- read.csv("./data/var_list.csv")
+
+dat.y <- read.csv("./data/yearly.csv")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+
+dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
+dat.y$lat <- rep(city$lat_d, each=4)
+dat.y$long <- rep(city$long_d, each=4)
+
+library(ncf)
+
+aqi.lisa.y <- by(dat.y[,c(2:3, 29:30)], as.factor(dat.y$year), 
+              function(x){
+                  temp <- lisa(x$long, x$lat, z=x$AQI,
+                               latlon = T, neigh=2000, resamp=500, quiet=TRUE)
+                  cbind(temp$correlation, temp$p)
+              })
+
+
+aqi.lisa.y <- cbind(city$city, do.call(cbind.data.frame, aqi.lisa.y))
+names(aqi.lisa.y) <- c("城市", "2014指数","P值","2015指数","P值","2016指数","P值", "2017指数","P值")
+
+write.csv(aqi.lisa.y, "./results/aqi.lisa.y.csv", row.names=T)
+
+library("kableExtra")
+## knitr::kable(aqi.lisa.y, row.names =F, align = "c",
+##              digits=3,
+##              caption="2014-2017年 35城市局部Moran's I",
+##              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+##     kable_styling(full_width = T) %>%
+##     column_spec(1, width = c("2cm"))%>%
+##         kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+##                   stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+##                   repeat_header_text = "(续)")%>%
+##     footnote(general ="通过局部Moran's I定义计算得到",
+##              general_title = "数据来源：",
+##              threeparttable = T)
+
+library("kableExtra")
+knitr::kable(aqi.lisa.y, row.names =F, align = "c", caption="2014-2017年 35城市局部Moran's I",
+             digits = 3,
+             longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    footnote(general ="通过局部Moran's I定义计算得到",
+             general_title = "数据来源：")
+
+```
 
 <!--# 参考文献 {-}-->
 [//]: # (\bibliography{Bibfile})
