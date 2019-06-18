@@ -1,0 +1,114 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-03"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+
+切片抽样是伪随机数抽样的一种马尔可夫链蒙特卡罗算法，即从统计分布中抽取随机样本。该方
+法是基于对随机变量进行采样时，可以从其密度函数图下的区域均匀采样。
+
+# 方法
+
+切片采样，最简单的形式，从曲线 $f(x)$ 下方均匀采样，不需要剔除任何点，如下:
+
+1. 选择一个初始值 $x_0$ ,并使得 $f(x_0)>0$。
+
+2. 在 $0$ 到 $f(x_0)>0$ 均匀抽取一个 $y$ 。
+
+3. 在曲线上 $y$ 对应位置画一条水平线。
+
+4. 从曲线的线段中选取一个点 $(x,y)$ 作为样本
+
+5. 用新的$x$ 值从第二步开始重复以上步骤。
+
+这里的动机是，从任意曲线中均匀采样点的一种方法是首先在整条曲线上绘制均匀高度的水平片段。
+然后，可以采样曲线中的一个点，即随机选择一个落在或低于曲线 $x$ （$x$ 来自之前的迭代过程）
+位置的切片，再沿着切片随机选择一个 $x$ 位置。通过使用之前迭代算法的 $x$ 位置，从长
+远来看，我们选择切片的概率与其在曲线内段的长度有关。
+
+通常，该算法最棘手的部分是找到水平切片的边界，这涉及到有关描述采样分布的函数的逆运
+算。尤其是对于对于多峰分布，其中片可能由多个不连续的部分组成。通常可以使用一种拒绝
+抽样的形式来克服这个问题，即从较大切片中抽取样本，但提前已知该切片包含有问题的期望切
+片，然后丢弃在期望切片外的点。
+
+还需要注意的是，该算法可用于对任意曲线下的面积进行采样，而不管函数是否积分到1. 事实
+上，将函数缩放一个常数对采样的 $x$ 位置没有影响。这意味着该算法可用于从概率密度函数仅
+知道一个常数的(即其归一化常数未知)的分布中采样，这在计算统计学中很常见。
+
+# 实现
+
+切片采样的名称来自第一步:通过从辅助变量y进行采样来定义切片。该变量是从 $[0,f(x)]$ 
+进行采样的，其中 $f(x)$ 要么是 $x$ 的概率密度函数(pdf)，要么至少与它的pdf成正比。这定
+义了 $x$ 的一个切片，其中 $f(x) \geq Y$ 。换句话说，我们现在看的是 $x$ 的一个区域，
+其中概率密度至少为 $Y$ ,然后下一个 $x$ 的值从这个切片上均匀采样。采样一个新的 $Y$ 值，
+然后是 $x$ ，以此类推。这可以可视化为在pdf下对点的 $y$ 位置和 $x$ 位置进行交替采样，
+因此 $x$ 来自期望的分布。$Y$ 值除了对过程有用之外，没有其他特殊的结果或解释。
+
+如果概率密度函数(pdf)和它的逆函数都可获得，并且分布是单峰的，那么找到切片并从中取样就
+很简单。如果没有，则可以使用一个逐步退出过程来查找端点位于切片之外的区域。然后，可以
+使用拒绝抽样从切片中提取样本。Neal详细描述了这方面的各种过程。
+
+注意，与从非均匀分布生成随机数的许多可用方法相比，这种方法直接生成的随机变量将表现出
+序列统计相关性。这是因为为了抽取下一个样本，需要根据当前样本的 $f(x)$ 值定义切片。
+
+# 与其他方法的比较
+
+切片采样是马尔可夫链方法，因此与 $Gibbs$ 采样和 $Metropolis$ 具有相同的目的。与 $Metropolis$
+不同，不需要手动调整候选函数或候选标准差。
+
+并且， $Metropolis$ 对步长很敏感。如果步长太小，随机游走会导致缓慢的去相关。如果步长太大，
+则由于高拒绝率导致效率很低。
+
+与 $Metropolis$ 相比，切片采样会自动调整步长以匹配密度函数的局部形状。其实现过程经论证，也比 $Gibbs$ 抽样或简单的 $Metropolis$ 更新更容易，更有效。
+
+请注意，与许多可用于从非均匀分布生成随机数的方法相比，通过此方法直接生成的随机变量将表
+现出序列统计相关性。换句话说，并非所有点都具有相同的，且独立被选择的可能性。 这是因为要
+抽取下一个样本，需要根据当前样本的 $f(x)$ 值定义切片。但是，生成的样本是马尔可夫的，因此
+预计会长期收敛到正确的分布。
+
+切片采样要求可以评估要采样的分布。放宽这一要求的一种方法是用可评估的分布代替，该分布
+与真正未评估的分布成比例。
