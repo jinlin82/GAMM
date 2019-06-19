@@ -99,7 +99,7 @@ $$\min _{\beta_{0}, \beta}\left\{\frac{1}{N}\left\|y-\beta_{0} 1_{N}-X
 \beta\right\|_{2}^{2}\right\} \text { subject to }\|\beta\|_{1} \leq t$$
 
 其中 $\|\beta\|_{p}=\left(\sum_{i=1}^{N}\left|\beta_{i}\right|^{p}\right)^{1 / p}$ 是标准的
-$\ell^{1}$ 形式，$1_{N}$ 是一个 $N \times 1$ 的向量。
+$\ell^{p}$形式，$1_{N}$ 是一个 $N \times 1$ 的向量。
 
 用 $\overline{x}$ 表示数据点 $x_i$ 的标量均值，$\overline{y}$ 表示响应变量 $y_i$ 的均值，故 
 $\beta_0$ 的估计结果可以通过 $\hat{\beta}_{0}=\overline{y}-\overline{x}^{T} \beta$
@@ -131,7 +131,7 @@ $$\hat{\beta}_{j}=S_{N \lambda}\left(\hat{\beta}_{j}^{\mathrm{OLS}}\right)=\hat{
 其中 $\hat{\beta}^{\text { OLS }}=\left(X^{T} X\right)^{-1} X^{T} y$ .
 
 $S_{\alpha}$ 被称为软阈值运算符，因为它将值转换为零（如果它们足够小则使它们恰
-好为零），而不是如硬阈值运算符（通常表示为$S_{\alpha}$）一样，将较小的值设置
+好为零），而不是如硬阈值运算符（通常表示为$H_{\alpha}$）一样，将较小的值设置
 为零并且保持较大的值不变。
 
 这可以和岭回归作比较。岭回归中，目标是最小化：
@@ -160,7 +160,7 @@ $$\hat{\beta}_{j}=H_{\sqrt{N \lambda}}\left(\hat{\beta}_{j}^{\mathrm{OLS}}\right
 
 回到一般的情况中，协变量之间或许不是独立的。考虑一种特殊情况，协变量中有两个变量$j$和$k$,对于
 每个观测，都相等，以至于 ${x}_{(j)}={x}_{(k)}$ ，其中${x}_{(j), i}={x}_{i j}$ 。那么，使lasso目标
-函数最小的 $\beta_j$ 和 $\beta_k$ 的值并不是唯一确定的事实上，如果存在某个解决方案
+函数最小的 $\beta_j$ 和 $\beta_k$ 的值并不是唯一确定的。事实上，如果存在某个解决方案
 $\hat{\boldsymbol{\beta}}$ ，其中
 $\hat{\boldsymbol{\beta}_j} \hat{\boldsymbol{\beta}_k} \geq \mathbf{0}$ ，那么如果 $s\in[0,1]$ 并用 $\hat{\beta}_{j}$  替代
 $s\left(\hat{\beta}_{j}+\hat{\beta}_{k}\right)$ ，用 $\hat{\beta}_{k}$ 替代
