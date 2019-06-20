@@ -1,0 +1,164 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-06"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# 正态性检验
+
+在统计学中，正态性检验用于确定数据集是否由正态分布建立了良好的模型，并计算数据集下面的随机变
+量服从正态分布的可能性。
+
+更准确地说，这种检验是模型选择的一种形式，可以根据人们对概率的理解有几种解释:
+
++ 在描述性统计术语中，衡量的是一个正常模型对数据的拟合优度——如果拟合较差，那么数据
+没有被一个正态分布很好地建模，而没有对任何潜在变量作出判断。
+
++ 在频率统计的统计假设检验中，数据是根据零假设进行检验的，零假设是正态分布的。
+
++ 在贝叶斯统计中,数据不进行正态性检验，而是计算数据来自参数为 $\mu、\sigma$ 的正态分布的可能性,并
+比较数据来自其他分布的可能性。最简单的方法是使用一个贝叶斯因子(给予不同的模型的数据可能性),或者
+更精细地对可能的模型和参数取一个先验分布，并计算给定概率的后验分布。
+
+## 图形方法
+
+检验正态性的一种非正式方法是将样本数据的直方图与正态概率曲线进行比较。数据的经验分布(直方图)
+应该是钟形的，类似于正态分布。但如果样本很小，则很难看出。在这种情况下，可以根据与样本均
+值和方差相同的正态分布的分位数对数据进行回归。对回归曲线的不匹配表明偏离了正态分布(见Anderson
+Darling系数和minitab)。
+
+一个可以用来评估正态性的图形工具是 $Q-Q$ 图。在统计学中， $Q-Q$ (分位数-分位数)图是一种概率图，它
+是通过将两个概率分布的分位数相互作图来比较两个概率分布的图形化方法。帮助评估一组数据是否可信地
+来自一些理论分布，如正态分布或指数分布。
+
+首先，选择分位数的区间集。图上的一个点($x, y$)对应第二个分布( $y$ 坐标)的一个分位数和第一个
+分布( $x$ 坐标)的相同分位数。如果比较的两个分布相似，Q-Q图中的点将近似位于直线 $y=x$ 上。如果
+分布是线性相关的，Q-Q图中的点将近似位于直线上，但不一定在直线 $y=x$ 上。Q-Q图还可以作为一
+种图形化的方法来估计位置尺度分布族中的参数。
+
+使用Q-Q图还比较分布的形状，它提供了关于位置、比例和偏斜度等属性在这两个分布中是如何相似或不同的
+图形视图。
+
+在统计分析时，常假设因变量是正态分布，则可以使用一个正态分布的 $Q-Q$ 图来检验这个假设是否成立。对
+应的两个分布是样本数据的分布和正态分布。若样本数据是正态分布数据，则 $Q-Q$ 图中绘制的点应大致落在
+直线附近。
+
+不过 $Q-Q$ 图只是视觉判断，还不够严谨，具有一定程度的主观性。但可以一眼看出假设是否正确合理，如
+果不合理，还可以看出假设是如何违反的，以及哪些数据点导致了违反，即可以检测到异常点。
+
+## 检验方法
+
+基于频率论的检验方法弥补了图形正态性检验的不足，下面介绍常用的几种正态检验统计量。
+
+### shapiro-wiki test
+
+shapiro-wiki检验由Samuel Sanford Shapiro and于1965年提出。对应的零假设为样本 $x_1,\cdots,x_n$ 
+来自正态分布总体。 检验统计量为：
+
+$$W=\frac{\left(\sum_{i=1}^{n} a_{i} 
+x_{(i)}\right)^{2}}{\sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{2}}$$
+
+其中 $x_{(i)}$ (用括号括住下标i;不要与 $x_i$ 混淆)是第 $i$ 序统计量，即是样本中第 $i$ 小的
+数;$\overline{x}=\left(x_{1}+\cdots+x_{n}\right) / n$ 是样本均值；系数 $a_i$ 由以下表达式给出：
+
+$$\left(a_{1}, \ldots, a_{n}\right)=\frac{m^{\top} V^{-1}}{C}$$
+
+$C$ 是向量范数：
+
+$$C=\left\|V^{-1} m\right\|=\left(m^{\top} V^{-1} V^{-1} m\right)^{1 / 2}$$
+
+$m$也是向量
+
+$$m=\left(m_{1}, \ldots, m_{n}\right)^{\top}$$
+
+由独立同分布随机变量的序统计量的期望值构成，该随机变量从标准正态分布中采样；最后，$V$ 
+是这些正态序统计量的协方差矩阵。
+
+这个检验的零假设是总体呈正态分布。因此，一方面，如果 $p$ 值小于所选择的显著性水平，
+则拒绝零假设，有证据表明所测试的数据不是正态分布。另一方面,如果 $p$ 值大于选择 $\alpha$ 
+水平,则数据来自正态分布总体的零假设不能被拒绝(例如， $\alpha$ 为0.05，数据集的 $p$ 
+值小于0.05。则拒绝数据来自正态分布总体的零假设)。和大多数统计显著性检验一样，如果样本容
+量足够大，这个检验甚至可以发现与原假设的微小偏差(即，虽然可能有一些统计上显著的影响，但
+可能太小而没有任何实际意义);因此，对影响大小的额外研究通常是可取的，如使用前一节的Q-Q图。
+
+### jarque-bera test
+
+在统计学中，由于Jarque-Bera检验检验样本数据是否具有正态分布的偏态和峰度，因次也是拟合优度检验。
+这项检验是以Carlos Jarque和Anil K. Bera的名字命名的。检验统
+计量始终为负。如果它远离零，则表示数据不具有正态分布。
+
+$JB$统计量的定义如下：
+
+$$J B=\frac{n-k+1}{6}\left(S^{2}+\frac{1}{4}(C-3)^{2}\right)$$
+其中 $n$ 是观测对象的数量（或者说是自由度）；$S$ 是样本偏度系数；$C$ 是样本峰度系数，$k$
+是自变量个数
+
+$$\begin{array}{l}{S=\frac{\hat{\mu}_{3}}{\hat{\sigma}^{3}}=\frac{\frac{1}{n} \sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{3}}{\left(\frac{1}{n} \sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{2}\right)^{3 / 2}}} \\ {C=\frac{\hat{\mu}_{4}}{\hat{\sigma}^{4}}=\frac{\frac{1}{n} \sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{2}}{\left(\frac{1}{n} \sum_{i=1}^{n}\left(x_{i}-\overline{x}\right)^{2}\right)^{2}}}\end{array}$$
+其中 $\hat{\mu}_{3}$ 和 $\hat{\mu}_{4}$ 分别是三阶中心矩和四阶中心距的估计量， $\overline{x}$
+是样本均值， $\hat{\sigma}^{2}$ 是二阶中心矩，方差的估计量。
+
+如果数据来自正态分布，则 $JB$ 统计量渐近地服从具有两个自由度的卡方分布，因此该统计量可用于检验数据
+来自正态分布的假设。零假设是偏度为零和过度峰度为零的联合假设。正态分布样本的期望偏度为0，期望过
+度峰度为0(与峰度为3相同)，任何对零假设的偏离，都会使 $JB$ 统计量增加。
+
+### 正态性检验的比较
+
+2011年的一项研究得出结论，比较Shapiro–Wilk, Kolmogorov–Smirnov, Lilliefors, and Anderson–Darling
+这几种正态性检验方法，在一定的显著性水平下，Shapiro–Wilk的表现最好，其次是Anderson–Darling。
+
+一些出版的著作推荐Jarque–Bera 检验。但是这个检验方法有弱点。对于短尾分布，尤其是双峰分布的情况，
+该检验方法表现不佳。因此一些作者在他们的研究中拒绝使用这种方法。
+
+从历史上看,标准矩的三阶或四阶(偏度ł和峰态)是最早用来正态性检验的方法。Lin-Mudholkar检验专门针
+对数据呈非对称的情况。Jarque-Bera检验本身来自于偏度和峰度估计。Mardia的多元偏态和峰度检验将矩
+检验方法推广到多元情况。其他早期检验统计量包括平均绝对偏差与标准偏差的比值以及极差与标准偏差
+的比值。
+
+最近的正态性检验括能量检验(Szekely和Rizzo)和基于经验特征函数(ECF)的检验(如Epps和Pullev， 
+Henze-Zirkler， BHEP test)。能量和ECF检验是一种强有力的检验方法，适用于检验单变量或多变量正态
+性，并且在统计上与其他替代方法一致。
+
+对于给定的标准差，正态分布的熵是所有分布中最高的。有许多基于此属性的正态性检验。
