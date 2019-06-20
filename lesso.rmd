@@ -1,0 +1,184 @@
+---
+title: "Mixed Model"
+author: "Jin"
+date: "2019-06"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ./style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+```{r setup,echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+# Lasso (statistics)
+
+在统计学和机器学习中，Lasso（最小绝对收缩和选择器；也叫Lasso或LASSO）是一种回归分析方法，
+它执行变量选择和正则化，以提高其产生的统计模型的预测准确性和可解释性。 它最初于1986年在地
+球物理学文献中引入，后来由Robert Tibshirani于1996年独立重新发现并推广，他创造了
+这一术语，并对观察到的性能提供了进一步的见解。
+
+Lasso最初是为最小二乘模型制定的，这个简单的例子揭示了估计量的大量行为，包括它与岭回归和
+最佳子集选择的关系，以及Lasso系数估计和所谓的软阈值之间的联系。它还表明(像标准线性回归)，
+如果协变量是共线的，系数估计不需要是唯一的。
+
+虽然最初是为最小二乘定义的，但lasso正则化很容易以一种简单的方式扩展到广泛的统计模型，包
+括广义线性模型、广义估计方程、比例风险模型和M -估计器. Lasso执行子集选择的能力依赖
+于约束的形式，并有多种解释，包括几何、贝叶斯统计和凸分析。
+
+LASSO与基础追踪去噪密切相关。
+
+# motivation
+
+为了提高回归模型的预测精度和可解释性，引入了Lasso，通过改变模型拟合过程，只选择提供的协
+变量的子集用于最终模型，而不是使用所有协变量。它是在地球物理学中独立开发的，基于先前的
+工作，即对系数的拟合和惩罚都使用了 $\ell^{1}$ 惩罚，并由统计学家Robert Tibshirani推广完善。
+
+在lasso之前，最广泛使用的选择包含哪些协变量的方法是逐步选择，它只在某些情况下提高预测
+精度，例如只有少数协变量与响应变量有很强的关系。然而，在其他情况下，它会使预测误差更大。
+同时，岭回归是当时最流行的提高预测精度的技术。岭回归通过缩小较大的回归系数来减少过度拟
+合，从而提高了预测误差，但它不进行协变量选择，因此也不能使模型更具解释性。
+
+Lasso能够实现这两个目标，方法是强制回归系数绝对值之和小于一个固定值，从而强制将某些系数
+设置为零，从而有效地选择一个不包含这些系数的更简单的模型。这一思想与岭回归相似，在岭回
+归中，系数的平方和必须小于一个固定值，虽然在岭回归的情况下，这只是缩小了系数的大小，并
+没有使它们中的任何一个为零。
+
+# 基本形式
+
+Lasso最初是在最小二乘的背景下引入的，首先考虑最小二乘的情况是有指导意义的，因为它在一个
+简单的设置中说明了Lasso的许多属性。
+
+考虑由N个案例组成的样本，每个案例由p个协变量和单个响应变量组成。 设 $y_i$ 为响应变量，
+$x_i:=(x_1,x_2,\cdots,x_p)^T$ 为第 $i$ 个案例的协变量向量。 然后Lasso的目标是解决
+
+$$\min _{\beta_{0}, \beta}\left\{\frac{1}{N} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-x_{i}^{T} 
+\beta\right)^{2}\right\} \text { subject to } \sum_{j=1}^{p}\left|\beta_{j}\right|\leq t$$
+
+这里 $t$ 是一个预先指定的自由参数，它决定正则化的数量。设 $X$ 为协变量矩阵，
+$X_{i j}=\left(x_{i}\right)_{j}$ 并且 $x_{i}^{T}$ 是 $X$ 的第 $i$ 行，则表达式可以写得更紧
+凑
+
+$$\min _{\beta_{0}, \beta}\left\{\frac{1}{N}\left\|y-\beta_{0} 1_{N}-X 
+\beta\right\|_{2}^{2}\right\} \text { subject to }\|\beta\|_{1} \leq t$$
+
+其中 $\|\beta\|_{p}=\left(\sum_{i=1}^{N}\left|\beta_{i}\right|^{p}\right)^{1 / p}$ 是标准的
+$\ell^{p}$形式，$1_{N}$ 是一个 $N \times 1$ 的向量。
+
+用 $\overline{x}$ 表示数据点 $x_i$ 的标量均值，$\overline{y}$ 表示响应变量 $y_i$ 的均值，故 
+$\beta_0$ 的估计结果可以通过 $\hat{\beta}_{0}=\overline{y}-\overline{x}^{T} \beta$
+得到，因此有
+
+$y_{i}-\hat{\beta}_{0}-x_{i}^{T} \beta=y_{i}-\left(\overline{y}-\overline{x}^{T} \beta\right)-x_{i}^{T} \beta=\left(y_{i}-\overline{y}\right)-\left(x_{i}-\overline{x}\right)^{T} \beta$
+
+因此，使用已居中(使零均值)的变量是标准的。此外，协变量通常是标准化的$\left(\sum_{i=1}^{N} x_{i}^{2}=1\right)$ ，因此解决方案不依赖于测量尺度。
+ 
+把
+
+$$\min _{\beta \in \mathbb{R}^{p}}\left\{\frac{1}{N}\|{y}-{X} {\beta}\|_{2}^{2}\right\} \text { subject to }\|\beta\|_{1} \leq t$$
+写成拉格朗日形式
+
+$$\min _{\beta \in \mathbb{R}^{p}}\left\{\frac{1}{N}\|y-X 
+\beta\|_{2}^{2}+\lambda\|\beta\|_{1}\right\}$$
+
+是有帮助的。其中 $t$ 和 $\lambda$ 之间的确切关系依赖于数据。
+
+# 正交协变量
+
+下面考虑Lasso估计量的一些基本属性。
+
+首先假设协变量是正交的，以至于$\left(x_{i} | x_{j}\right)=\delta_{i j}$，其中
+$(\cdot|\cdot)$ 是内积，并且$\delta_{ij}$ 是kronecker delta克罗内克符号，或者，
+同样地，$X^TX=I$ ,然后使用次梯度法可以得到
+
+$$\hat{\beta}_{j}=S_{N \lambda}\left(\hat{\beta}_{j}^{\mathrm{OLS}}\right)=\hat{\beta}_{j}^{\mathrm{OLS}} \max \left(0,1-\frac{N \lambda}{\left|\hat{\beta}_{j}^{\mathrm{OLS}}\right|}\right)$$
+其中 $\hat{\beta}^{\text { OLS }}=\left(X^{T} X\right)^{-1} X^{T} y$ .
+
+$S_{\alpha}$ 被称为软阈值运算符，因为它将值转换为零（如果它们足够小则使它们恰
+好为零），而不是如硬阈值运算符（通常表示为$H_{\alpha}$）一样，将较小的值设置
+为零并且保持较大的值不变。
+
+这可以和岭回归作比较。岭回归中，目标是最小化：
+
+$$\min _{\beta \in \mathbb{R}^{p}}\left\{\frac{1}{N}\|y-X \beta\|_{2}^{2}+\lambda\|\beta\|_{2}^{2}\right\}$$
+
+产生了
+$$\hat{\beta}_{j}=(1+N \lambda)^{-1} \hat{\beta}_{j}^{\text { OLS }} $$
+
+因此，岭回归通过均衡性因子 $(1+N \lambda)^{-1}$ 缩减所有的系数并且没有将任何系数
+设置为0.它也可以与具有最佳子集选择的回归进行比较，该最佳子集选择的回归的目标是最小化
+
+$$\min _{\beta \in \mathbb{R}^{p}}\left\{\frac{1}{N}\|{y}-{X} {\beta}\|_{2}^{2}+\lambda\|\beta\|_{0}\right\}$$
+ 
+其中 $\|\cdot\|_{0}$ 是 “$\ell^{0}$” 形式, 如果 $z$ 的 $m$ 个分量都是非零的,则 $\ell^{0}$ 
+被定义为 $\|z\|=m$ 。在这种情况中，可以表示为
+
+$$\hat{\beta}_{j}=H_{\sqrt{N \lambda}}\left(\hat{\beta}_{j}^{\mathrm{OLS}}\right)=\hat{\beta}_{j}^{\mathrm{OLS}} \mathrm{I}\left(\left|\hat{\beta}_{j}^{\mathrm{OLS}}\right| \geq \sqrt{N \lambda}\right)$$
+其中 $H_{\alpha}$ 为硬阈值函数, $I$ 为指标函数(如果参数为真，则为1，否则为0)。
+
+因此，lasso估计值共享岭回归和最佳子集选择回归的估计值具有的特性，因为它们都像岭回归
+一样缩小了所有系数的大小，但也将其中一些设置为零，就像在最佳子集选择的情况下一样。此外，虽
+然岭回归将所有系数按常数因子进行缩放，但lasso将系数按常数值转换为零，并在达到零时将其设置为零。
+
+# 相关协变量
+
+回到一般的情况中，协变量之间或许不是独立的。考虑一种特殊情况，协变量中有两个变量$j$和$k$,对于
+每个观测，都相等，以至于 ${x}_{(j)}={x}_{(k)}$ ，其中${x}_{(j), i}={x}_{i j}$ 。那么，使lasso目标
+函数最小的 $\beta_j$ 和 $\beta_k$ 的值并不是唯一确定的。事实上，如果存在某个解决方案
+$\hat{\boldsymbol{\beta}}$ ，其中
+$\hat{\boldsymbol{\beta}_j} \hat{\boldsymbol{\beta}_k} \geq \mathbf{0}$ ，那么如果 $s\in[0,1]$ 并用 $\hat{\beta}_{j}$  替代
+$s\left(\hat{\beta}_{j}+\hat{\beta}_{k}\right)$ ，用 $\hat{\beta}_{k}$ 替代
+$(1-s)\left(\hat{\beta}_{j}+\hat{\beta}_{k}\right)$ ，则当保持其他 $\hat{\beta_i}$ 不变时，便
+给出解决方案。所以lasso目标函数有一个连续的有效极小值。几种不同的Lasso，包括the Elastic 
+Net，已经被设计来解决这个缺点。
+
+# 一般形式
+
+Lasso正则化可以扩展到各种各样的目标函数，如广义线性模型、广义估计方程、比例风险模型和一般的M
+估计器。给定目标函数
+
+$$\frac{1}{N} \sum_{i=1}^{N} f\left(x_{i}, y_{i}, \alpha, \beta\right)$$
+
+则lasso正则化版本的估计量将是以下表达式的解决方案
+
+$$\min _{\alpha, \beta} \frac{1}{N} \sum_{i=1}^{N} f\left(x_{i}, y_{i}, \alpha, \beta\right) 
+\text { subject to }\|\beta\|_{1} \leq t $$
+
+只有 $\beta$ 被惩罚，而 $\alpha$ 可以自由地取任何允许的值，就像 $\beta_0$ 在基本情况下
+没有被惩罚一样。
