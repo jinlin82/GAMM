@@ -91,17 +91,13 @@ norm.test <- list(
 
     jarque.bera.test(dat.m$AQI),
     jarque.bera.test(dat.m$excellent),
-    jarque.bera.test(dat.m$severe)
-)
-
-
+    jarque.bera.test(dat.m$severe))
 
 temp <- t(sapply(norm.test, function(x) c(x$stat, x$p.v)))
 norm.test <- cbind(temp[1:6, ], temp[7:12, ])
 dimnames(norm.test) <- list(c("年均AQI","年度空气质量为优天数","年度严重污染天数",
                               "月均AQI","月度空气质量为优天数","月度严重污染天数"),
                             c("W 统计量","P值", "JB统计量", "P值"))
-
 
 write.csv(norm.test, "./results/aqi.y17.csv", row.names=F)
 
@@ -121,8 +117,6 @@ knitr::kable(norm.test, row.names =T, align = c("l", rep("r",4)),
 rm(list=ls())
 dat.y <- read.csv("./data/yearly.csv")
 dat.m <- read.csv("./data/monthly.csv")
-
-library(car)
 
 par(mfrow=c(1,2))
 par(mar = c(1.1, 4.5, 2.1, 1.1))
@@ -158,8 +152,6 @@ legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), 
 
 
 
-
-
 ### 建模思路
 
 普通模型（LM,GLM）
@@ -172,6 +164,21 @@ legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), 
 ## 空气质量指数（AQI）影响因素分析
 
 相关分析，散点图矩阵
+
+```{r fig-aqi-cor, eval=T, fig.height=2.5,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = " 年度空气质量为优天数，月度平均AQI对数密度图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+names(dat.y)
+names(dat.m)
+
+pairs(dat.y[, c(3, 32:39)])
+
+
+```
+
+
 
 ## 空气质量为优的影响因素分析
 

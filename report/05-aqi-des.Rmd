@@ -168,8 +168,8 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 城市公路客运量进行表示。能源消耗产生的废气严重污染了空气，尤其是煤炭消耗，电能是清洁
 高效的二次能源，用全社会用电量代表能源消耗，同时选取工业二氧化硫排放量和工业烟粉尘排
 放量作为废气排放的指标。绿化建设可以吸附灰尘、净化空气、减少微粒并减少空气中细菌含量，
-对空气的净化有重要的作用。同时，废气治理力度的大小也会对空气质量的好坏产生重要的影响。
-因此，选取建成区绿化覆盖率和废气治理完成投资作为绿化建设和污染治理的指标。
+对空气的净化有重要的作用。同时，环境治理投资特别是废气治理力度的大小也会对空气质量的好坏产生重要的影响。
+因此，选取建成区绿化覆盖率，工业污染治理完成投资和废气治理完成投资作为绿化建设和污染治理的指标。
 
 经济社会因素可以视为影响空气质量好坏的人为因素，这些因素可以根据实际情况做出相应改变。
 而气象因素及地理因素则是影响空气质量好坏的固定因素，气温、降水量、气压、风速、相对湿度、
@@ -182,11 +182,11 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 理这些方面。其中，固定资产投资、地区生产总值、地区生产总值增长率表示经济增长；常
 住人口表示人口因素；建成区绿化覆盖率表示绿化建设；城市公路客运量表示交通运输；房
 屋建筑施工面积表示固定污染源；私人汽车拥有量表示移动污染源；全社会用电量表示能源
-消耗；工业二氧化硫排放量、工业烟粉尘排放量表示废气排放；废气治理完成投资表示污染
-治理。社会经济因素最后选定12个指标。最终选定的气象因素包括：最低气温、最高气温、
+消耗；工业二氧化硫排放量、工业烟粉尘排放量表示废气排放；工业污染治理完成投资和废气治理完成投资表示污染
+治理。社会经济因素最后选定13个指标。最终选定的气象因素包括：最低气温、最高气温、
 降水量、平均气压、平均风速、平均气温、平均相对湿度、日照时数等8个指标。最终选的
 地理因素有：是否供暖、是否临海、经度、纬度、海拔，共5个指标。三个方面影响因素合
-计选择了25个指标，最终的指标体系如表\@ref(tab:tab3) 所示。
+计选择了26个指标，最终的指标体系如表\@ref(tab:tab3) 所示。
 
 ```{r tab3, eval=T,results='markup', cache=F}
 library("kableExtra")
@@ -194,7 +194,7 @@ library("kableExtra")
 tab3 <- read.csv('./results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
              longtable = TRUE, booktabs = TRUE, escape = F,
-             linesep  = c(rep("", 11), "\\hline", rep("",7), "\\hline")) %>%
+             linesep  = c(rep("", 12), "\\hline", rep("",7), "\\hline")) %>%
 			     kable_styling(latex_options = c("scale_down", "repeat_header", "hold_position"),
                  repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
@@ -259,10 +259,12 @@ knitr::kable(tab4, row.names =F, align = "l", caption="城市基本情况概述"
 指标的缺失值均采用类似的方法进行处理。对于气象因素中缺失数据的处理，均采用上年同期数据
 对本年当期数据进行填充。
 
-对于废气污染治理投资，各城市并未公布具体数据，但其对空气质量的好坏有很大程度的影响。
-我们可以从统计年鉴中获得各省份的废气污染治理投资，直观上可以将其视为地区生产总值的一
-部分。因此，将各城市地区生产总值占所在省份生产总值的比重乘以所在省份废气治理投资作为
-各城市废气污染治理投资的数据。
+对于工业污染治理完成投资和废气污染治理投资，各城市并未公布具体数据，但其对空气质
+量的好坏有很大程度的影响。我们可以从中国统计年鉴中获得各城市所在各省份的工业污染
+治理完成投资和废气污染治理投资数据。我们假定各城市工业污染治理完成投资和废气污染
+治理投资占全省的比例与其GDP占全省的比例大致相等。因此，将各城市地区生产总值占所
+在省份生产总值的比重乘以所在省份工业污染治理完成投资和废气污染治理投资作为各城市
+这两个变量的数据。
 
 由于要进行月度分析，在所获得的数据中，针对非月度数据，需要采用合适的频率转化方法进行频率
 转化，转为月度数据进行分析。经济指标的数据类型可以分为存量与流量数据，对于地区生产总值、
@@ -345,7 +347,7 @@ knitr::kable(aqi.y17, row.names =F, align = "c", caption="2017年35城市空气�
 
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
-ecovar <- names(dat.y)[c(1, 17:28)]
+ecovar <- names(dat.y)[c(1, 17:29)]
 eco.y17 <- dat.y[dat.y$year==2017, ecovar]
 
 varinfo <- varlist[match(ecovar[-1], as.character(varlist$var_code)), c(1,2,7)]
@@ -363,7 +365,7 @@ knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
              caption="2017年35城市社会经济统计变量描述统计",
              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
     kable_styling(full_width = T) %>%
-    column_spec(1:2, width = c("4cm","2cm"))%>%
+    column_spec(1:2, width = c("4.3cm","1.8cm"))%>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)",
@@ -391,10 +393,11 @@ knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
 为1066.89万千瓦时，最少的是海口，为70.34万千瓦时。工业二氧化硫排放量最多的是重庆，
 为139880吨，工业烟粉尘排放量最多的是呼和浩特，为111036吨，两者排放最少的城市均为
 海口，分别为502吨和113吨。作为固定污染源的代表，房屋建筑施工面积最多的是上海，为
-41197.5万平方米，最少的是南宁，为1847.32万平方米。且对于污染的各种治理，建成区绿化
-覆盖率最多的是北京，为48.42%，最少的是兰州，为30.93%。35个城市2017年年均废气治理
-完成投资为4.32亿元，其中废气治理完成投资额最多的是上海，为13.35亿元，最少的是西宁，
-为0.29亿元。
+41197.5万平方米，最少的是南宁，为1847.32万平方米。且对于污染的各种治理，建成区绿
+化覆盖率最多的是北京，为48.42%，最少的是兰州，为30.93%。35个城市2017年年均工业污
+染治理完成投资为7.06亿元，各个城市工业污染治理完成投资相差较大，标准差达到7.70亿
+元；废气治理完成投资平均值为4.32亿元，其中废气治理完成投资额最多的是上海，为
+13.35亿元，最少的是西宁，为0.29亿元。
 
 根据以上信息可以发现，重庆的固定资产投资最多，人口最多，工业二氧化硫排放也最多，其
 建成区绿化面积为40.32%，废气污染治理投资额为5亿元，2017年空气质量等级为良，无严重
@@ -419,7 +422,7 @@ knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
 
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
-weavar <- names(dat.y)[c(1, 32:39)]
+weavar <- names(dat.y)[c(1, 33:40)]
 wea.y17 <- dat.y[dat.y$year==2017, weavar]
 
 varinfo <- varlist[match(weavar[-1], as.character(varlist$var_code)), c(1,2,7)]
@@ -479,7 +482,7 @@ knitr::kable(wea.stat, row.names =F, align = c("l","l",rep("r", 4)),
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
 
-geovar <- names(dat.y)[c(1,3,10,15, 40,41)]
+geovar <- names(dat.y)[c(1,3,10,15, 41,42)]
 geo.y17 <- dat.y[dat.y$year==2017, geovar]
 
 varinfo <- varlist[match(geovar[-1], as.character(varlist$var_code)), c(1,2,7)]
@@ -542,7 +545,7 @@ knitr::kable(geo.stat, row.names =F, align = c("l","l","c", rep("r", 3)),
 建议。为了进一步观察2014-2017年各城市空气质量的变动趋势，根据2014-2017年各城市的年均
 AQI数据绘制了35所城市2014-2017年年均AQI的变化趋势图，如图 \@ref(fig:fig-aqi-year) 所示。
 
-```{r fig-aqi-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="H", fig.cap = "35城市2014-2017年平均AQI变化趋势图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-aqi-year, eval=T, fig.height=7.5, fig.width=6.5, out.width="1.05\\textwidth", fig.pos="h", fig.cap = "35城市2014-2017年平均AQI变化趋势图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
 
@@ -1079,7 +1082,7 @@ library(ncf)
 
 par(mfrow = c(2,2))
 par(mar = c(4.5, 4.1, 2.8, 2.1))
-cor.log <- by(dat.y[,c(2:3, 29:30)], as.factor(dat.y$year), 
+cor.log <- by(dat.y[,c(2:3, 30:31)], as.factor(dat.y$year), 
               function(x){
                   plot(correlog(x$long, x$lat, z=x$AQI,
                                 increment = 100, latlon = T, resamp=500, quiet=TRUE),
@@ -1195,7 +1198,7 @@ dat.y$long <- rep(city$long_d, each=4)
 
 library(ncf)
 
-aqi.lisa.y <- by(dat.y[,c(2:3, 29:30)], as.factor(dat.y$year), 
+aqi.lisa.y <- by(dat.y[,c(2:3, 30:31)], as.factor(dat.y$year), 
               function(x){
                   temp <- lisa(x$long, x$lat, z=x$AQI,
                                latlon = T, neigh=2000, resamp=500, quiet=TRUE)
