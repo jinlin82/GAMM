@@ -12,9 +12,6 @@ csl: ./style/chinese-gb7714-2005-numeric.csl
 link-citations: true
 ---
 
-**TODO**
-
-
 
 
 ```{r setup, echo=F}
@@ -35,11 +32,154 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 # 基于广义可加混合模型的城市空气质量影响因素实证分析
 
+从上一章的分析可以看出，城市空气质量形成原因很复杂，不是某一个方面变量所决定，而
+是各个因素的综合作用的结果。
+
+
+
 ## 因变量定义及自变量筛选
 
-### 因变量定义
 
-### 基于Lasso的自变量筛选
+因变量定义不同，影响因素可能是不一样的； 建模原则，从简单到复杂
+除关注平均AQI之外，还需要从正反两个方面研究。
+最终目标是空气质量为优
+
+### 因变量定义及其分布
+
+```{r fig-dep-dist, eval=T, fig.height=7,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = "AQI，空气质量为优天数，严重污染天数 Q-Q 图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+library(car)
+
+## par(mfrow=c(3,2))
+layout(matrix(1:6, nrow=3, byrow = T), heights=c(5.5,5,6))
+par(mar = c(2.1, 4.1, 4.1, 2.1))
+qqPlot(dat.y$AQI, id=F, grid = F, xlab = "", ylab="年度AQI分位点",
+       main = "2014-2017年度数据", lwd=1)
+qqPlot(dat.m$AQI, id=F, grid = F, xlab = "", ylab="月度AQI分位点",
+       main = "2014-2017月度数据", lwd=1)
+par(mar = c(2.1, 4.1, 2.1, 2.1))
+qqPlot(dat.y$excellent, id=F, grid = F, xlab = "", ylab="年度质量为优天数", lwd=1)
+qqPlot(dat.m$excellent, id=F, grid = F, xlab = "", ylab="月度质量为优天数", lwd=1)
+par(mar = c(5.1, 4.1, 2.1, 2.1))
+qqPlot(dat.y$severe, id=F, grid = F, xlab = "正态分布分位点", ylab="年度严重污染天数", lwd=1)
+qqPlot(dat.m$severe, id=F, grid = F, xlab = "正态分布分位点", ylab="月度严重污染天数", lwd=1)
+
+```
+
+```{r tab-dep-norm, eval=T, results='markup'}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+library(tseries)
+
+norm.test <- list(
+    shapiro.test(dat.y$AQI),
+    shapiro.test(dat.y$excellent),
+    shapiro.test(dat.y$severe),
+
+    shapiro.test(dat.m$AQI),
+    shapiro.test(dat.m$excellent),
+    shapiro.test(dat.m$severe),
+
+    jarque.bera.test(dat.y$AQI),
+    jarque.bera.test(dat.y$excellent),
+    jarque.bera.test(dat.y$severe),
+
+    jarque.bera.test(dat.m$AQI),
+    jarque.bera.test(dat.m$excellent),
+    jarque.bera.test(dat.m$severe)
+)
+
+
+
+temp <- t(sapply(norm.test, function(x) c(x$stat, x$p.v)))
+norm.test <- cbind(temp[1:6, ], temp[7:12, ])
+dimnames(norm.test) <- list(c("年均AQI","年度空气质量为优天数","年度严重污染天数",
+                              "月均AQI","月度空气质量为优天数","月度严重污染天数"),
+                            c("W 统计量","P值", "JB统计量", "P值"))
+
+
+write.csv(norm.test, "./results/aqi.y17.csv", row.names=F)
+
+library("kableExtra")
+knitr::kable(norm.test, row.names =T, align = c("l", rep("r",4)),
+             caption="因变量正态性检验",digits = 3,
+             longtable = TRUE, booktabs = TRUE, linesep  = c("","","\\hline"), escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:5, width = c("4.5cm", "2cm", "2cm", "2cm", "2cm"))
+
+```
+
+```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = " 年度 空气质量为优天数，月度平均AQI对数密度图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+
+library(car)
+
+par(mfrow=c(1,2))
+par(mar = c(1.1, 4.5, 2.1, 1.1))
+
+plot(density(scale(log(dat.y$excellent+3))), main="年度空气质量为优天数对数密度",
+     xlim = c(-4,4), ylim = c(0,0.55), ylab = "", col="red",
+     cex.main = 0.8, cex.lab=0.7)
+lines(seq(-4, 4, 0.01), dnorm(seq(-4, 4, 0.01)), lty=2, col="blue")
+legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), col = c("red", "blue"),
+       bty = 'n', cex = 0.7, pt.cex = 1
+       )
+
+plot(density(scale(log(dat.m$AQI))), main = "月度平均AQI对数密度",
+     xlim = c(-4,4), ylim = c(0,0.55), ylab = "", col = "red",
+     cex.main=0.8, cex.lab=0.7)
+lines(seq(-4, 4, 0.01), dnorm(seq(-4, 4, 0.01)), lty=2, col = "blue")
+legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), col = c("red", "blue"),
+       bty = 'n', cex = 0.7, pt.cex = 1
+       )
+
+```
+
+关注的问题不同对于因变量设置及其分布有很大影响
+
+正态分布，二项分布（两点分布），泊松分布之间的关系。
+
+1. 在满足一定条件情况下，二项分布和泊松分布的极限分布都是正态分布。
+2. 在满足一定条件情况下，二项分布可以近似为泊松分布。
+
+年度： 平均AQI(正态)， 年空气质量为优天数(近似正态)，年严重污染天数(泊松)
+
+月度： 平均AQI(取对数后正态)， 月空气质量为优天数(泊松)， 月是否发生严重污染(处理后两点分布)
+
+
+
+
+
+### 建模思路
+
+普通模型（LM,GLM）
+混合模型(LMM,GLMM)
+可加模型(GAM, GAMM)
+
+#### 基于Lasso的自变量筛选
+
+
+## 空气质量指数（AQI）影响因素分析
+
+相关分析，散点图矩阵
+
+## 空气质量为优的影响因素分析
+
+### 泊松可加混合模型的建立
+
+### 泊松可加混合模型最优模型选择
+
+### 空气质量为优的天数的影响因素分析
 
 ## 空气严重污染的影响因素分析
 
@@ -49,13 +189,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 ### 是否出现严重污染的影响因素分析
 
-## 空气质量为优的影响因素分析
 
-### 泊松可加混合模型的建立
-
-### 泊松可加混合模型最优模型选择
-
-### 空气质量为优的天数的影响因素分析
 
 
 

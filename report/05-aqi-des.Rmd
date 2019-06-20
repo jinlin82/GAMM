@@ -176,21 +176,32 @@ knitr::kable(tab2, row.names =F, align = "l", caption="空气质量指数及其�
 日照时数都会对空气质量产生一定的影响。同时，城市的地形、南北方差异，北方供暖会产生大量
 废气排放，沿海城市因为有海风有利于污染物扩散都会对空气质量产生相应的影响。
 
-根据以上分析，鉴于数据的可获得性，选取比较有代表性的指标，最终确定空气质量印象因素为：
-社会经济因素、气象因素和地理因素。其中社会经济因素表现在经济增长、人口因素、绿化建设、
-交通运输、固定污染源、移动污染源、能源消耗、废气排放、污染治理这些方面。其中，固定资产
-投资、地区生产总值、地区生产总值增长率表示经济增长；常住人口表示人口因素；建成区绿化
-覆盖率表示绿化建设；城市公路客运量表示交通运输；房屋建筑施工面积表示固定污染源；私人
-汽车拥有量表示移动污染源；全社会用电量表示能源消耗；工业二氧化硫排放量、工业烟粉尘排
-放量表示废气排放；废气治理完成投资表示污染治理。最终选定的气象因素包括：最低气温、
-最高气温、降水量、平均气压、平均风速、平均气温、平均相对湿度、日照时数。最终选的地理
-因素有：是否供暖、是否临海、经度、纬度、海拔。具体的指标体系如表\@ref(tab:tab3) 所示。
+根据以上分析，鉴于数据的可获得性，选取比较有代表性的指标，最终确定空气质量影响因
+素一级指标为：社会经济因素、气象因素和地理因素。其中社会经济因素表现在经济增长、
+人口因素、绿化建设、交通运输、固定污染源、移动污染源、能源消耗、废气排放、污染治
+理这些方面。其中，固定资产投资、地区生产总值、地区生产总值增长率表示经济增长；常
+住人口表示人口因素；建成区绿化覆盖率表示绿化建设；城市公路客运量表示交通运输；房
+屋建筑施工面积表示固定污染源；私人汽车拥有量表示移动污染源；全社会用电量表示能源
+消耗；工业二氧化硫排放量、工业烟粉尘排放量表示废气排放；废气治理完成投资表示污染
+治理。社会经济因素最后选定12个指标。最终选定的气象因素包括：最低气温、最高气温、
+降水量、平均气压、平均风速、平均气温、平均相对湿度、日照时数等8个指标。最终选的
+地理因素有：是否供暖、是否临海、经度、纬度、海拔，共5个指标。三个方面影响因素合
+计选择了25个指标，最终的指标体系如表\@ref(tab:tab3) 所示。
 
 ```{r tab3, eval=T,results='markup', cache=F}
+library("kableExtra")
+
 tab3 <- read.csv('./results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
-      longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F)
+             longtable = TRUE, booktabs = TRUE, escape = F,
+             linesep  = c(rep("", 11), "\\hline", rep("",7), "\\hline")) %>%
+			     kable_styling(latex_options = c("scale_down", "repeat_header", "hold_position"),
+                 repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1:4, width = c("3cm", "3cm", "5cm", "2cm"))
+			 
 ```
+
 
 ### 数据来源及预处理
 
@@ -880,7 +891,7 @@ knitr::kable(aqi.select.box, row.names =T, align = "c",
 分布特征进行了分析，根据各城市的经度及纬度，绘制了35个城市2017年年均AQI的空间分布图，
 结果如图 \@ref(fig:fig-city-map) 所示。
 
-```{r fig-city-map, eval=T, fig.height=7, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "35个城市2017年平均AQI空间分布图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-city-map, eval=T, fig.height=7, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = "35个城市2017年平均AQI空间分布图", dev=c("cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light")}
 
 library(ggplot2)
 library(ggrepel)
@@ -999,7 +1010,7 @@ dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
 dat.y$lat <- rep(city$lat_d, each=4)
 dat.y$long <- rep(city$long_d, each=4)
 
-### 全局 Moran's I
+####### 全局 Moran's I
 library(ape)
 source("./codes/geodistance.R")
 df.cities <- city[,c(1, 5, 6)]
@@ -1063,7 +1074,7 @@ dat.y$city <- factor(as.character(dat.y$city), levels=dat.y$city[(0:34)*4+1])
 dat.y$lat <- rep(city$lat_d, each=4)
 dat.y$long <- rep(city$long_d, each=4)
 
-### correlogram
+####### correlogram
 library(ncf)
 
 par(mfrow = c(2,2))
@@ -1196,20 +1207,6 @@ aqi.lisa.y <- cbind(city$city, do.call(cbind.data.frame, aqi.lisa.y))
 names(aqi.lisa.y) <- c("城市", "2014指数","P值","2015指数","P值","2016指数","P值", "2017指数","P值")
 
 write.csv(aqi.lisa.y, "./results/aqi.lisa.y.csv", row.names=T)
-
-library("kableExtra")
-## knitr::kable(aqi.lisa.y, row.names =F, align = "c",
-##              digits=3,
-##              caption="2014-2017年 35城市局部Moran's I",
-##              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
-##     kable_styling(full_width = T) %>%
-##     column_spec(1, width = c("2cm"))%>%
-##         kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-##                   stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-##                   repeat_header_text = "(续)")%>%
-##     footnote(general ="通过局部Moran's I定义计算得到",
-##              general_title = "数据来源：",
-##              threeparttable = T)
 
 library("kableExtra")
 knitr::kable(aqi.lisa.y, row.names =F, align = "c", caption="2014-2017年 35城市局部Moran's I",
