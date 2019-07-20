@@ -37,7 +37,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-## 因变量定义及自变量筛选
+## 因变量定义及自变量筛选方法
 
 
 因变量定义不同，影响因素可能是不一样的； 建模原则，从简单到复杂
@@ -102,14 +102,14 @@ dimnames(norm.test) <- list(c("年均AQI","年度空气质量为优天数","年�
 write.csv(norm.test, "./results/aqi.y17.csv", row.names=F)
 
 library("kableExtra")
-knitr::kable(norm.test, row.names =T, align = c("l", rep("r",4)),
+knitr::kable(norm.test, row.names =T, align = c(rep("r",4)),
              caption="因变量正态性检验",digits = 3,
              longtable = TRUE, booktabs = TRUE, linesep  = c("","","\\hline"), escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1:5, width = c("4.5cm", "2cm", "2cm", "2cm", "2cm"))
+    column_spec(1, width = c("4.5cm"))
 
 ```
 
@@ -163,22 +163,685 @@ legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), 
 
 ## 空气质量指数（AQI）影响因素分析
 
-相关分析，散点图矩阵
+### 相关分析
 
-```{r fig-aqi-cor, eval=T, fig.height=2.5,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = " 年度空气质量为优天数，月度平均AQI对数密度图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+24个连续自变量与AQI的散点图
+
+2个分类自变量与AQI的箱线图
+
+24个连续自变量与AQI的皮尔逊相关系数
+
+24个连续自变量之间，特别是同类影响因素之间（例子）也存在高度线性关系，即存在多重共线性现象
+
+以上都是初步方法，使用Lasso方法进行更严格变量筛选
+
+主要是年度结果，月度数据散点图和相关系数没有给出，直接使用Lasso回归
+
+```{r fig-aqi-cor, eval=T, fig.height=9, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = " 24个自变量与年均AQI散点图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 dat.y <- read.csv("./data/yearly.csv")
 dat.m <- read.csv("./data/monthly.csv")
+varlist <- read.csv("./data/var_list.csv")
 
-names(dat.y)
-names(dat.m)
+indvar <- names(dat.y)[c(17:38)]
 
-pairs(dat.y[, c(3, 32:39)])
+varinfo <- varlist[match(indvar, as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
 
+dat.scat <- dat.y[, as.character(varinfo[,3])]
+
+par(mfrow = c(6, 4), mar = c(2.1, 1.1, 2.1, 1.1))
+mapply(function(x,i) {plot(dat.y$AQI~x, main = i, cex.main = 1,
+                           yaxt='n', pch = 20, ylim = c(40,200))
+    legend("topright", legend = as.character(round(cor(dat.y$AQI,x),3)),
+           bty="n", text.font=4, text.col="blue")
+    lines(lowess(x, dat.y$AQI), col = "red", f=0.9)
+},
+dat.scat, varinfo[,2])
 
 ```
 
 
+
+```{r fig-aqi-boxplot, eval=T, fig.height=3.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "是否供暖和是否临海年均AQI箱线图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+varlist <- read.csv("./data/var_list.csv")
+
+indvar <- names(dat.y)[41:42]
+
+varinfo <- varlist[match(indvar, as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.box <- dat.y[, as.character(varinfo[,3])]
+dat.box$heating <- factor(dat.box$heating)
+levels(dat.box$heating) <- c("无集中供暖", "集中供暖")
+dat.box$coast <- factor(dat.box$coast)
+levels(dat.box$coast) <- c("非临海", "临海")
+
+
+par(mfrow = c(1, 2), mar = c(3.1, 3.1, 2.1, 1.1))
+boxplot(dat.y$AQI~dat.box$heating)
+boxplot(dat.y$AQI~dat.box$coast, yaxt="n")
+
+```
+
+```{r, eval=F}
+####### 年度散点图
+pairs(dat.y[, c(3, 28:29)])
+pairs(dat.y[, c(3, 24:27)])
+pairs(dat.y[, c(3, 22:23)])
+pairs(dat.y[, c(3, 17:21)])
+
+pairs(dat.y[, c(3, 32:39)])
+pairs(dat.y[, c(3, 30:32)])
+
+boxplot(dat.y$AQI~dat.y$coast)
+boxplot(dat.y$AQI~dat.y$heating)
+
+cor(dat.y[, c(3, 28:29)])
+cor(dat.y[, c(3, 24:27)])
+cor(dat.y[, c(3, 22:23)])
+cor(dat.y[, c(3, 17:21)])
+
+cor(dat.y[, c(3, 32:39)])
+cor(dat.y[, c(3, 30:32)])
+
+####### 月度散点图
+pairs(dat.m[, c(4, 31:32)])
+pairs(dat.m[, c(4, 27:30)])
+pairs(dat.m[, c(4, 25:28)])
+pairs(dat.m[, c(4, 20:23)])
+
+
+pairs(dat.m[, c(4, 36:43)])
+pairs(dat.m[, c(4, 33:35)])
+
+boxplot(dat.m$AQI~dat.m$coast)
+boxplot(dat.m$AQI~dat.m$heating)
+
+cor(dat.m[, c(4, 31:32)])
+cor(dat.m[, c(4, 27:30)])
+cor(dat.m[, c(4, 25:28)])
+cor(dat.m[, c(4, 20:23)])
+
+
+cor(dat.m[, c(4, 36:43)])
+cor(dat.m[, c(4, 33:35)])
+
+```
+
+### 基于Lasso方法的变量筛选
+
+
+```{r eval=T}
+rm(list=ls())
+dat.y <- read.csv("./data/yearly.csv")
+dat.m <- read.csv("./data/monthly.csv")
+varlist <- read.csv("./data/var_list.csv")
+
+####### 年度数据
+indvar <- names(dat.y)[c(1:3, 17:38, 41:42)]
+
+varinfo <- varlist[match(indvar, as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y <- dat.y[, as.character(varinfo[,3])]
+
+
+####### 经纬度转换
+dat.sel.y$lat <- paste(substr(dat.sel.y$lat,1,2), substr(dat.sel.y$lat,3,4))
+dat.sel.y$long <- paste(substr(dat.sel.y$long, 1, nchar(dat.sel.y$long)-2),
+                   substr(dat.sel.y$long, nchar(dat.sel.y$long)-1, nchar(dat.sel.y$long)))
+
+dat.sel.y$lat = as.numeric(measurements::conv_unit(dat.sel.y$lat,
+                                   from = 'deg_dec_min', to = 'dec_deg'))
+dat.sel.y$long = as.numeric(measurements::conv_unit(dat.sel.y$long,
+                                                    from = 'deg_dec_min', to = 'dec_deg'))
+dat.sel.y$height <- dat.sel.y$height/10
+
+####### 设置水平值
+## levels(dat.sel.y$heating) <- c("无集中供暖", "集中供暖")
+## levels(dat.sel.y$coast) <- c("非临海", "临海")
+
+
+####### 数据标准化
+## dat.sel.y[,-c(23, 24)] <- scale(dat.sel.y[,-c(23,24)])
+
+write.csv(dat.sel.y, "./results/dat.sel.y.csv", row.names=F)
+
+####### 月度数据
+indvar <- names(dat.m)[c(1:4, 20:41, 44:45)]
+
+varinfo <- varlist[match(indvar, as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.m <- dat.m[, as.character(varinfo[,3])]
+
+
+####### 经纬度转换
+dat.sel.m$lat <- paste(substr(dat.sel.m$lat,1,2), substr(dat.sel.m$lat,3,4))
+dat.sel.m$long <- paste(substr(dat.sel.m$long, 1, nchar(dat.sel.m$long)-2),
+                   substr(dat.sel.m$long, nchar(dat.sel.m$long)-1, nchar(dat.sel.m$long)))
+
+dat.sel.m$lat = as.numeric(measurements::conv_unit(dat.sel.m$lat,
+                                   from = 'deg_dec_min', to = 'dec_deg'))
+dat.sel.m$long = as.numeric(measurements::conv_unit(dat.sel.m$long,
+                                                    from = 'deg_dec_min', to = 'dec_deg'))
+dat.sel.m$height <- dat.sel.m$height/10
+
+####### 设置水平值
+## levels(dat.sel.m$heating) <- c("无集中供暖", "集中供暖")
+## levels(dat.sel.m$coast) <- c("非临海", "临海")
+
+
+####### 数据标准化
+## dat.sel.m[,-c(23, 24)] <- scale(dat.sel.m[,-c(23,24)])
+
+write.csv(dat.sel.m, "./results/dat.sel.m.csv", row.names=F)
+
+```
+
+gamsel原理，最佳lambda值确定，使用交叉验证，因变量已标准化
+
+```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.y[,-c(1:3, 23:24)]), as.matrix(dat.sel.y[,3]))
+## summary(gam1)
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.y[,-c(1:3, 23:24)]),
+         index=22, which = i, main = y, cex.main = 0.95, ylim = c(-5, 5))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:3, 23:24)]))
+
+```
+
+
+```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.m <- read.csv("./results/dat.sel.m.csv")
+
+varinfo <- varlist[match(names(dat.sel.m), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.m$city <- factor(dat.sel.m$city)
+dat.sel.m$year <- factor(dat.sel.m$year)
+dat.sel.m$month <- factor(dat.sel.m$month)
+dat.sel.m$heating <- factor(dat.sel.m$heating)
+dat.sel.m$coast <- factor(dat.sel.m$coast)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.m[,-c(1:4, 24:25)]), as.matrix(log(dat.sel.m[,4])))
+## summary(gam1)
+
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+## plot(gam1,newx=as.matrix(dat.sel.m[,-c(1, 23:24)]), index=22)
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.m[,-c(1:4, 24:25)]),
+         index=22, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:4, 24:25)]))
+
+```
+
+### 年均AQI模型建立与最优模型确定
+使用Lasso方法得到的参数估计值有偏，对Lasso变量选择结果重新估计相应模型。
+
+空间相关处理：加入空间自变量（纬度，经度变量）是否可以解决空间相关，通过对残差进
+行空间相关检验
+
+时间相关处理：年度数据共4个时间点，不考虑时间相关
+
+#### 线性回归模型
+作为比较基准，我们仍然首先建立基本线性回归模型。
+
+```{r tab-lm-y, eval=T, results='markup'}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+lm.y <- lm(dat.sel.y[, c("AQI", varsel)])
+lm.y.coef <- summary(lm.y)$coef
+
+
+dimnames(lm.y.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.y.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+残差空间自相关检验结果，其他模型有类似结果
+
+```{r tab-lm-y-res-spatial, eval=T, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.lm <- tapply(resid(lm.y), as.factor(dat.sel.y$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+调整的 $R^{2}$ 为 `r round(summary(lm.y)$adj.r,3)`, AIC 为`r round(AIC(lm.y),3)`， BIC 为`r round(BIC(lm.y), 3)`
+
+
+#### 线性混合效应模型
+
+```{r tab-lme-y, eval=T, results='markup'}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+library(mgcv)
+lme.y <- gamm(AQI~invest+car+gas_control+mean_temp+rain+humid+wind_speed+pressure+coast+heating+lat,
+              random=list(city=~1), data=dat.sel.y, method = "REML")
+
+lme.y.coef <- summary(lme.y$lme)$tTable[,-3]
+
+dimnames(lme.y.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.y.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+随机截距项的标准差为 `r round(getVarCov(lme.y$lme)[1,1]^0.5, 3)`, AIC 为`r round(AIC(lme.y$lme),3)`， BIC 为`r round(BIC(lme.y$lme), 3)`
+
+#### 半参数回归模型
+
+```{r tab-gam-y, eval=T, results='markup'}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+library(mgcv)
+gam.y <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+coast+heating+lat,
+             data=dat.sel.y, method = "REML")
+
+gam.y.coef <- summary(gam.y)$p.table
+
+dimnames(gam.y.coef) <- list(c("截距项", varselname[-c(1,2,4)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,3))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="AQI",xlab = "废气治理投资"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "汽车拥有量"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "平均气温"
+         )
+
+```
+
+```{r tab-gam-y-smooth, eval=T, results='markup'}
+gam.smooth.tab.y <- summary(gam.y)$s.table[,-2]
+
+dimnames(gam.smooth.tab.y) <- list(varselname[c(1,2,4)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+AIC 为`r round(AIC(gam.y),3)`， BIC 为`r round(BIC(gam.y), 3)`
+
+#### 半参数混合效应模型
+
+```{r tab-gamm-y, eval=T, results='markup'}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+library(mgcv)
+gamm.y <- gamm(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+coast+heating+lat,
+               random=list(city=~1), data=dat.sel.y, method = "REML")
+
+gamm.y.coef <- summary(gamm.y$lme)$tTable[-(10:12),-3]
+
+dimnames(gamm.y.coef) <- list(c("截距项", varselname[-c(1,2,4)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.y.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-gamm-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,3))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="AQI",xlab = "废气治理投资"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gamm.y$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "汽车拥有量"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gamm.y$gam,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "平均气温"
+         )
+
+```
+
+```{r tab-gamm-y-smooth, eval=T, results='markup'}
+gamm.smooth.tab.y <- summary(gamm.y$gam)$s.table[,-2]
+
+dimnames(gamm.smooth.tab.y) <- list(varselname[c(1,2,4)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+随机截距项的标准差为 , AIC 为`r round(AIC(gamm.y$lme),3)`， BIC 为`r round(BIC(gamm.y$lme), 3)`
+
+
+#### 模型比较与选择
+
+综合考虑：
+
+1. AIC，BIC
+2. 模型参数显著性
+3. 参数的实际意义
+
+把gam选择为最优模型，部分自变量仍不显著，删除之重新建模
+
+最后的模型为：
+
+```{r tab-gam-y-best, eval=T, results='markup'}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+
+varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y$city <- factor(dat.sel.y$city)
+dat.sel.y$year <- factor(dat.sel.y$year)
+dat.sel.y$heating <- factor(dat.sel.y$heating)
+dat.sel.y$coast <- factor(dat.sel.y$coast)
+
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+library(mgcv)
+gam.y.best <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+wind_speed+coast+heating+lat,
+                  data=dat.sel.y, method = "REML")
+
+
+gam.y.best.coef <- summary(gam.y.best)$p.table
+
+dimnames(gam.y.best.coef) <- list(c("截距项", varselname[c(3,7,9:11)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,3))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="AQI",xlab = "废气治理投资"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "汽车拥有量"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y.best,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "平均气温"
+         )
+
+```
+
+```{r tab-gam-y-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.y <- summary(gam.y.best)$s.table[,-2]
+
+dimnames(gam.smooth.tab.y) <- list(varselname[c(1,2,4)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r tab-gam-y-res-spatial, eval=T, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.gam.best <- tapply(resid(gam.y.best), as.factor(dat.sel.y$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.gam.best <- sapply(moran.g.gam.best, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.gam.best) <- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
+             caption="最优模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+AIC 为`r round(AIC(gam.y.best),3)`， BIC 为`r round(BIC(gam.y.best), 3)`
+
+
+### 月均AQI模型建立与最优模型确定
+
+#### 线性回归模型
+作为比较基准，我们仍然建立基本线性回归模型。
+
+#### 线性混合效应模型
+
+#### 半参数回归模型
+
+#### 半参数混合效应模型
+
+#### 模型比较与选择
+
+
+### 模型结果解释
 
 ## 空气质量为优的影响因素分析
 

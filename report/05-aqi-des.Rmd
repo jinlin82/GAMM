@@ -414,15 +414,14 @@ knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
 
 #### 气象因素变量描述性分析
 
-与此同时，为了观察各城市气象因素的总体概况，进而对各城市的平均气温、最低气温、最高
-气温、降水量、平均相对湿度、平均风速、平均气压及日照时数进行描述性分析，同样计算各
+与此同时，为了观察各城市气象因素的总体概况，进而对各城市的平均气温、降水量、平均相对湿度、平均风速、平均气压及日照时数进行描述性分析，同样计算各
 指标的均值、最小值、最大值及相应的标准差。计算结果如表 \@ref(tab:tab-wea) 所示。
 
 ```{r tab-wea, eval=T, results='markup'}
 
 varlist <- read.csv("./data/var_list.csv")
 dat.y <- read.csv("./data/yearly.csv")
-weavar <- names(dat.y)[c(1, 33:40)]
+weavar <- names(dat.y)[c(1, 33:38)]
 wea.y17 <- dat.y[dat.y$year==2017, weavar]
 
 varinfo <- varlist[match(weavar[-1], as.character(varlist$var_code)), c(1,2,7)]
@@ -452,9 +451,7 @@ knitr::kable(wea.stat, row.names =F, align = c("l","l",rep("r", 4)),
 ```
 
 根据表 \@ref(tab:tab-wea) 可以发现，2017年35个城市中平均气温最小的是哈尔滨，为
-5.13℃，最大的是海口，为24.63℃，相应的最低气温的最小值和最大值也分别是哈尔滨和
-海口，取值分别为-27.7℃和11.1℃。最高气温的最小值是29.7℃，为昆明的最高气温，最
-大值是42℃，为重庆的最高气温。2017年35所城市年均降水量973.74毫米，其中最小的是
+5.13℃，最大的是海口，为24.63℃。2017年35所城市年均降水量973.74毫米，其中最小的是
 银川，降水量为211.3毫米，最大的是广州，降水量为2067.4毫米，且由标准差也可以看出，
 各城市间2017年降水量差异很大。平均相对湿度最小的是呼和浩特，为44%，最大的是海口，
 为82.17%。平均风速和平均气压最小的都是西宁，分别为1.05米/秒、771.49百帕，两者
@@ -1023,7 +1020,7 @@ city.dists.inv <- 1/city.dist.km
 diag(city.dists.inv) <- 0
 
 
-moran.g <- by(dat.y[,c(3, 29:30)], as.factor(dat.y$year), 
+moran.g <- by(dat.y[,c(3, 30:31)], as.factor(dat.y$year), 
               function(x) Moran.I(x$AQI, city.dists.inv)
 )
 
