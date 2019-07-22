@@ -433,7 +433,7 @@ dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.y[,-c(1:3, 23:24)]), as.matrix(dat.sel.y[,3]))
+gam1 <- gamsel(as.matrix(dat.sel.y[,-c(1:3, 23:24)]), as.matrix(dat.sel.y[,3]), gamma = 0.4)
 ## summary(gam1)
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
@@ -461,9 +461,7 @@ dat.sel.m$heating <- factor(dat.sel.m$heating)
 dat.sel.m$coast <- factor(dat.sel.m$coast)
 
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.m[,-c(1:4, 24:25)]), as.matrix(log(dat.sel.m[,4])))
-## summary(gam1)
-
+gam1 <- gamsel(as.matrix(dat.sel.m[,-c(1:4, 24:25)]), as.matrix(log(dat.sel.m[,4])), gamma = 0.4)
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m[,-c(1, 23:24)]), index=22)
@@ -471,7 +469,7 @@ mapply(function(i, y) {
     plot(gam1,newx=as.matrix(dat.sel.m[,-c(1:4, 24:25)]),
          index=22, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
     as.list(1:22),
-    as.list(varinfo[,2][-c(1:4, 24:25)]))
+    as.list(varinfo[,2][-c(1:4, 19:20)]))
 
 ```
 
@@ -499,7 +497,7 @@ dat.sel.y$year <- factor(dat.sel.y$year)
 dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
-varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "heating", "coast", "lat")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
@@ -571,12 +569,12 @@ dat.sel.y$year <- factor(dat.sel.y$year)
 dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
-varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "heating", "coast", "lat")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-lme.y <- gamm(AQI~invest+car+gas_control+mean_temp+rain+humid+wind_speed+pressure+coast+heating+lat,
+lme.y <- gamm(AQI~invest+car+gas_control+mean_temp+rain+humid+wind_speed+pressure+heating+coast+lat,
               random=list(city=~1), data=dat.sel.y, method = "REML")
 
 lme.y.coef <- summary(lme.y$lme)$tTable[,-3]
@@ -612,12 +610,12 @@ dat.sel.y$year <- factor(dat.sel.y$year)
 dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
-varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "heating", "coast", "lat")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gam.y <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+coast+heating+lat,
+gam.y <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+heating+coast+lat,
              data=dat.sel.y, method = "REML")
 
 gam.y.coef <- summary(gam.y)$p.table
@@ -644,7 +642,7 @@ plot.gam(gam.y,
          col="blue",
          shade=T,
          shade.col="grey",
-         ylab="AQI",xlab = "废气治理投资"
+         ylab="AQI",xlab = "固定资产投资额"
          )
 par(mar=c(5,3,2,1))
 plot.gam(gam.y,
@@ -699,12 +697,12 @@ dat.sel.y$year <- factor(dat.sel.y$year)
 dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
-varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "heating", "coast", "lat")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gamm.y <- gamm(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+coast+heating+lat,
+gamm.y <- gamm(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+heating+coast+lat,
                random=list(city=~1), data=dat.sel.y, method = "REML")
 
 gamm.y.coef <- summary(gamm.y$lme)$tTable[-(10:12),-3]
@@ -731,7 +729,7 @@ plot.gam(gamm.y$gam,
          col="blue",
          shade=T,
          shade.col="grey",
-         ylab="AQI",xlab = "废气治理投资"
+         ylab="AQI",xlab = "固定资产投资额"
          )
 par(mar=c(5,3,2,1))
 plot.gam(gamm.y$gam,
@@ -798,12 +796,12 @@ dat.sel.y$year <- factor(dat.sel.y$year)
 dat.sel.y$heating <- factor(dat.sel.y$heating)
 dat.sel.y$coast <- factor(dat.sel.y$coast)
 
-varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "coast", "heating", "lat")
+varsel <- c("invest", "car", "gas_control", "mean_temp", "rain", "humid", "wind_speed", "pressure", "heating", "coast", "lat")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gam.y.best <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+wind_speed+coast+heating+lat,
+gam.y.best <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+wind_speed+heating+coast+lat,
                   data=dat.sel.y, method = "REML")
 
 
