@@ -68,8 +68,8 @@ diag(city.dists.inv) <- 0
 
 
 moran.g.lm <- tapply(resid(lm.y), as.factor(dat.sel.y$year), 
-              function(x) Moran.I(x, city.dists.inv)
-)
+                     function(x) Moran.I(x, city.dists.inv)
+                     )
 
 moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
 dimnames(moran.g.lm)[[1]] <- c("Moran's I", "P值")
@@ -82,7 +82,7 @@ gam.y <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_sp
              data=dat.sel.y, method = "REML")
 
 gam.y.1 <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+wind_speed+coast+heating+lat,
-             data=dat.sel.y, method = "REML")
+               data=dat.sel.y, method = "REML")
 
 summary(gam.y.1)
 plot(gam.y)
@@ -119,8 +119,8 @@ AIC(gam.y)
 BIC(gam.y)
 
 moran.g.gam <- tapply(resid(gam.y.best), as.factor(dat.sel.y$year), 
-              function(x) Moran.I(x, city.dists.inv)
-)
+                      function(x) Moran.I(x, city.dists.inv)
+                      )
 
 moran.g.gam <- sapply(moran.g.gam, function(x) c(x$observed, x$p.v))
 dimnames(moran.g.gam)[[1]] <- c("Moran's I", "P值")
@@ -136,8 +136,8 @@ BIC(lme.y$lme)
 ranef(lme.y$lme)
 
 moran.g.lme <- tapply(resid(lme.y$lme), as.factor(dat.sel.y$year), 
-              function(x) Moran.I(x, city.dists.inv)
-)
+                      function(x) Moran.I(x, city.dists.inv)
+                      )
 
 moran.g.lme <- sapply(moran.g.lme, function(x) c(x$observed, x$p.v))
 dimnames(moran.g.lme)[[1]] <- c("Moran's I", "P值")
@@ -157,8 +157,8 @@ ranef(gamm.y$lme)
 
 
 moran.g.gamm <- tapply(resid(gamm.y$lme), as.factor(dat.sel.y$year), 
-              function(x) Moran.I(x, city.dists.inv)
-)
+                       function(x) Moran.I(x, city.dists.inv)
+                       )
 
 moran.g.gamm <- sapply(moran.g.gamm, function(x) c(x$observed, x$p.v))
 dimnames(moran.g.gamm)[[1]] <- c("Moran's I", "P值")
@@ -171,8 +171,8 @@ library(lmerTest)
 
 lmm <- lmer(AQI~
                 ## gdp        
-            ## +gdp_rate   
-            +invest     
+                ## +gdp_rate   
+                +invest     
             ## +pop        
             ## +green      
             ## +passenger  
@@ -215,14 +215,14 @@ coef(fm, s=2)
 
 
 s <- cv.glmnet(as.matrix(dat.sel.y[,-c(1)]),
-          as.matrix(dat.sel.y[,1]))$lambda.1se
+               as.matrix(dat.sel.y[,1]))$lambda.1se
 s
 coef(fm, s)
 
 lm0 <- lm(AQI~
               ## gdp        
-          ## +gdp_rate   
-          +invest     
+              ## +gdp_rate   
+              +invest     
           ## +pop        
           ## +green      
           ## +passenger  
@@ -248,7 +248,7 @@ lm0 <- lm(AQI~
           ## +height
           ## +(1|dat.y$city)
     ,     
-          data=dat.sel.y)
+      data=dat.sel.y)
 
 summary(lm0)
 
@@ -260,33 +260,33 @@ library(glmmLasso)
 dat.sel.y$city <- dat.y$city
 
 lmm1 <- glmmLasso(AQI~ gdp        
-            +gdp_rate   
-            +invest     
-            +pop        
-            +green      
-            +passenger  
-            +con_area   
-            +car        
-            +power      
-            +ind_SO2    
-            +ind_smoke  
-            +ind_control
-            +gas_control
-            +mean_temp  
-            +low_temp   
-            +high_temp  
-            +rain       
-            +humid      
-            +wind_speed 
-            +pressure   
-            +sun        
-            +heating
-            +coast
-            +long       
-            +lat        
-            +height,
-            rnd = list(city=~1),
-            lambda = 1180,     
-            data=dat.sel.y, final.re = T)
+                  +gdp_rate   
+                  +invest     
+                  +pop        
+                  +green      
+                  +passenger  
+                  +con_area   
+                  +car        
+                  +power      
+                  +ind_SO2    
+                  +ind_smoke  
+                  +ind_control
+                  +gas_control
+                  +mean_temp  
+                  +low_temp   
+                  +high_temp  
+                  +rain       
+                  +humid      
+                  +wind_speed 
+                  +pressure   
+                  +sun        
+                  +heating
+                  +coast
+                  +long       
+                  +lat        
+                  +height,
+                  rnd = list(city=~1),
+                  lambda = 1180,     
+                  data=dat.sel.y, final.re = T)
 
 summary(lmm1)
