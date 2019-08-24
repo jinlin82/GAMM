@@ -83,18 +83,19 @@ gam.y.severe <- gam(severe~s(green)+s(pop)+car
                    data=dat.sel.y.severe,
                    family = "poisson", method = "REML")
 
-gam.y.severe <- gam(severe~s(pop)
-                    +rain+humid+wind_speed+sun
+gam.y.severe.best <- gam(severe~s(pop)
+                    +rain+wind_speed+s(sun)
                    +heating+coast+lat,
                    data=dat.sel.y.severe,
                    family = "poisson", method = "REML")
 
-gam.y.severe.best <- gam(severe~con_area+gas_control+wind_speed
-                   +heating+coast+s(lat),
-                   data=dat.sel.y.severe, method = "REML")
 
 summary(gam.y.severe)
 AIC(gam.y.severe)
+
+summary(gam.y.severe.best)
+AIC(gam.y.severe.best)
+
 plot(gam.y.severe)
 
 par(mfrow = c(1,3))
@@ -159,6 +160,12 @@ dimnames(moran.g.lme)[[1]] <- c("Moran's I", "P值")
 ####### gamm
 gamm.y.severe <- gamm(severe~s(green)+s(pop)+car
                     +rain+humid+s(wind_speed)+s(sun)
+                   +lat,
+                   random=list(city=~1), data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+gamm.y.severe <- gamm(severe~+s(pop)
+                    +rain+humid+wind_speed+sun
                    +lat,
                    random=list(city=~1), data=dat.sel.y.severe,
                    family = "poisson", method = "REML")

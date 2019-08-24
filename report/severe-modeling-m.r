@@ -25,20 +25,20 @@ dat.sel.m.severe$severe[dat.sel.m.severe$severe>0] <- 1
 
 ####### gamsel #######################################################################
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.39, family = "binomial", num_lambda = 50)
+gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.48, family = "binomial", num_lambda = 50)
 gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1, 23:24)]), index=22)
 mapply(function(i, y) {
     plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]),
-         index=44, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+         index=37, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
     as.list(1:22),
     as.list(varinfo[,2][-c(1:4, 24:25)]))
 
+gam1
 
-
-varsel <- as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 44, "nonzero")[[1]]])
+varsel <- as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 36, "nonzero")[[1]]])
 
 ####################################### MODEL #########################################
 ####### 线性模型
@@ -80,9 +80,9 @@ dat.sel.m.severe$severe <- as.factor(dat.sel.m.severe$severe)
 levels(dat.sel.m.severe$severe) <- c("正常", "严重污染")
 
 ####### glm
-glm.m.severe <- glm(severe~pop+car
+glm.m.severe <- glm(severe~pop+car+gas_control
                    +mean_temp+rain+humid+wind_speed+pressure+sun
-                   +lat,
+                   +heating+coast+lat,
                    data=dat.sel.m.severe,
                    family = binomial)
 summary(glm.m.severe)
@@ -91,13 +91,24 @@ AIC(glm.m.severe)
 ####### gam
 library(mgcv)
 
-gam.m.severe <- gam(severe~s(pop)
+gam.m.severe <- gam(severe~s(pop)+car+gas_control
                    +s(mean_temp)+rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial, method = "REML")
+
+gam.m.severe.best <- gam(severe~s(pop)
+                   +s(mean_temp)+rain+humid+wind_speed
                    +lat,
                    data=dat.sel.m.severe,
                    family = binomial, method = "REML")
 
 summary(gam.m.severe)
+AIC(gam.m.severe)
+
+summary(gam.m.severe.best)
+AIC(gam.m.severe)
+
 plot(gam.m.severe)
 
 par(mfrow = c(1,3))
@@ -140,9 +151,9 @@ dimnames(moran.g.gam)[[1]] <- c("Moran's I", "P值")
 
 ####### lme
 
-lme.m.severe <- gamm(severe~pop+car
+lme.m.severe <- gamm(severe~pop+car+gas_control
                    +mean_temp+rain+humid+wind_speed+pressure+sun
-                   +lat,
+                   +heating+coast+lat,
                    data=dat.sel.m.severe,
                    family = binomial, 
                    random=list(city=~1), method = "REML")
@@ -163,11 +174,20 @@ dimnames(moran.g.lme)[[1]] <- c("Moran's I", "P值")
 ####### gamm
 gamm.m.severe <- gamm(severe~s(pop)+car
                    +mean_temp+rain+humid+wind_speed+pressure+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial, 
+                     random=list(city=~1),
+                   method = "REML")
+
+gamm.m.severe <- gamm(severe~s(pop)
+                   +s(mean_temp)+rain+humid+wind_speed+sun
                    +lat,
                    data=dat.sel.m.severe,
                    family = binomial, 
                      random=list(city=~1),
-                     method = "REML")
+                   method = "REML"
+                   )
 
 summary(gamm.m.severe$lme)
 summary(gamm.m.severe$gam)

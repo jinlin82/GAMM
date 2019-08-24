@@ -1472,15 +1472,14 @@ knitr::kable(gam.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 
 
 
-### 模型结果解释
 
 ## 空气质量为优的天数影响因素分析
 
 ### 年度数据分析
 
-#### 变量筛选
+#### 自变量筛选
 
-```{r fig-var-sel-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.y.excel <- read.csv("./results/dat.sel.y.excel.csv")
@@ -1498,7 +1497,7 @@ dat.sel.y.excel$excellent <- log(dat.sel.y.excel$excellent)
 
 library(gamsel)
 gam1 <- gamsel(as.matrix(dat.sel.y.excel[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.excel[,3]), gamma = 0.4)
-## gam1
+######## gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 mapply(function(i, y) {
@@ -1511,17 +1510,419 @@ mapply(function(i, y) {
 
 解释 55.49%
 
-#### 线性模型
 
-#### 线性混合模型
+#### 线性回归模型
+
+作为比较的基准，首先建立线性回归模型，结果如表 \@ref(tab:tab-excel-lm-y) 所示。由
+表 \@ref(tab:tab-excel-lm-y) 可知，在筛选出的变量中，废气治理完成投资额、平均风速、
+供暖、临海、纬度这五个变量在10%的显著性水平下通过显著性检验，且其系数分别为
+1.1121、-9.2522、14.9104、-16.8303、1.8383，说明废气治理完成投资额、供暖、
+纬度对年均空气质量为优天数呈正向影响，而平均风速、临海对年均空气质量为优天数呈负向影响。也就是说，在
+其他变量保持不变的条件下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖地区年均
+空气质量为优天数大14.9104，而临海地区比不临海地区年均空气质量为优天数小16.8303；纬度越高的地方，年均
+空气质量为优天数越大，空气质量越差。但根据我们的认知，废气治理完成投资额越多，空气质量
+应该越好。在这里，我们可以做出如下解释，目前废气治理完成投资额不足，当空气
+污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一定时间
+内，废气污染治理完成投资额越多，空气污染越严重。
+
+```{r tab-excel-lm-y, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 21, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+lm.y.excel <- lm(dat.sel.y.excel[, c("excellent", varsel)])
+lm.y.excel.coef <- summary(lm.y.excel)$coef
+
+
+dimnames(lm.y.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数存在空间自相关。
+因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，时间相对较短，
+因此不考虑时间相关。残差空间自相关检验结果如表 \@ref(tab:tab-excel-lm-y-res-spatial) 所示。
+由表 \@ref(tab:tab-excel-lm-y-res-spatial) 可知，在5%的显著性水平下，各年的莫兰指数均未
+通过显著性检验，说明残差不存在空间自相关。
+
+```{r tab-excel-lm-y-res-spatial, eval=T, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.lm <- tapply(resid(lm.y.excel), as.factor(dat.sel.y.excel$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+#### 线性混合效应模型
+
+之后将城市作为随机效应建立线性混合模型，对空气质量影响因素进行分析。拟合结果如
+表 \@ref(tab:tab-excel-lme-y) 所示。由表 \@ref(tab:tab-excel-lme-y) 可以看出，在10%的显著性
+水平下，私人汽车拥有量、废气治理完成投资额、降水量、平均风速、平均气压、是否临海
+通过显著性检验，且其系数分别为-0.0371、0.5005、-0.0056、-11.6601、0.1529、-15.8228。
+表明在其他变量保持不变的条件下，私人汽车拥有量越多，年均空气质量为优天数越小，空气质量越好；
+废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；降水量越多，年均空气质量为优天数越小，空气
+质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；平均气压越大，年均空气质量为优天数越大，
+空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小15.8228。同样，在线性
+混合模型中，废气治理完成投资额与年均空气质量为优天数之间关系的符号仍然是正的，与线性回归模型
+结论一致，可以做出类似的解释。同时，城市作为随机效应，其截距项的标准差为11.328，
+说明不同城市其年均空气质量为优天数存在一定的差异。且其残差项也不存在空间自相关。
+
+```{r tab-excel-lme-y, eval=T, results='markup'}
+
+library(mgcv)
+lme.y.excel <- gamm(excellent~gdp+power+gas_control
+                   +rain+humid+wind_speed
+                   +heating+coast+lat,
+              random=list(city=~1), data=dat.sel.y.excel, method = "REML")
+
+lme.y.excel.coef <- summary(lme.y.excel$lme)$tTable[,-3]
+
+dimnames(lme.y.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
 
 #### 半参数回归模型
 
-#### 半参数混合模型
+由之前变量筛选的结果可知，固定资产投资额、平均气温与年均空气质量为优天数之间存在非线性相关
+关系。进一步建立半参数回归模型，结果如表 \@ref(tab:tab-excel-gam-y) 所示。由
+表 \@ref(tab:tab-excel-gam-y) 可知，在10%的显著性水平下，废气治理完成投资额、平均风速、
+是否供暖、是否临海、纬度对年均空气质量为优天数存在显著影响，其系数分别为0.5149、-11.0720、
+13.6271、-11.9634、1.6734。表明在其他变量保持不变的条件下，废气污染治理完成投资
+额越多，年均空气质量为优天数越大，空气质量越差；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均来讲，供暖地区比不供暖地区的年均空气质量为优天数大13.6271，而临海地区比不临海地区的
+年均空气质量为优天数少11.9634；纬度越高的地方年均空气质量为优天数越大，其空气质量越差。且图 \@ref(fig:fig-excel-gam-y) 中
+显示了固定资产投资额、汽车拥有量和平均气温的拟合曲线，阴影部分表示95%的置信区间。
+同时由表 \@ref(tab:tab-excel-gam-y-smooth) 可知，在10%的显著性水平下，固定资产投资额、
+平均气温通过显著性检验，而私人汽车拥有量未通过显著性检验，表明固资产投资额、平均
+气温对年均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-y) 可以发现，年均空气质量为优天数随固定资产
+投资的增加呈下降-增加-下降的变动趋势，具体来讲，固定资产投资在2000亿元之前年均空气质量为优天数
+下降较快，其在2000-9000亿元之间年均空气质量为优天数缓慢上升，固定资产投资在9000亿元之后年均空气质量为优天数
+有更快程度的下降。表明固定资产投资额在达到一定程度之后，空气质量会逐渐变好。且整体
+来讲，年均空气质量为优天数随着平均气温的增加而增加，但15℃之前增加较快，之后缓慢增长。
 
-#### 最优模型选择
+```{r tab-excel-gam-y, eval=T, results='markup'}
+
+
+library(mgcv)
+gam.y.excel <- gam(excellent~s(gdp)+power+gas_control
+                   +rain+humid+wind_speed
+                   +heating+coast+s(lat),
+                   data=dat.sel.y.excel, method = "REML")
+gam.y.excel.coef <- summary(gam.y.excel)$p.table
+
+dimnames(gam.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.excel,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "GDP"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y.excel,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "纬度"
+         )
+
+```
+
+```{r tab-excel-gam-y-smooth, eval=T, results='markup'}
+gam.smooth.tab.y.excel <- summary(gam.y.excel)$s.table[,-2]
+
+dimnames(gam.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+#### 半参数混合效应模型
+
+进一步建立半参数混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-excel-gamm-y) 
+所示。由表 \@ref(tab:tab-excel-gamm-y) 可知，在10%的显著性水平下，废气治理完成投资额、平均相对湿度、
+平均风速、平均气压、是否临海通过显著性检验，且其系数分别为0.4189、-0.4982、-13.511、0.1343、
+-10.0546。表明在其他条件不变的前提下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均相对湿度越大，年均空气质量为优天数越小，空气质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均气压越大，年均空气质量为优天数越大，空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小，空气
+质量好。图 \@ref(fig:fig-excel-gamm-y) 显示了半参数混合效应模型的非参数曲线，其非参数项为固定
+资产投资额、汽车拥有量和平均气温，且由表 \@ref(tab:tab-excel-gamm-y-smooth) 的非参数项显著性
+检验可知，在10%的显著性水平下，私人汽车拥有量和平均气温通过显著性检验，表明私人汽车拥有
+量和平均气温对年均空气质量为优天数存在非线性影响。且从图 \@ref(fig:fig-excel-gamm-y) 可以看出，年均空气质量为优天数随
+私人汽车拥有量的下降而下降，而我们预期私人汽车拥有量越多，空气质量越差，这与我们的预期
+不一致。同时，平均气温在15℃之前年均空气质量为优天数随平均气温的增加而增加，在15℃之后，年均空气质量为优天数随平均气
+温的增加而下降，这与半参数回归模型中的结果不一致。
+
+
+```{r tab-excel-gamm-y, eval=T, results='markup'}
+
+library(mgcv)
+gamm.y.excel <- gamm(excellent~s(gdp)+power+gas_control
+                   +rain+humid+wind_speed
+                   +heating+coast+s(lat),
+               random=list(city=~1), data=dat.sel.y.excel, method = "REML")
+
+gamm.y.excel.coef <- summary(gamm.y.excel$lme)$tTable[-(9:10),-3]
+
+dimnames(gamm.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gamm-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.excel$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "GDP"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gamm.y.excel$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "纬度"
+         )
+
+```
+
+```{r tab-excel-gamm-y-smooth, eval=T, results='markup'}
+gamm.smooth.tab.y.excel <- summary(gamm.y.excel$gam)$s.table[,-2]
+
+dimnames(gamm.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+#### 模型比较与选择
+
+上述分析中，我们选取年均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，分别
+建立线性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空
+气质量的影响因素进行分析。根据以上分析结果可知，在线性回归模型中，显著的变
+量有废气治理完成投资额、平均风速、是否供暖、是否临海、纬度，模型的AIC、BIC
+值分别为1089.159、1127.4；在线性混合效应模型中，显著的变量有私人汽车拥有量、
+废气治理完成投资额、降水量、平均风速、平均气压、是否临海，AIC、BIC值分别为
+1064.311、1104.24；在半参数回归模型中，显著的变量有废气治理完成投资额、平均
+风速、是否供暖、是否临海、纬度、固定资产投资、平均气温，AIC、BIC值分别为
+1049.803、1107.445；在半参数混合效应模型中，显著的变量有废气治理完成投资额、
+平均相对湿度、平均风速、平均气压、是否临海、私人汽车拥有量、平均气温，AIC、
+BIC值分别为1019.786，1068.271。根据以上结果，从AIC、BIC值可以看出半参数混合
+效应模型最好，但是从模型变量来讲，结合之前的分析及我们的预期，这些模型尚未
+很好地表明变量与年均空气质量为优天数之间的关系。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以年均空气质量为优天数为因变量，废气
+治理完成投资额、平均风速、是否供暖、是否临海、纬度、固定资产投资、汽车拥有量、
+平均气温为自变量建立半参数回归模型，结果如表 \@ref(tab:tab-excel-gam-y-best) 所示。
+由表 \@ref(tab:tab-excel-gam-y-best) 可知，在10%的显著性水平下，废气治理完成投资额、
+平均风速、是否供暖、是否临海、纬度、固定资产投资额、私人汽车拥有量、平均气温
+均通过显著性检验，且参数项系数分别为0.5289、-10.1325、15.7729、-12.5379、2.5147。
+表明在其他条件不变的情况下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖的年均空气质量为优天数大
+15.7729，临海地区比不临海地区的年均空气质量为优天数小12.5379；且纬度越高的地方年均空气质量为优天数越大，
+空气质量越差。图 \@ref(fig:fig-excel-gam-y-best) 表明了固定资产投资、汽车拥有量、
+平均气温的非参数曲线，且从表 \@ref(tab:tab-excel-gam-y-smooth-best) 中可以看出，
+在10%的显著性水平下，固定资产投资额、私人汽车拥有量、平均气温均对空气质量有
+非线性影响。且从图 \@ref(fig:fig-excel-gam-y-best) 中可以看出，年均空气质量为优天数随固定资产投资
+呈现下降-上升-下降的趋势，固定资产投资在2500亿元之前，年均空气质量为优天数随固定资产投资的
+增加而下降，在2500-9000亿元之间时，年均空气质量为优天数随固定资产投资的增加而增加，9000亿元
+之后，年均空气质量为优天数随固定资产投资的增加快速下降。同时，年均空气质量为优天数随私人汽车拥有量的增加
+呈现出缓慢增加之后再缓慢下降的趋势。私人汽车拥有量在200万辆之前，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢增加，几乎没什么大的变化，在200万辆之后，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢下降。平均气温与非参数回归模型中的结果保持一致，在15℃之
+前，年均空气质量为优天数随平均气温的增加增加较快，平均气温在15℃之后，年均空气质量为优天数随平均气温的增加
+而缓慢增加。进一步对残差进行空间自相关检验，检验结果如表 \@ref(tab:tab-excel-gam-y-res-spatial) 。
+从表 \@ref(tab:tab-excel-gam-y-res-spatial) 中可以看出，残差不存在空间自相关。
+
+```{r tab-excel-gam-y-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.y.excel.best <- gam(excellent~s(gdp)+power+gas_control
+                   +humid+wind_speed
+                   +s(lat),
+                   data=dat.sel.y.excel, method = "REML")
+
+
+gam.y.excel.best.coef <- summary(gam.y.excel.best)$p.table
+
+dimnames(gam.y.excel.best.coef) <- list(c("截距项", varselname[c(2,3,5,6)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.excel.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "GDP"
+         )
+par(mar=c(5,3,2,1))
+plot.gam(gam.y.excel.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="",xlab = "纬度"
+         )
+
+
+```
+
+```{r tab-excel-gam-y-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.y.excel <- summary(gam.y.excel.best)$s.table[,-2]
+
+dimnames(gam.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r tab-excel-gam-y-res-spatial, eval=T, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.gam.best <- tapply(resid(gam.y.excel.best), as.factor(dat.sel.y.excel$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.gam.best <- sapply(moran.g.gam.best, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.gam.best) <- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
+             caption="最优模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+
 
 ### 月度数据分析
+
+#### 自变量筛选
 
 之后以同样的方法以对数月均AQI为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m) 
 所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变量，纵轴表示标准化后的年均AQI。由图 
@@ -1549,7 +1950,7 @@ dat.sel.m.excel$coast <- factor(dat.sel.m.excel$coast)
 
 library(gamsel)
 gam1 <- gamsel(as.matrix(dat.sel.m.excel[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.excel[,4]), gamma = 0.39)
-gam1
+####### gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m.excel[,-c(1, 23:24)]), index=22)
@@ -1562,20 +1963,375 @@ mapply(function(i, y) {
 ```
 
 解释48.22%
-	
+
+
 #### 泊松回归模型
+
+作为比较的基准，首先建立线性回归模型，结果如表 \@ref(tab:tab-excel-lm-m) 所示。由
+表 \@ref(tab:tab-excel-lm-m) 可知，在筛选出的变量中，废气治理完成投资额、平均风速、
+供暖、临海、纬度这五个变量在10%的显著性水平下通过显著性检验，且其系数分别为
+1.1121、-9.2522、14.9104、-16.8303、1.8383，说明废气治理完成投资额、供暖、
+纬度对年均空气质量为优天数呈正向影响，而平均风速、临海对年均空气质量为优天数呈负向影响。也就是说，在
+其他变量保持不变的条件下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖地区年均
+空气质量为优天数大14.9104，而临海地区比不临海地区年均空气质量为优天数小16.8303；纬度越高的地方，年均
+空气质量为优天数越大，空气质量越差。但根据我们的认知，废气治理完成投资额越多，空气质量
+应该越好。在这里，我们可以做出如下解释，目前废气治理完成投资额不足，当空气
+污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一定时间
+内，废气污染治理完成投资额越多，空气污染越严重。
+
+```{r tab-excel-lm-m, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 25, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+glm.m.excel <- glm(excellent~con_area+gas_control
+                   +mean_temp+rain+humid+wind_speed+heating+coast
+                   +lat,
+                   data=dat.sel.m.excel,
+                   family = "poisson")
+lm.m.excel.coef <- summary(glm.m.excel)$coef
+
+
+dimnames(lm.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数存在空间自相关。
+因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，时间相对较短，
+因此不考虑时间相关。残差空间自相关检验结果如表 \@ref(tab:tab-excel-lm-m-res-spatial) 所示。
+由表 \@ref(tab:tab-excel-lm-m-res-spatial) 可知，在5%的显著性水平下，各年的莫兰指数均未
+通过显著性检验，说明残差不存在空间自相关。
+
+```{r tab-excel-lm-m-res-spatial, eval=F, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.lm <- tapply(resid(glm.m.excel), as.factor(dat.sel.m.excel$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
 
 #### 泊松混合效应模型
 
+之后将城市作为随机效应建立线性混合模型，对空气质量影响因素进行分析。拟合结果如
+表 \@ref(tab:tab-excel-lme-m) 所示。由表 \@ref(tab:tab-excel-lme-m) 可以看出，在10%的显著性
+水平下，私人汽车拥有量、废气治理完成投资额、降水量、平均风速、平均气压、是否临海
+通过显著性检验，且其系数分别为-0.0371、0.5005、-0.0056、-11.6601、0.1529、-15.8228。
+表明在其他变量保持不变的条件下，私人汽车拥有量越多，年均空气质量为优天数越小，空气质量越好；
+废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；降水量越多，年均空气质量为优天数越小，空气
+质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；平均气压越大，年均空气质量为优天数越大，
+空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小15.8228。同样，在线性
+混合模型中，废气治理完成投资额与年均空气质量为优天数之间关系的符号仍然是正的，与线性回归模型
+结论一致，可以做出类似的解释。同时，城市作为随机效应，其截距项的标准差为11.328，
+说明不同城市其年均空气质量为优天数存在一定的差异。且其残差项也不存在空间自相关。
+
+```{r tab-excel-lme-m, eval=T, results='markup'}
+
+library(mgcv)
+lme.m.excel <- gamm(excellent~con_area+gas_control+mean_temp+rain+humid+wind_speed +heating+coast+lat,
+              random=list(city=~1), data=dat.sel.m.excel, method = "REML")
+
+lme.m.excel.coef <- summary(lme.m.excel$lme)$tTable[,-3]
+
+dimnames(lme.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
 #### 泊松可加模型
+
+由之前变量筛选的结果可知，固定资产投资额、平均气温与年均空气质量为优天数之间存在非线性相关
+关系。进一步建立半参数回归模型，结果如表 \@ref(tab:tab-excel-gam-m) 所示。由
+表 \@ref(tab:tab-excel-gam-m) 可知，在10%的显著性水平下，废气治理完成投资额、平均风速、
+是否供暖、是否临海、纬度对年均空气质量为优天数存在显著影响，其系数分别为0.5149、-11.0720、
+13.6271、-11.9634、1.6734。表明在其他变量保持不变的条件下，废气污染治理完成投资
+额越多，年均空气质量为优天数越大，空气质量越差；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均来讲，供暖地区比不供暖地区的年均空气质量为优天数大13.6271，而临海地区比不临海地区的
+年均空气质量为优天数少11.9634；纬度越高的地方年均空气质量为优天数越大，其空气质量越差。且图 \@ref(fig:fig-excel-gam-m) 中
+显示了固定资产投资额、汽车拥有量和平均气温的拟合曲线，阴影部分表示95%的置信区间。
+同时由表 \@ref(tab:tab-excel-gam-m-smooth) 可知，在10%的显著性水平下，固定资产投资额、
+平均气温通过显著性检验，而私人汽车拥有量未通过显著性检验，表明固资产投资额、平均
+气温对年均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-m) 可以发现，年均空气质量为优天数随固定资产
+投资的增加呈下降-增加-下降的变动趋势，具体来讲，固定资产投资在2000亿元之前年均空气质量为优天数
+下降较快，其在2000-9000亿元之间年均空气质量为优天数缓慢上升，固定资产投资在9000亿元之后年均空气质量为优天数
+有更快程度的下降。表明固定资产投资额在达到一定程度之后，空气质量会逐渐变好。且整体
+来讲，年均空气质量为优天数随着平均气温的增加而增加，但15℃之前增加较快，之后缓慢增长。
+
+```{r tab-excel-gam-m, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.excel <- gam(excellent~con_area+gas_control
+                   +mean_temp+rain+humid+wind_speed+heating+coast
+                   +s(lat),
+                   data=dat.sel.m.excel,
+                   family = "poisson", method = "REML")
+gam.m.excel.coef <- summary(gam.m.excel)$p.table
+
+dimnames(gam.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gam-m, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,1))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.excel,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "纬度"
+         )
+
+```
+
+```{r tab-excel-gam-m-smooth, eval=T, results='markup'}
+gam.smooth.tab.m.excel <- t(as.data.frame(summary(gam.m.excel)$s.table[,-2]))
+
+dimnames(gam.smooth.tab.m.excel) <- list(varselname[c(9)], c("经验自由度", "卡方统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
 
 #### 泊松可加混合效应模型
 
-#### 最优模型选择
+进一步建立半参数混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-excel-gamm-m) 
+所示。由表 \@ref(tab:tab-excel-gamm-m) 可知，在10%的显著性水平下，废气治理完成投资额、平均相对湿度、
+平均风速、平均气压、是否临海通过显著性检验，且其系数分别为0.4189、-0.4982、-13.511、0.1343、
+-10.0546。表明在其他条件不变的前提下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均相对湿度越大，年均空气质量为优天数越小，空气质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均气压越大，年均空气质量为优天数越大，空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小，空气
+质量好。图 \@ref(fig:fig-excel-gamm-m) 显示了半参数混合效应模型的非参数曲线，其非参数项为固定
+资产投资额、汽车拥有量和平均气温，且由表 \@ref(tab:tab-excel-gamm-m-smooth) 的非参数项显著性
+检验可知，在10%的显著性水平下，私人汽车拥有量和平均气温通过显著性检验，表明私人汽车拥有
+量和平均气温对年均空气质量为优天数存在非线性影响。且从图 \@ref(fig:fig-excel-gamm-m) 可以看出，年均空气质量为优天数随
+私人汽车拥有量的下降而下降，而我们预期私人汽车拥有量越多，空气质量越差，这与我们的预期
+不一致。同时，平均气温在15℃之前年均空气质量为优天数随平均气温的增加而增加，在15℃之后，年均空气质量为优天数随平均气
+温的增加而下降，这与半参数回归模型中的结果不一致。
 
 
+```{r tab-excel-gamm-m-model, eval=T, results='hide'}
+
+library(mgcv)
+gamm.m.excel <- gamm(excellent~con_area+gas_control
+                     +mean_temp+rain+humid+wind_speed+heating+coast
+                     +s(lat),
+                     random=list(city=~1), data=dat.sel.m.excel,
+                     family = "poisson", method = "REML")
+
+```
+
+```{r tab-excel-gamm-m, eval=T, results='markup'}
+gamm.m.excel.coef <- summary(gamm.m.excel$lme)$tTable[-(10),-3]
+
+dimnames(gamm.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gamm-m, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,1))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.excel$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "纬度"
+         )
+
+```
+
+```{r tab-excel-gamm-m-smooth, eval=T, results='markup'}
+gamm.smooth.tab.m.excel <- t(as.data.frame(summary(gamm.m.excel$gam)$s.table[,-2]))
+
+dimnames(gamm.smooth.tab.m.excel) <- list(varselname[c(9)],c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+#### 模型比较与选择
+
+上述分析中，我们选取年均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，分别
+建立线性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空
+气质量的影响因素进行分析。根据以上分析结果可知，在线性回归模型中，显著的变
+量有废气治理完成投资额、平均风速、是否供暖、是否临海、纬度，模型的AIC、BIC
+值分别为1089.159、1127.4；在线性混合效应模型中，显著的变量有私人汽车拥有量、
+废气治理完成投资额、降水量、平均风速、平均气压、是否临海，AIC、BIC值分别为
+1064.311、1104.24；在半参数回归模型中，显著的变量有废气治理完成投资额、平均
+风速、是否供暖、是否临海、纬度、固定资产投资、平均气温，AIC、BIC值分别为
+1049.803、1107.445；在半参数混合效应模型中，显著的变量有废气治理完成投资额、
+平均相对湿度、平均风速、平均气压、是否临海、私人汽车拥有量、平均气温，AIC、
+BIC值分别为1019.786，1068.271。根据以上结果，从AIC、BIC值可以看出半参数混合
+效应模型最好，但是从模型变量来讲，结合之前的分析及我们的预期，这些模型尚未
+很好地表明变量与年均空气质量为优天数之间的关系。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以年均空气质量为优天数为因变量，废气
+治理完成投资额、平均风速、是否供暖、是否临海、纬度、固定资产投资、汽车拥有量、
+平均气温为自变量建立半参数回归模型，结果如表 \@ref(tab:tab-excel-gam-m-best) 所示。
+由表 \@ref(tab:tab-excel-gam-m-best) 可知，在10%的显著性水平下，废气治理完成投资额、
+平均风速、是否供暖、是否临海、纬度、固定资产投资额、私人汽车拥有量、平均气温
+均通过显著性检验，且参数项系数分别为0.5289、-10.1325、15.7729、-12.5379、2.5147。
+表明在其他条件不变的情况下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖的年均空气质量为优天数大
+15.7729，临海地区比不临海地区的年均空气质量为优天数小12.5379；且纬度越高的地方年均空气质量为优天数越大，
+空气质量越差。图 \@ref(fig:fig-excel-gam-m-best) 表明了固定资产投资、汽车拥有量、
+平均气温的非参数曲线，且从表 \@ref(tab:tab-excel-gam-m-smooth-best) 中可以看出，
+在10%的显著性水平下，固定资产投资额、私人汽车拥有量、平均气温均对空气质量有
+非线性影响。且从图 \@ref(fig:fig-excel-gam-m-best) 中可以看出，年均空气质量为优天数随固定资产投资
+呈现下降-上升-下降的趋势，固定资产投资在2500亿元之前，年均空气质量为优天数随固定资产投资的
+增加而下降，在2500-9000亿元之间时，年均空气质量为优天数随固定资产投资的增加而增加，9000亿元
+之后，年均空气质量为优天数随固定资产投资的增加快速下降。同时，年均空气质量为优天数随私人汽车拥有量的增加
+呈现出缓慢增加之后再缓慢下降的趋势。私人汽车拥有量在200万辆之前，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢增加，几乎没什么大的变化，在200万辆之后，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢下降。平均气温与非参数回归模型中的结果保持一致，在15℃之
+前，年均空气质量为优天数随平均气温的增加增加较快，平均气温在15℃之后，年均空气质量为优天数随平均气温的增加
+而缓慢增加。进一步对残差进行空间自相关检验，检验结果如表 \@ref(tab:tab-excel-gam-m-res-spatial) 。
+从表 \@ref(tab:tab-excel-gam-m-res-spatial) 中可以看出，残差不存在空间自相关。
+
+```{r tab-excel-gam-m-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.excel.best <- gam(excellent~con_area+gas_control
+                   +mean_temp+rain+humid+wind_speed+heating
+                   +s(lat),
+                   data=dat.sel.m.excel,
+                   family = "poisson", method = "REML")
+
+
+gam.m.excel.best.coef <- summary(gam.m.excel.best)$p.table
+
+dimnames(gam.m.excel.best.coef) <- list(c("截距项", varselname[-c(8,9)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-excel-gam-m-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,1))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.excel.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="excellent",xlab = "纬度"
+         )
+
+```
+
+```{r tab-excel-gam-m-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.m.excel <- t(as.data.frame(summary(gam.m.excel.best)$s.table[,-2]))
+
+dimnames(gam.smooth.tab.m.excel) <- list(varselname[c(9)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+	
 
 ## 空气严重污染的影响因素分析
+
+### 年度数据分析
+
+#### 自变量筛选
 
 ```{r fig-var-sel-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度严重污染天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
@@ -1591,29 +2347,436 @@ dat.sel.y.severe$heating <- factor(dat.sel.y.severe$heating)
 dat.sel.y.severe$coast <- factor(dat.sel.y.severe$coast)
 
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.severe[,3]), gamma = 0.30)
-## gam1
+gam1 <- gamsel(as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.severe[,3]), gamma = 0.5)
+gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 mapply(function(i, y) {
     plot(gam1,newx=as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]),
-         index=35, which = i, main = y, cex.main = 0.95, ylim = c(-3, 3))},
+         index=18, which = i, main = y, cex.main = 0.95, ylim = c(-3, 3))},
     as.list(1:22),
     as.list(varinfo[,2][-c(1:3, 23:24)]))
-
 ```
 
 解释 60.46%
 
 #### 泊松回归模型
 
+作为比较的基准，首先建立线性回归模型，结果如表 \@ref(tab:tab-severe-lm-y) 所示。由
+表 \@ref(tab:tab-severe-lm-y) 可知，在筛选出的变量中，废气治理完成投资额、平均风速、
+供暖、临海、纬度这五个变量在10%的显著性水平下通过显著性检验，且其系数分别为
+1.1121、-9.2522、14.9104、-16.8303、1.8383，说明废气治理完成投资额、供暖、
+纬度对年均空气质量为优天数呈正向影响，而平均风速、临海对年均空气质量为优天数呈负向影响。也就是说，在
+其他变量保持不变的条件下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖地区年均
+空气质量为优天数大14.9104，而临海地区比不临海地区年均空气质量为优天数小16.8303；纬度越高的地方，年均
+空气质量为优天数越大，空气质量越差。但根据我们的认知，废气治理完成投资额越多，空气质量
+应该越好。在这里，我们可以做出如下解释，目前废气治理完成投资额不足，当空气
+污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一定时间
+内，废气污染治理完成投资额越多，空气污染越严重。
+
+```{r tab-severe-lm-y, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 18, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+glm.y.severe <- glm(dat.sel.y.severe[, c("severe", varsel)], family = "poisson")
+lm.y.severe.coef <- summary(glm.y.severe)$coef
+
+
+dimnames(lm.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数存在空间自相关。
+因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，时间相对较短，
+因此不考虑时间相关。残差空间自相关检验结果如表 \@ref(tab:tab-severe-lm-y-res-spatial) 所示。
+由表 \@ref(tab:tab-severe-lm-y-res-spatial) 可知，在5%的显著性水平下，各年的莫兰指数均未
+通过显著性检验，说明残差不存在空间自相关。
+
+```{r tab-severe-lm-y-res-spatial, eval=F, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.lm <- tapply(resid(glm.y.severe), as.factor(dat.sel.y.severe$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
 #### 泊松混合效应模型
+
+之后将城市作为随机效应建立线性混合模型，对空气质量影响因素进行分析。拟合结果如
+表 \@ref(tab:tab-severe-lme-y) 所示。由表 \@ref(tab:tab-severe-lme-y) 可以看出，在10%的显著性
+水平下，私人汽车拥有量、废气治理完成投资额、降水量、平均风速、平均气压、是否临海
+通过显著性检验，且其系数分别为-0.0371、0.5005、-0.0056、-11.6601、0.1529、-15.8228。
+表明在其他变量保持不变的条件下，私人汽车拥有量越多，年均空气质量为优天数越小，空气质量越好；
+废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；降水量越多，年均空气质量为优天数越小，空气
+质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；平均气压越大，年均空气质量为优天数越大，
+空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小15.8228。同样，在线性
+混合模型中，废气治理完成投资额与年均空气质量为优天数之间关系的符号仍然是正的，与线性回归模型
+结论一致，可以做出类似的解释。同时，城市作为随机效应，其截距项的标准差为11.328，
+说明不同城市其年均空气质量为优天数存在一定的差异。且其残差项也不存在空间自相关。
+
+```{r tab-severe-lme-y-model, eval=T, results='hide'}
+
+library(mgcv)
+lme.y.severe <- gamm(severe~green+pop+car
+                    +rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   random=list(city=~1), data=dat.sel.y.severe,
+                   family="poisson", method = "REML")
+```
+
+```{r tab-severe-lme-y, eval=T, results='markup'}
+lme.y.severe.coef <- summary(lme.y.severe$lme)$tTable[,-3]
+
+dimnames(lme.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
 
 #### 泊松可加模型
 
+由之前变量筛选的结果可知，固定资产投资额、平均气温与年均空气质量为优天数之间存在非线性相关
+关系。进一步建立半参数回归模型，结果如表 \@ref(tab:tab-severe-gam-y) 所示。由
+表 \@ref(tab:tab-severe-gam-y) 可知，在10%的显著性水平下，废气治理完成投资额、平均风速、
+是否供暖、是否临海、纬度对年均空气质量为优天数存在显著影响，其系数分别为0.5149、-11.0720、
+13.6271、-11.9634、1.6734。表明在其他变量保持不变的条件下，废气污染治理完成投资
+额越多，年均空气质量为优天数越大，空气质量越差；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均来讲，供暖地区比不供暖地区的年均空气质量为优天数大13.6271，而临海地区比不临海地区的
+年均空气质量为优天数少11.9634；纬度越高的地方年均空气质量为优天数越大，其空气质量越差。且图 \@ref(fig:fig-severe-gam-y) 中
+显示了固定资产投资额、汽车拥有量和平均气温的拟合曲线，阴影部分表示95%的置信区间。
+同时由表 \@ref(tab:tab-severe-gam-y-smooth) 可知，在10%的显著性水平下，固定资产投资额、
+平均气温通过显著性检验，而私人汽车拥有量未通过显著性检验，表明固资产投资额、平均
+气温对年均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-severe-gam-y) 可以发现，年均空气质量为优天数随固定资产
+投资的增加呈下降-增加-下降的变动趋势，具体来讲，固定资产投资在2000亿元之前年均空气质量为优天数
+下降较快，其在2000-9000亿元之间年均空气质量为优天数缓慢上升，固定资产投资在9000亿元之后年均空气质量为优天数
+有更快程度的下降。表明固定资产投资额在达到一定程度之后，空气质量会逐渐变好。且整体
+来讲，年均空气质量为优天数随着平均气温的增加而增加，但15℃之前增加较快，之后缓慢增长。
+
+```{r tab-severe-gam-y, eval=T, results='markup'}
+
+library(mgcv)
+gam.y.severe <- gam(severe~s(pop)+s(green)+car
+                    +rain+humid+s(wind_speed)+s(sun)
+                   +heating+coast+lat,
+                   data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+gam.y.severe.coef <- summary(gam.y.severe)$p.table
+
+dimnames(gam.y.severe.coef) <- list(c("截距项", varselname[c(3:5,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "绿化率"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均风速"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=4,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gam-y-smooth, eval=T, results='markup'}
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe)$s.table[,-2])
+
+dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)], c("经验自由度", "卡方统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
 #### 泊松可加混合效应模型
 
-#### 最优模型选择
+进一步建立半参数混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-severe-gamm-y) 
+所示。由表 \@ref(tab:tab-severe-gamm-y) 可知，在10%的显著性水平下，废气治理完成投资额、平均相对湿度、
+平均风速、平均气压、是否临海通过显著性检验，且其系数分别为0.4189、-0.4982、-13.511、0.1343、
+-10.0546。表明在其他条件不变的前提下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均相对湿度越大，年均空气质量为优天数越小，空气质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均气压越大，年均空气质量为优天数越大，空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小，空气
+质量好。图 \@ref(fig:fig-severe-gamm-y) 显示了半参数混合效应模型的非参数曲线，其非参数项为固定
+资产投资额、汽车拥有量和平均气温，且由表 \@ref(tab:tab-severe-gamm-y-smooth) 的非参数项显著性
+检验可知，在10%的显著性水平下，私人汽车拥有量和平均气温通过显著性检验，表明私人汽车拥有
+量和平均气温对年均空气质量为优天数存在非线性影响。且从图 \@ref(fig:fig-severe-gamm-y) 可以看出，年均空气质量为优天数随
+私人汽车拥有量的下降而下降，而我们预期私人汽车拥有量越多，空气质量越差，这与我们的预期
+不一致。同时，平均气温在15℃之前年均空气质量为优天数随平均气温的增加而增加，在15℃之后，年均空气质量为优天数随平均气
+温的增加而下降，这与半参数回归模型中的结果不一致。
+
+
+```{r tab-severe-gamm-y-model, eval=T, results='hide'}
+
+library(mgcv)
+gamm.y.severe <- gamm(severe~s(green)+s(pop)+car
+                    +rain+humid+s(wind_speed)+s(sun)
+                  +heating+coast+lat,
+                   random=list(city=~1), data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+```
+
+```{r tab-severe-gamm-y, eval=T, results='markup'}
+gamm.y.severe.coef <- summary(gamm.y.severe$lme)$tTable[-(6:9),-3]
+
+dimnames(gamm.y.severe.coef) <- list(c("截距项", varselname[c(3:5, 8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gamm-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "绿化率"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均风速"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=4,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gamm-y-smooth, eval=T, results='markup'}
+gamm.smooth.tab.y.severe <- as.data.frame(summary(gamm.y.severe$gam)$s.table[,-2])
+
+dimnames(gamm.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)],c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+#### 模型比较与选择
+
+上述分析中，我们选取年均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，分别
+建立线性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空
+气质量的影响因素进行分析。根据以上分析结果可知，在线性回归模型中，显著的变
+量有废气治理完成投资额、平均风速、是否供暖、是否临海、纬度，模型的AIC、BIC
+值分别为1089.159、1127.4；在线性混合效应模型中，显著的变量有私人汽车拥有量、
+废气治理完成投资额、降水量、平均风速、平均气压、是否临海，AIC、BIC值分别为
+1064.311、1104.24；在半参数回归模型中，显著的变量有废气治理完成投资额、平均
+风速、是否供暖、是否临海、纬度、固定资产投资、平均气温，AIC、BIC值分别为
+1049.803、1107.445；在半参数混合效应模型中，显著的变量有废气治理完成投资额、
+平均相对湿度、平均风速、平均气压、是否临海、私人汽车拥有量、平均气温，AIC、
+BIC值分别为1019.786，1068.271。根据以上结果，从AIC、BIC值可以看出半参数混合
+效应模型最好，但是从模型变量来讲，结合之前的分析及我们的预期，这些模型尚未
+很好地表明变量与年均空气质量为优天数之间的关系。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以年均空气质量为优天数为因变量，废气
+治理完成投资额、平均风速、是否供暖、是否临海、纬度、固定资产投资、汽车拥有量、
+平均气温为自变量建立半参数回归模型，结果如表 \@ref(tab:tab-severe-gam-y-best) 所示。
+由表 \@ref(tab:tab-severe-gam-y-best) 可知，在10%的显著性水平下，废气治理完成投资额、
+平均风速、是否供暖、是否临海、纬度、固定资产投资额、私人汽车拥有量、平均气温
+均通过显著性检验，且参数项系数分别为0.5289、-10.1325、15.7729、-12.5379、2.5147。
+表明在其他条件不变的情况下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖的年均空气质量为优天数大
+15.7729，临海地区比不临海地区的年均空气质量为优天数小12.5379；且纬度越高的地方年均空气质量为优天数越大，
+空气质量越差。图 \@ref(fig:fig-severe-gam-y-best) 表明了固定资产投资、汽车拥有量、
+平均气温的非参数曲线，且从表 \@ref(tab:tab-severe-gam-y-smooth-best) 中可以看出，
+在10%的显著性水平下，固定资产投资额、私人汽车拥有量、平均气温均对空气质量有
+非线性影响。且从图 \@ref(fig:fig-severe-gam-y-best) 中可以看出，年均空气质量为优天数随固定资产投资
+呈现下降-上升-下降的趋势，固定资产投资在2500亿元之前，年均空气质量为优天数随固定资产投资的
+增加而下降，在2500-9000亿元之间时，年均空气质量为优天数随固定资产投资的增加而增加，9000亿元
+之后，年均空气质量为优天数随固定资产投资的增加快速下降。同时，年均空气质量为优天数随私人汽车拥有量的增加
+呈现出缓慢增加之后再缓慢下降的趋势。私人汽车拥有量在200万辆之前，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢增加，几乎没什么大的变化，在200万辆之后，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢下降。平均气温与非参数回归模型中的结果保持一致，在15℃之
+前，年均空气质量为优天数随平均气温的增加增加较快，平均气温在15℃之后，年均空气质量为优天数随平均气温的增加
+而缓慢增加。进一步对残差进行空间自相关检验，检验结果如表 \@ref(tab:tab-severe-gam-y-res-spatial) 。
+从表 \@ref(tab:tab-severe-gam-y-res-spatial) 中可以看出，残差不存在空间自相关。
+
+```{r tab-severe-gam-y-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.y.severe.best <- gam(severe~s(pop)
+                    +rain+wind_speed+s(sun)
+                   +heating+coast+lat,
+                   data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+
+gam.y.severe.best.coef <- summary(gam.y.severe.best)$p.table
+
+dimnames(gam.y.severe.best.coef) <- list(c("截距项", varselname[c(4,6,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-y-best, eval=T, fig.height=3.0, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gam-y-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe.best)$s.table[,-2])
+
+dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,7)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
 
 
 ### 月度数据分析
@@ -1647,27 +2810,401 @@ dat.sel.m.severe$coast <- factor(dat.sel.m.severe$coast)
 dat.sel.m.severe$severe[dat.sel.m.severe$severe>0] <- 1
 
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.39, family = "binomial", num_lambda = 50)
+gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.48, family = "binomial", num_lambda = 50)
 ## gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1, 23:24)]), index=22)
 mapply(function(i, y) {
     plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]),
-         index=44, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+         index=37, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
     as.list(1:22),
     as.list(varinfo[,2][-c(1:4, 24:25)]))
 
 ```
 
-解释 28.58%
+解释 26.53%
+
 
 #### Logistic回归模型
 
+作为比较的基准，首先建立线性回归模型，结果如表 \@ref(tab:tab-severe-lm-m) 所示。由
+表 \@ref(tab:tab-severe-lm-m) 可知，在筛选出的变量中，废气治理完成投资额、平均风速、
+供暖、临海、纬度这五个变量在10%的显著性水平下通过显著性检验，且其系数分别为
+1.1121、-9.2522、14.9104、-16.8303、1.8383，说明废气治理完成投资额、供暖、
+纬度对年均空气质量为优天数呈正向影响，而平均风速、临海对年均空气质量为优天数呈负向影响。也就是说，在
+其他变量保持不变的条件下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖地区年均
+空气质量为优天数大14.9104，而临海地区比不临海地区年均空气质量为优天数小16.8303；纬度越高的地方，年均
+空气质量为优天数越大，空气质量越差。但根据我们的认知，废气治理完成投资额越多，空气质量
+应该越好。在这里，我们可以做出如下解释，目前废气治理完成投资额不足，当空气
+污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一定时间
+内，废气污染治理完成投资额越多，空气污染越严重。
+
+```{r tab-severe-lm-m, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+glm.m.severe <- glm(severe~pop+car
+                   +mean_temp+rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial)
+
+lm.m.severe.coef <- summary(glm.m.severe)$coef
+
+
+dimnames(lm.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数存在空间自相关。
+因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，时间相对较短，
+因此不考虑时间相关。残差空间自相关检验结果如表 \@ref(tab:tab-severe-lm-m-res-spatial) 所示。
+由表 \@ref(tab:tab-severe-lm-m-res-spatial) 可知，在5%的显著性水平下，各年的莫兰指数均未
+通过显著性检验，说明残差不存在空间自相关。
+
+
 #### Logistic混合效应模型
+
+之后将城市作为随机效应建立线性混合模型，对空气质量影响因素进行分析。拟合结果如
+表 \@ref(tab:tab-severe-lme-m) 所示。由表 \@ref(tab:tab-severe-lme-m) 可以看出，在10%的显著性
+水平下，私人汽车拥有量、废气治理完成投资额、降水量、平均风速、平均气压、是否临海
+通过显著性检验，且其系数分别为-0.0371、0.5005、-0.0056、-11.6601、0.1529、-15.8228。
+表明在其他变量保持不变的条件下，私人汽车拥有量越多，年均空气质量为优天数越小，空气质量越好；
+废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；降水量越多，年均空气质量为优天数越小，空气
+质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；平均气压越大，年均空气质量为优天数越大，
+空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小15.8228。同样，在线性
+混合模型中，废气治理完成投资额与年均空气质量为优天数之间关系的符号仍然是正的，与线性回归模型
+结论一致，可以做出类似的解释。同时，城市作为随机效应，其截距项的标准差为11.328，
+说明不同城市其年均空气质量为优天数存在一定的差异。且其残差项也不存在空间自相关。
+
+```{r tab-severe-lme-m-model, eval=T, results='hide'}
+
+library(mgcv)
+
+lme.m.severe <- gamm(severe~pop+car
+                   +mean_temp+rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial, 
+                   random=list(city=~1), method = "REML")
+```
+
+```{r tab-severe-lme-m, eval=T, results='markup'}
+lme.m.severe.coef <- summary(lme.m.severe$lme)$tTable[,-3]
+
+dimnames(lme.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
 
 #### Logistic可加模型
 
+由之前变量筛选的结果可知，固定资产投资额、平均气温与年均空气质量为优天数之间存在非线性相关
+关系。进一步建立半参数回归模型，结果如表 \@ref(tab:tab-severe-gam-m) 所示。由
+表 \@ref(tab:tab-severe-gam-m) 可知，在10%的显著性水平下，废气治理完成投资额、平均风速、
+是否供暖、是否临海、纬度对年均空气质量为优天数存在显著影响，其系数分别为0.5149、-11.0720、
+13.6271、-11.9634、1.6734。表明在其他变量保持不变的条件下，废气污染治理完成投资
+额越多，年均空气质量为优天数越大，空气质量越差；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均来讲，供暖地区比不供暖地区的年均空气质量为优天数大13.6271，而临海地区比不临海地区的
+年均空气质量为优天数少11.9634；纬度越高的地方年均空气质量为优天数越大，其空气质量越差。且图 \@ref(fig:fig-severe-gam-m) 中
+显示了固定资产投资额、汽车拥有量和平均气温的拟合曲线，阴影部分表示95%的置信区间。
+同时由表 \@ref(tab:tab-severe-gam-m-smooth) 可知，在10%的显著性水平下，固定资产投资额、
+平均气温通过显著性检验，而私人汽车拥有量未通过显著性检验，表明固资产投资额、平均
+气温对年均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-severe-gam-m) 可以发现，年均空气质量为优天数随固定资产
+投资的增加呈下降-增加-下降的变动趋势，具体来讲，固定资产投资在2000亿元之前年均空气质量为优天数
+下降较快，其在2000-9000亿元之间年均空气质量为优天数缓慢上升，固定资产投资在9000亿元之后年均空气质量为优天数
+有更快程度的下降。表明固定资产投资额在达到一定程度之后，空气质量会逐渐变好。且整体
+来讲，年均空气质量为优天数随着平均气温的增加而增加，但15℃之前增加较快，之后缓慢增长。
+
+```{r tab-severe-gam-m, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.severe <- gam(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                   +heating+coast+s(lat),
+                   data=dat.sel.m.severe,
+                   family = binomial, method = "REML")
+gam.m.severe.coef <- summary(gam.m.severe)$p.table
+
+dimnames(gam.m.severe.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+plot.gam(gam.m.severe,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+plot.gam(gam.m.severe,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+```
+
+```{r tab-severe-gam-m-smooth, eval=T, results='markup'}
+gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe)$s.table[,-2])
+
+dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "卡方统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
 #### Logistic可加混合效应模型
 
-#### 最优模型选择
+进一步建立半参数混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-severe-gamm-m) 
+所示。由表 \@ref(tab:tab-severe-gamm-m) 可知，在10%的显著性水平下，废气治理完成投资额、平均相对湿度、
+平均风速、平均气压、是否临海通过显著性检验，且其系数分别为0.4189、-0.4982、-13.511、0.1343、
+-10.0546。表明在其他条件不变的前提下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均相对湿度越大，年均空气质量为优天数越小，空气质量越好；平均风速越大，年均空气质量为优天数越小，空气质量越好；
+平均气压越大，年均空气质量为优天数越大，空气质量越差；平均来讲，临海地区比不临海地区的年均空气质量为优天数小，空气
+质量好。图 \@ref(fig:fig-severe-gamm-m) 显示了半参数混合效应模型的非参数曲线，其非参数项为固定
+资产投资额、汽车拥有量和平均气温，且由表 \@ref(tab:tab-severe-gamm-m-smooth) 的非参数项显著性
+检验可知，在10%的显著性水平下，私人汽车拥有量和平均气温通过显著性检验，表明私人汽车拥有
+量和平均气温对年均空气质量为优天数存在非线性影响。且从图 \@ref(fig:fig-severe-gamm-m) 可以看出，年均空气质量为优天数随
+私人汽车拥有量的下降而下降，而我们预期私人汽车拥有量越多，空气质量越差，这与我们的预期
+不一致。同时，平均气温在15℃之前年均空气质量为优天数随平均气温的增加而增加，在15℃之后，年均空气质量为优天数随平均气
+温的增加而下降，这与半参数回归模型中的结果不一致。
+
+
+```{r tab-severe-gamm-m-model, eval=T, results='hide'}
+
+library(mgcv)
+gamm.m.severe <- gamm(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                   +heating+coast+s(lat),
+                      random=list(city=~1), data=dat.sel.m.severe,
+                     family = "binomial", method = "REML")
+
+```
+
+```{r tab-severe-gamm-m, eval=T, results='markup'}
+gamm.m.severe.coef <- summary(gamm.m.severe$lme)$tTable[-(9:11),-3]
+
+dimnames(gamm.m.severe.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gamm-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+
+```
+
+```{r tab-severe-gamm-m-smooth, eval=T, results='markup'}
+gamm.smooth.tab.m.severe <- t(as.data.frame(summary(gamm.m.severe$gam)$s.table[,-2]))
+
+dimnames(gamm.smooth.tab.m.severe) <- list(varselname[c(1,3,10)],c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+#### 模型比较与选择
+
+上述分析中，我们选取年均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，分别
+建立线性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空
+气质量的影响因素进行分析。根据以上分析结果可知，在线性回归模型中，显著的变
+量有废气治理完成投资额、平均风速、是否供暖、是否临海、纬度，模型的AIC、BIC
+值分别为1089.159、1127.4；在线性混合效应模型中，显著的变量有私人汽车拥有量、
+废气治理完成投资额、降水量、平均风速、平均气压、是否临海，AIC、BIC值分别为
+1064.311、1104.24；在半参数回归模型中，显著的变量有废气治理完成投资额、平均
+风速、是否供暖、是否临海、纬度、固定资产投资、平均气温，AIC、BIC值分别为
+1049.803、1107.445；在半参数混合效应模型中，显著的变量有废气治理完成投资额、
+平均相对湿度、平均风速、平均气压、是否临海、私人汽车拥有量、平均气温，AIC、
+BIC值分别为1019.786，1068.271。根据以上结果，从AIC、BIC值可以看出半参数混合
+效应模型最好，但是从模型变量来讲，结合之前的分析及我们的预期，这些模型尚未
+很好地表明变量与年均空气质量为优天数之间的关系。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以年均空气质量为优天数为因变量，废气
+治理完成投资额、平均风速、是否供暖、是否临海、纬度、固定资产投资、汽车拥有量、
+平均气温为自变量建立半参数回归模型，结果如表 \@ref(tab:tab-severe-gam-m-best) 所示。
+由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，废气治理完成投资额、
+平均风速、是否供暖、是否临海、纬度、固定资产投资额、私人汽车拥有量、平均气温
+均通过显著性检验，且参数项系数分别为0.5289、-10.1325、15.7729、-12.5379、2.5147。
+表明在其他条件不变的情况下，废气治理完成投资额越多，年均空气质量为优天数越大，空气质量越差；
+平均风速越大，年均空气质量为优天数越小，空气质量越好；平均来讲，供暖地区比不供暖的年均空气质量为优天数大
+15.7729，临海地区比不临海地区的年均空气质量为优天数小12.5379；且纬度越高的地方年均空气质量为优天数越大，
+空气质量越差。图 \@ref(fig:fig-severe-gam-m-best) 表明了固定资产投资、汽车拥有量、
+平均气温的非参数曲线，且从表 \@ref(tab:tab-severe-gam-m-smooth-best) 中可以看出，
+在10%的显著性水平下，固定资产投资额、私人汽车拥有量、平均气温均对空气质量有
+非线性影响。且从图 \@ref(fig:fig-severe-gam-m-best) 中可以看出，年均空气质量为优天数随固定资产投资
+呈现下降-上升-下降的趋势，固定资产投资在2500亿元之前，年均空气质量为优天数随固定资产投资的
+增加而下降，在2500-9000亿元之间时，年均空气质量为优天数随固定资产投资的增加而增加，9000亿元
+之后，年均空气质量为优天数随固定资产投资的增加快速下降。同时，年均空气质量为优天数随私人汽车拥有量的增加
+呈现出缓慢增加之后再缓慢下降的趋势。私人汽车拥有量在200万辆之前，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢增加，几乎没什么大的变化，在200万辆之后，年均空气质量为优天数随私人
+汽车拥有量的增加而缓慢下降。平均气温与非参数回归模型中的结果保持一致，在15℃之
+前，年均空气质量为优天数随平均气温的增加增加较快，平均气温在15℃之后，年均空气质量为优天数随平均气温的增加
+而缓慢增加。进一步对残差进行空间自相关检验，检验结果如表 \@ref(tab:tab-severe-gam-m-res-spatial) 。
+从表 \@ref(tab:tab-severe-gam-m-res-spatial) 中可以看出，残差不存在空间自相关。
+
+```{r tab-severe-gam-m-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.severe.best <- gam(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                  +s(lat),
+                   data=dat.sel.m.severe,
+                   family = "binomial", method = "REML")
+
+
+gam.m.severe.best.coef <- summary(gam.m.severe.best)$p.table
+
+dimnames(gam.m.severe.best.coef) <- list(c("截距项", varselname[-c(1,3,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+```
+
+```{r tab-severe-gam-m-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.m.severe <- t(as.data.frame(summary(gam.m.severe.best)$s.table[,-2]))
+
+dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
