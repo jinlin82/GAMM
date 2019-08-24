@@ -206,7 +206,7 @@ BIC(lmm)
 ########################################## UNUSED #######################################
 ####### GLM lasso
 library(glmnet)
-fm <- glmnet(as.matrix(dat.sel.y[,-c(1)]), as.matrix(dat.sel.y[,1]))
+fm <- glmnet(as.matrix(dat.sel.y[,-c(1:3)]), as.matrix(dat.sel.y[,3]))
 plot(fm, label = T)
 print(fm)
 coef(fm, s=2)

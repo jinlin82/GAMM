@@ -373,13 +373,9 @@ varlist <- read.csv("./data/var_list.csv")
 
 ####### 年度数据
 indvar <- names(dat.y)[c(1:3, 17:38, 41:42)]
-
 varinfo <- varlist[match(indvar, as.character(varlist$var_code)), c(1:3,7)]
-
 varinfo <- varinfo[order(varinfo$var_no), ]
-
 dat.sel.y <- dat.y[, as.character(varinfo[,3])]
-
 
 
 ####### 经纬度转换
@@ -402,7 +398,16 @@ dat.sel.y$height <- dat.sel.y$height/10
 ## dat.sel.y[,-c(23, 24)] <- scale(dat.sel.y[,-c(23,24)])
 
 write.csv(dat.sel.y, "./results/dat.sel.y.csv", row.names=F)
-#write.csv(dat.sel.y, "C:users/qq/desktop/dat.sel.y.csv", row.names=F)
+
+dat.sel.y.excel <- dat.sel.y
+dat.sel.y.excel$AQI <- dat.y$excellent
+colnames(dat.sel.y.excel)[3] <- "excellent"
+write.csv(dat.sel.y.excel, "./results/dat.sel.y.excel.csv", row.names=F)
+
+dat.sel.y.severe <- dat.sel.y
+dat.sel.y.severe$AQI <- dat.y$severe
+colnames(dat.sel.y.severe)[3] <- "severe"
+write.csv(dat.sel.y.severe, "./results/dat.sel.y.severe.csv", row.names=F)
 
 ####### 月度数据
 indvar <- names(dat.m)[c(1:4, 20:41, 44:45)]
@@ -433,7 +438,16 @@ dat.sel.m$height <- dat.sel.m$height/10
 ## dat.sel.m[,-c(23, 24)] <- scale(dat.sel.m[,-c(23,24)])
 
 write.csv(dat.sel.m, "./results/dat.sel.m.csv", row.names=F)
-#write.csv(dat.sel.m, "C:users/qq/desktop/dat.sel.m.csv", row.names=F)
+
+dat.sel.m.excel <- dat.sel.m
+dat.sel.m.excel$AQI <- dat.m$excellent
+colnames(dat.sel.m.excel)[4] <- "excellent"
+write.csv(dat.sel.m.excel, "./results/dat.sel.m.excel.csv", row.names=F)
+
+dat.sel.m.severe <- dat.sel.m
+dat.sel.m.severe$AQI <- dat.m$severe
+colnames(dat.sel.m.severe)[4] <- "severe"
+write.csv(dat.sel.m.severe, "./results/dat.sel.m.severe.csv", row.names=F)
 
 ```
 
@@ -478,6 +492,8 @@ mapply(function(i, y) {
 
 ```
 
+解释 68.04%
+
 之后以同样的方法以对数月均AQI为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m) 
 所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变量，纵轴表示标准化后的年均AQI。由图 
 \@ref(fig:fig-var-sel-m) 可知，地区生产总值、地区生产总值增长率、固定资产投资额、常住人口、
@@ -503,17 +519,20 @@ dat.sel.m$heating <- factor(dat.sel.m$heating)
 dat.sel.m$coast <- factor(dat.sel.m$coast)
 
 library(gamsel)
-gam1 <- gamsel(as.matrix(dat.sel.m[,-c(1:4, 24:25)]), as.matrix(log(dat.sel.m[,4])), gamma = 0.4)
+gam1 <- gamsel(as.matrix(dat.sel.m[,-c(1:4, 24:25)]), as.matrix(log(dat.sel.m[,4])), gamma = 0.369)
+## gam1
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m[,-c(1, 23:24)]), index=22)
 mapply(function(i, y) {
     plot(gam1,newx=as.matrix(dat.sel.m[,-c(1:4, 24:25)]),
-         index=22, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+         index=27, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
     as.list(1:22),
-    as.list(varinfo[,2][-c(1:4, 19:20)]))
+    as.list(varinfo[,2][-c(1:4, 24:25)]))
 
 ```
+
+解释 59.70%
 
 ### 年均AQI模型建立与最优模型确定
 
@@ -1038,9 +1057,7 @@ varlist <- read.csv("./data/var_list.csv")
 dat.sel.m <- read.csv("./results/dat.sel.m.csv")
 month<-read.csv("./data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
-head(dat.sel.m)
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
-head(dat.sel.m)
 names(dat.sel.m)<-c("city","year","month","AQI","gdp","gdp_rate","invest","pop","green","passenger","con_area",
                     "car","power","ind_SO2","ind_smoke","ind_control","gas_control","mean_temp","low_temp",
                     "high_temp","rain","wind_speed","pressure","heating","coast","long","lat","height","sun")
@@ -1193,8 +1210,6 @@ varselname <- as.character(varselname[order(varselname$var_no), 2])
 library(mgcv)
 gam.m <- gam(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+sun+heating+coast+te(lat),
              data=dat.sel.m, method = "REML")
-AIC(gam.m)
-BIC(gam.m)
 gam.m.coef <- summary(gam.m)$p.table
 
 dimnames(gam.m.coef) <- list(c("截距项", varselname[-11]), c("估计值", "标准误", "t值", "P值"))
@@ -1306,7 +1321,7 @@ knitr::kable(gamm.m.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gamm-m, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gamm-m, eval=T, fig.height=4, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.m$gam,
@@ -1423,7 +1438,7 @@ knitr::kable(gam.m.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gam-m-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-m-best, eval=T, fig.height=4, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 plot.gam(gam.m.best,
@@ -1459,25 +1474,200 @@ knitr::kable(gam.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 
 ### 模型结果解释
 
-## 空气质量为优的影响因素分析
+## 空气质量为优的天数影响因素分析
 
-### 泊松可加混合模型的建立
+### 年度数据分析
 
-### 泊松可加混合模型最优模型选择
+#### 变量筛选
 
-### 空气质量为优的天数的影响因素分析
+```{r fig-var-sel-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y.excel <- read.csv("./results/dat.sel.y.excel.csv")
+
+varinfo <- varlist[match(names(dat.sel.y.excel), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y.excel$city <- factor(dat.sel.y.excel$city)
+dat.sel.y.excel$year <- factor(dat.sel.y.excel$year)
+dat.sel.y.excel$heating <- factor(dat.sel.y.excel$heating)
+dat.sel.y.excel$coast <- factor(dat.sel.y.excel$coast)
+
+dat.sel.y.excel[dat.sel.y.excel$excellent==0,3] <- 0.01
+dat.sel.y.excel$excellent <- log(dat.sel.y.excel$excellent)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.y.excel[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.excel[,3]), gamma = 0.4)
+## gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.y.excel[,-c(1:3, 23:24)]),
+         index=21, which = i, main = y, cex.main = 0.95, ylim = c(-1, 1))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:3, 23:24)]))
+
+```
+
+解释 55.49%
+
+#### 线性模型
+
+#### 线性混合模型
+
+#### 半参数回归模型
+
+#### 半参数混合模型
+
+#### 最优模型选择
+
+### 月度数据分析
+
+之后以同样的方法以对数月均AQI为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m) 
+所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变量，纵轴表示标准化后的年均AQI。由图 
+\@ref(fig:fig-var-sel-m) 可知，地区生产总值、地区生产总值增长率、固定资产投资额、常住人口、
+建成区绿化覆盖率、城市公路客运量、全社会用电量、工业二氧化硫排放量、工业烟粉尘排放量、工业
+污染治理完成投资额、平均相对湿度、经度、海拔对对数月均AQI无影响，这些变量被剔除，而剩下的
+变量有房屋建筑施工面积、私人汽车拥有量、废气污染治理完成投资额、平均气温、降水量、平均风速、
+平均气压、日照时数、纬度。且在剩下的这些变量中，可以看出，房屋建筑施工面积、私人汽车拥有量、
+废气治理完成投资额、日照时数对对数月均AQI呈正向影响，而平均气温、降水量、平均风速、平均气压
+对对数月均AQI呈负向影响，纬度与对数月均AQI呈非线性相关关系。
+
+```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.m.excel <- read.csv("./results/dat.sel.m.excel.csv")
+
+varinfo <- varlist[match(names(dat.sel.m.excel), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.m.excel$city <- factor(dat.sel.m.excel$city)
+dat.sel.m.excel$year <- factor(dat.sel.m.excel$year)
+dat.sel.m.excel$month <- factor(dat.sel.m.excel$month)
+dat.sel.m.excel$heating <- factor(dat.sel.m.excel$heating)
+dat.sel.m.excel$coast <- factor(dat.sel.m.excel$coast)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.m.excel[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.excel[,4]), gamma = 0.39)
+gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+## plot(gam1,newx=as.matrix(dat.sel.m.excel[,-c(1, 23:24)]), index=22)
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.m.excel[,-c(1:4, 24:25)]),
+         index=25, which = i, main = y, cex.main = 0.95, ylim = c(-10, 10))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:4, 24:25)]))
+
+```
+
+解释48.22%
+	
+#### 泊松回归模型
+
+#### 泊松混合效应模型
+
+#### 泊松可加模型
+
+#### 泊松可加混合效应模型
+
+#### 最优模型选择
+
+
 
 ## 空气严重污染的影响因素分析
 
-### 泊松可加混合模型的建立
+```{r fig-var-sel-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度严重污染天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y.severe <- read.csv("./results/dat.sel.y.severe.csv")
 
-### 二项可加混合模型最优模型选择
+varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
 
-### 是否出现严重污染的影响因素分析
+dat.sel.y.severe$city <- factor(dat.sel.y.severe$city)
+dat.sel.y.severe$year <- factor(dat.sel.y.severe$year)
+dat.sel.y.severe$heating <- factor(dat.sel.y.severe$heating)
+dat.sel.y.severe$coast <- factor(dat.sel.y.severe$coast)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.severe[,3]), gamma = 0.30)
+## gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]),
+         index=35, which = i, main = y, cex.main = 0.95, ylim = c(-3, 3))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:3, 23:24)]))
+
+```
+
+解释 60.46%
+
+#### 泊松回归模型
+
+#### 泊松混合效应模型
+
+#### 泊松可加模型
+
+#### 泊松可加混合效应模型
+
+#### 最优模型选择
 
 
+### 月度数据分析
 
+#### 自变量筛选
 
+之后以同样的方法以对数月均AQI为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m) 
+所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变量，纵轴表示标准化后的年均AQI。由图 
+\@ref(fig:fig-var-sel-m) 可知，地区生产总值、地区生产总值增长率、固定资产投资额、常住人口、
+建成区绿化覆盖率、城市公路客运量、全社会用电量、工业二氧化硫排放量、工业烟粉尘排放量、工业
+污染治理完成投资额、平均相对湿度、经度、海拔对对数月均AQI无影响，这些变量被剔除，而剩下的
+变量有房屋建筑施工面积、私人汽车拥有量、废气污染治理完成投资额、平均气温、降水量、平均风速、
+平均气压、日照时数、纬度。且在剩下的这些变量中，可以看出，房屋建筑施工面积、私人汽车拥有量、
+废气治理完成投资额、日照时数对对数月均AQI呈正向影响，而平均气温、降水量、平均风速、平均气压
+对对数月均AQI呈负向影响，纬度与对数月均AQI呈非线性相关关系。
 
-<!--# 参考文献 {-}-->
-[//]: # (\bibliography{Bibfile})
+```{r fig-var-sel-m-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现严重污染自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.m.severe <- read.csv("./results/dat.sel.m.severe.csv")
+
+varinfo <- varlist[match(names(dat.sel.m.severe), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.m.severe$city <- factor(dat.sel.m.severe$city)
+dat.sel.m.severe$year <- factor(dat.sel.m.severe$year)
+dat.sel.m.severe$month <- factor(dat.sel.m.severe$month)
+dat.sel.m.severe$heating <- factor(dat.sel.m.severe$heating)
+dat.sel.m.severe$coast <- factor(dat.sel.m.severe$coast)
+
+dat.sel.m.severe$severe[dat.sel.m.severe$severe>0] <- 1
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.39, family = "binomial", num_lambda = 50)
+## gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+## plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1, 23:24)]), index=22)
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]),
+         index=44, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:4, 24:25)]))
+
+```
+
+解释 28.58%
+
+#### Logistic回归模型
+
+#### Logistic混合效应模型
+
+#### Logistic可加模型
+
+#### Logistic可加混合效应模型
+
+#### 最优模型选择
