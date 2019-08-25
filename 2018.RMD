@@ -59,9 +59,9 @@ gammSlice使用的切片采样方案。因此，我们在这里给出一些细�
 $$\begin{array}{ccccc}{1}
 p(\boldsymbol{y} | \boldsymbol{\beta}, \boldsymbol{u}) \propto \exp \left(\boldsymbol{y}^{T}(\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{u})-\mathbf{1}^{T} b(\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{u})\right)
 \\\boldsymbol{u}=\left[\begin{array}{c}{\boldsymbol{u}_{1}} \\ {\boldsymbol{u}_{2}} \\ {\vdots} \\ {\boldsymbol{u}_{L}}\end{array}\right] | \sigma_{1}^{2}, \ldots, \sigma_{L}^{2} \sim N\left(\mathbf{0},\left[\begin{array}{cccc}{\sigma_{1}^{2} \boldsymbol{I}_{q_{1}}} & {\mathbf{0}} & {\cdots} & {\mathbf{0}} \\ {\mathbf{0}} & {\sigma_{2}^{2} \boldsymbol{I}_{q_{2}}} & {\cdots} & {\mathbf{0}} \\ {\vdots} & {\vdots} & {\ddots} & {\mathbf{0}} \\ {\mathbf{0}} & {\mathbf{0}} & {\cdots} & {\sigma_{L}^{2} \boldsymbol{I}_{q_{L}}}\end{array}\right]\right)
-\\ \beta \sim \mathrm{N}\left(0, \sigma_{\beta}^{2} \boldsymbol{I}\right), \quad \sigma_{\ell}^{\mathrm{ind}} \text { Half-Cauchy }\left(A_{\ell}\right), 1 \leqslant \ell \leqslant L \end{array}$$ {#eq:m14}
+\\ \beta \sim \mathrm{N}\left(0, \sigma_{\beta}^{2} \boldsymbol{I}\right), \quad \sigma_{\ell}^{\mathrm{ind}} \text { Half-Cauchy }\left(A_{\ell}\right), 1 \leqslant \ell \leqslant L \end{array}$$ {#eq:m-18-14}
 
-[@eq:m14]中的符号意义如下：$\boldsymbol \beta$ 是所有固定效应参数的向量，$\boldsymbol{X}$ 表示
+[@eq:m-18-14]中的符号意义如下：$\boldsymbol \beta$ 是所有固定效应参数的向量，$\boldsymbol{X}$ 表示
 固定效应设计矩阵，$\boldsymbol{u}$ 是所有随机效应参数的向量， $\boldsymbol{Z}$ 是随机效应设计矩
 阵， $\boldsymbol{I}_{d}$ 表示 $d \times d$ 单位矩阵，$q_{\ell}$ 是 $\boldsymbol{u}_{\ell}$ 
 的长度，并且
@@ -79,13 +79,13 @@ $ z_ {1 k} \ left（x_ {1 ij} \ right）$ 和 $z_{2 k}\left(x_{2 i j}\right)$ �
 
 $$\sigma \sim \text { Half-Cauchy }(A) \quad \text { if and only if 
 }\left\{\begin{array}{l}{\sigma^{2} | a \sim \text { Inverse-Gamma }(1 / 2,1 / a)} \\ {a \sim 
-\text { Inverse-Gamma }\left(1 / 2,1 / A^{2}\right)}\end{array}\right.$$ {#eq:m15}
+\text { Inverse-Gamma }\left(1 / 2,1 / A^{2}\right)}\end{array}\right.$$ {#eq:m-18-15}
 
 其中，$x \sim$ Inverse-Gamma($\kappa$,$\lambda$) 意味着 $x$  有一个形状参数为 $k$ ,比率参数
 为 $\lambda$ 的逆伽马分布。逆伽马分布的密度函数为：
 
 $$p(x)=\lambda^{\kappa} \Gamma(\kappa)^{-1} x^{-\kappa-1} \exp (-\lambda / x), \quad x>0$$ 
-因此我们将[@eq:m15]中的 $\sigma_{\ell} \stackrel{\mathrm{ind}}{\sim}$ Half-Cauchy $\left(A_{\ell}\right)$ 替换为：
+因此我们将[@eq:m-18-15]中的 $\sigma_{\ell} \stackrel{\mathrm{ind}}{\sim}$ Half-Cauchy $\left(A_{\ell}\right)$ 替换为：
 
 $$\sigma_{\ell}^{2} | a_{\ell} \sim \text { Inverse-Gamma }\left(1 / 2,1 / a_{\ell}\right), \quad a_{\ell} \sim \text { Inverse-Gamma }\left(1 / 2,1 / A_{\ell}^{2}\right)$$
 
@@ -101,7 +101,7 @@ $$t | s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{s}_{4} \sim \mathcal{H}_{b}\
 s_{2}, \boldsymbol{s}_{3}, \boldsymbol{s}_{4}\right)$$
 表示随机变量 $t$ ,并以 $\left(S_{1}, S_{2}, S_{3}, S_{4}\right)$ 为条件。$t$的密度函数为
 
-$$p_{b}\left(t | s_{1}, s_{2}, s_{3}, s_{4}\right) \propto \exp \left(s_{1} t-\frac{1}{2}\left(t^{2} / s_{2}\right)-1^{T} b\left(t s_{3}+s_{4}\right)\right), \quad-\infty<t<\infty$$ {#eq:m16}
+$$p_{b}\left(t | s_{1}, s_{2}, s_{3}, s_{4}\right) \propto \exp \left(s_{1} t-\frac{1}{2}\left(t^{2} / s_{2}\right)-1^{T} b\left(t s_{3}+s_{4}\right)\right), \quad-\infty<t<\infty$$ {#eq:m-18-16}
 
 $\boldsymbol 1_{d}$表示 $d\times 1$ 的单位向量，$p$ 是 $\boldsymbol X$ 
 中的列数，$q=\sum_{\ell=1} q_{\ell}$ 是 $\boldsymbol Z$ 中的列数。 最后，让 $B$ 和 $G$ 
@@ -114,7 +114,7 @@ knitr::include_graphics("./results/code.png")
 假设B足够大，达到可接受的收敛水平，则保留的样本可以作为各自后验分布的提取，用于近似贝叶
 斯推理。
 
-对于一般参数$s1、s2、s3、s4$，仍然需要描述来自 $\mathcal{H}_{b}\left(s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{S}_{4}\right)$ 的抽样。因为相应的密度函数[@eq:m16] 
+对于一般参数$s1、s2、s3、s4$，仍然需要描述来自 $\mathcal{H}_{b}\left(s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{S}_{4}\right)$ 的抽样。因为相应的密度函数[@eq:m-18-16] 
 在归一化因子之前具有一个简单的封闭形式表达式，因此可以使用切片采样获得所需的样本提取。
 Neal(2003)描述了易于实现的过程，他的“逐步退出”方法是gammSlice中使用的默认方法。
 
