@@ -52,7 +52,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 ## 抽样计划详情
 
 如第1节所述，Zhao等(2006)给出了gammSlice支持的贝叶斯GAMM的详细数学描述。但是，他们没有讨论
-gammSlice使用的切片采样方案。因此，我们在这里给出一些细节。
+gammSlice使用的切片采样方案[@Zhao2006]。因此，我们在这里给出一些细节。
 
 由gammSlice支持的模型有如下一般形式：
 
@@ -116,9 +116,8 @@ knitr::include_graphics("./results/code.png")
 
 对于一般参数$s1、s2、s3、s4$，仍然需要描述来自 $\mathcal{H}_{b}\left(s_{1}, s_{2}, \boldsymbol{s}_{3}, \boldsymbol{S}_{4}\right)$ 的抽样。因为相应的密度函数[@eq:m-18-16] 
 在归一化因子之前具有一个简单的封闭形式表达式，因此可以使用切片采样获得所需的样本提取。
-Neal(2003)描述了易于实现的过程，他的“逐步退出”方法是gammSlice中使用的默认方法。
+Neal(2003)描述了易于实现的过程，他的“逐步退出”方法是gammSlice中使用的默认方法[@Neal2003]。
 
 切片抽样的这种简单性使得算法实现非常直观和稳健。然而,由于 $\boldsymbol Z$ 矩阵中经
 常出现稀疏形式，导致即使简单的算法实现，效率可能也不高。。在gammSlice中，我们小心地
 避免了由这些稀疏形式引起的多余计算。
-

@@ -64,10 +64,10 @@ Sys.setlocale("LC_ALL", "Chinese")
 $\mathbf{X} \boldsymbol \beta+\mathbf{Z b}$ 的光滑，其中 $\boldsymbol \beta$ 是固定效应的向量，并且
 $\mathrm{b} \sim N\left(0, \boldsymbol{I} \sigma_{b}^{2}\right)$ 是独立同分布的随机效应。
 光滑项上的任何总和为零的约束通常在重新参数化之前被吸收到基中(尽管Wood等人在2013年讨论了
-用于限制项的几个替代方法)。
+用于限制项的几个替代方法) [@Wood2013;@Wood2013a]。
 
 张量积平滑存在一点问题。第5.6.5节(p. 235)的构造设计使光滑模型矩阵的列能够简单划分，并且
-他的参数向量允许光滑以$\mathbf{X} \boldsymbol\beta+\mathbf{Z}_{1} \mathbf{b}_{1}+\mathbf{Z}_{2} \mathbf{b}_{2}+\cdots$
+他的参数向量允许光滑以 $\mathbf{X} \boldsymbol\beta+\mathbf{Z}_{1} \mathbf{b}_{1}+\mathbf{Z}_{2} \mathbf{b}_{2}+\cdots$ 
 的形式表示。其中 $\boldsymbol\beta$ 是一个固定参数的向量，$\mathbf{b}_{j}$ 为随机效应 
  $\mathrm{b}_j \sim N\left(0, \boldsymbol{I} \sigma_{{b}_j}^{2}\right)$ 的独立向量。
 这样的参数项作为含有单一惩罚的平滑被估计。
@@ -85,18 +85,19 @@ $M_T$ 个0元素。注意在被分解的和中没有参数 $\lambda_i$ :这是�
 矩阵)。
 
 现在不可能实现用单个惩罚获得项的简单表示，因此重新参数化实际上更简单。假设 
-$\widetilde{\boldsymbol{X}}$ 是张量积光滑的原始模型矩阵。对特征向量矩阵进行分区，使
-$\mathbf{U}=\left[\mathbf{U}_{R}: \mathbf{U}_{F}\right]$ ,其中 $\mathbf{U}_{F}$ 有 $M_T$ 列。
+ $\widetilde{\boldsymbol{X}}$ 是张量积光滑的原始模型矩阵。对特征向量矩阵进行分区，使
+ $\mathbf{U}=\left[\mathbf{U}_{R}: \mathbf{U}_{F}\right]$ ,其中 $\mathbf{U}_{F}$ 有 $M_T$ 列。
 并且定义
-$X \equiv \widetilde{\boldsymbol{X}} \boldsymbol{U}_{F}, \boldsymbol{Z} \equiv \widetilde{\boldsymbol{X}} \boldsymbol{U}_{R}$ 和
-$S_{i}=\boldsymbol{U}_{R}^{\top} \widetilde{\boldsymbol{S}}_{i} \boldsymbol{U}_{R} \cdot$ 
+ $X \equiv \widetilde{\boldsymbol{X}} \boldsymbol{U}_{F}, \boldsymbol{Z} \equiv \widetilde{\boldsymbol{X}} \boldsymbol{U}_{R}$ 
+和
+ $S_{i}=\boldsymbol{U}_{R}^{\top} \widetilde{\boldsymbol{S}}_{i} \boldsymbol{U}_{R} \cdot$ 
 故张量积项(即线性预测子和随机效应分布)的混合模型表示现在是：
 
 $$\boldsymbol{X} \boldsymbol \beta+\boldsymbol Z \boldsymbol{b} \text { where } \boldsymbol{b} \sim N\left(\mathbf{0},\left(\sum \lambda_{i} \boldsymbol S_{i}\right)^{-1}\right)$$
 
 并且参数 $\lambda_i$ 和 $\beta_F$ 必须被估计。这种协方差矩阵结构并不是标准软件中可用
 的一种形式，但事实证明它是可以实现的，至少在Pinheiro和Bates(2000)的 $nlme$ 软件中是这样的:R 包 
- $mgcv$ 为 $lme$ 提供了一个合适的“pdMat”类，称为“pdtens”。给定这样一个类，将一个或多个张量积项合
+ $mgcv$ 为 $lme$ 提供了一个合适的“pdMat”类，称为“pdtens” [@Pinheiro2000]。给定这样一个类，将一个或多个张量积项合
 并到一个(广义的)线性混合模型中是很简单的。
 
 ## 混合模型估计的GAMM推断
@@ -107,7 +108,7 @@ $$\boldsymbol{X} \boldsymbol \beta+\boldsymbol Z \boldsymbol{b} \text { where } 
 不包括与光滑项相关的列，$\overline{\boldsymbol \psi}_{\theta}$ 是相应的随机效应协方差矩阵。
 现在定义一个协方差矩阵：
 
-$$\boldsymbol{V}=\overline{\boldsymbol Z} \overline{\psi}_{\theta}\overline{\boldsymbol{Z}}^{\top}+\boldsymbol{\Lambda} \sigma^{2}$$
+$$\boldsymbol{V}=\overline{\boldsymbol Z} \;\overline{\psi}_{\theta}\overline{\boldsymbol{Z}}^{\top}+\boldsymbol{\Lambda} \sigma^{2}$$
 
 其中 $\boldsymbol{\Lambda}$ 是线性混合模型(或者是更一般情况下的工作线性混合模型)估计的残差
 项的协方差矩阵。本质上，第4.2.4、5.8和6.10节中的贝叶斯方法意味着
@@ -118,5 +119,6 @@ $$\boldsymbol\beta \sim N\left(\hat{\boldsymbol\beta},\left(\overline{\boldsymbo
 
 $$\boldsymbol{F}=\left(\overline{\boldsymbol{X}}^{\top} \boldsymbol{V}^{-1} \overline{\boldsymbol{X}}+\boldsymbol{S}\right)^{-1}\left(\overline{\boldsymbol{X}}^{\top} \boldsymbol{V}^{-1} \overline{\boldsymbol{X}}\right)$$
 
-的主对角线给出了 $\boldsymbol \beta$ 每个元素的有效自由度。注意，在计算 $\overline{\boldsymbol X}^{\top}\boldsymbol V^{-1} \overline{\boldsymbol X}$ 
+的主对角线给出了 $\boldsymbol \beta$ 每个元素的有效自由度。注意，在计算
+$\overline{\boldsymbol X}^{\top}\boldsymbol V^{-1} \overline{\boldsymbol X}$ 
 时，利用 $\boldsymbol V$ 的特殊结构通常是一个好主意，否则计算过程十分复杂。
