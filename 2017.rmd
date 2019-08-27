@@ -96,8 +96,8 @@ $$\begin{aligned} l_{r}(\theta) \simeq & \log f(\boldsymbol y | \hat{\boldsymbol
 $\hat{\boldsymbol{\beta}},\hat{\boldsymbol{b}}$ 。与线性情况相反，这些计算不再是
 直接的，但也需要迭代，且惩罚IRLS方案通常在使用时是快速和可靠的。
 
-拉普拉斯近似在Davison(2003)或Wood(2015)中有更详细的讨论。Shum和McCullagh(1995)表明，
-如果随机效应的数量以不高于 $n^{l/3}$ 的速度增长，那么它通常提供了有充分根据的推断。
+拉普拉斯近似在Davison(2003)或Wood(2015)中有更详细的讨论[@Davison2003;@Wood2015]。Shun和McCullagh(1995)表明，
+如果随机效应的数量以不高于 $n^{l/3}$ 的速度增长，那么它通常提供了有充分根据的推断[@Shun1995]。
 例如。考虑以下情况：数据是每个受试者有两三个非高斯观测值，对应的模型是每个受试者有
 一个随机效应。显然拉普拉斯近似很可能给出有效的结果。在这种情况下，可以使用数值积分
 (有时称为“求积”)来计算(受限的)似然函数，前提是所需的积分分解为一组数值上容易处理的
@@ -164,7 +164,7 @@ $\boldsymbol z | \boldsymbol{b}, \boldsymbol{\beta} \sim N\left(\boldsymbol{X} \
 其中用到了Fisher权重。也就是说，PIRLS算法的步骤3中，$\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\phi}}$
 是利用2.4节(p. 78)的方法对上述工作线性混合模型进行拟合得到的。这种方法在混合模型
 的背景下(Breslow和Clayton, 1993)被称为PQL(惩罚拟似然)方法。在样条平滑背景下，这
-种方法被称为“面向性能的迭代”(Gu, 1992)。
+种方法被称为“面向性能的迭代”(Gu, 1992)[@Breslow1993]。
 
 一个显而易见的问题是当 $\mathbf{z}|\mathbf{b}, \boldsymbol{\beta}$ 显然不服从高斯
 分布时，为什么使用高斯线性混合模型或受限制的似然函数是有效的。对于工作模型，在假
@@ -227,3 +227,4 @@ $$\mathcal{B} | \boldsymbol{y} \sim N\left(\hat{\mathcal{B}},\left(\boldsymbol\c
 $$\hat{\boldsymbol{\theta}} \sim N\left(\boldsymbol{\theta}, \hat{\mathscr{I}}^{-1}\right)$$
 其中 $\hat{\mathscr{I}}$ 是基于PQL工作线性混合模型或完全拉普拉斯近似的剖面或受限制的
 极大似然的负Hessian。
+
