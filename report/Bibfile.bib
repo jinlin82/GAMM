@@ -1,7 +1,5 @@
 % Encoding: UTF-8
 
-@String{author = {}}
-
 @Book{BOLSTAD2017,
   title   = {INTRODUCTION TO BAYESIAN STATISTICS},
   year    = {2017},
@@ -24,7 +22,7 @@
 }
 
 @Article{Breslow1995,
-  author   = {Breslow, NORMAN E. and LIN, XIHONG},
+  author   = {Breslow, NORMAN E. and Lin, XIHONG},
   title    = {{Bias correction in generalised linear mixed models with a single component of dispersion}},
   journal  = {Biometrika},
   year     = {1995},
@@ -159,18 +157,6 @@
   title    = {GAMM在非寿险公司未决赔款准备金评估中的运用研究},
   school   = {湖南大学},
   year     = {2009},
-  abstract = {
-
-
-随着我国保险业的发展,保险业的竞争不断加剧,非寿险公司面临的风险也日益加剧,由于保险行业的特性,其风险主要体现为保险公司的准备金的计提水平,其中,未决赔款准备金是非寿险公司主要的负债之一,而且未决赔款准备金的计提水平将直接影响保险公司的盈利、产品定价、偿付能力和税收,所以未决赔款准备金也是非寿险公司必须使用精算方法谨慎评估的项目。
-
-
-
-从实际操作来看,链梯法是广泛应用于提取未决赔款准备金的一种方法,这种方法由于原理简单、操作简便而受到了保险公司的青睐,但是链梯法也存在很多缺陷,它只能对最终赔付额、发展因子和未决赔款准备金进行点估计,不能对未决赔款准备金的分布函数和提存的缺口进行量化的分析,由于抽样的波动性导致点估计值很不稳定。而且对于长尾业务或新开展的业务,其尾部因子的选取具有很大的主观性,因此链梯法的使用受到了一定的限制,其根源在于该方法是一种确定性的、静态的方法。于是人们开始尝试将随机模型引入到准备金评估中。
-
-
-
-在众多随机模型中,广义线性模型得到了较为广泛的应用,但是该模型仍将连续协变量对联系函数的影响看作是线性的,而且未考虑随机效应的影响,本文以此为切入点,引入广义加法混合模型评估未决赔款准备金。本文构建了伽玛加法混合模型、泊松加法混合模型,并将非参数平滑方法应用于到广义加法混合模型中,结合bayes理论和MCMC方法得到参数的估计。与传统的链梯法相比,广义加法混合模型更适合长尾业务准备金的评估,得到的结果更为准确,结果更为客观。为保险公司提取准备金提供了更大的参考空间,为全面地考察公司持续经营的成果提供了参考依据。},
   keywords = {未决赔款准备金;;广义加法混合模型;;马尔科夫蒙特卡洛},
 }
 
@@ -190,84 +176,6 @@
   title    = {基于切片抽样MCMC方法的比较分析},
   school   = {四川大学},
   year     = {2007},
-  abstract = {
-
-
-
-
-本文首先介绍了Monte Carlo方法以及常用的Markov Chain Monte Carlo(MCMC)方法,并指出他们的不足所在,然后针对这些方法的不足,引入了Slice Sampling(切片抽样)方法。通过这两种方法的模拟分析得到切片抽样可以降低计算成本的结论。本文采用数值模拟的方法来进行比较分析,替换了软件原有的Gibbs抽样,发现切片抽样具有高效性这一事实。最后文章讨论了现有随机模拟方法的不足和改进方向。
-
-
-
-
-
-随着贝叶斯理论的不断发展以及计算机硬件的不断更新,出现了Markov Chain Monte Carlo(MCMC)方法。目前,MCMC方法已经逐渐作为在统计推断中解决高维数值问题的强大而普遍的工具,这些问题包括需要高维积分的复杂似然函数的估计。MCMC算法的使用是建立在贝叶斯推断的框架下的,其基本假设是:所有的模型参数分别服从特定的先验分布。
-
-
-
-
-
-一个贝叶斯推断是基于后验密度函数的参数的,也就是说对第j个参数θ_j的条件密度为。
-
-
-
-
-
-考虑一个分层模型的贝叶斯形式的例子:
-
-
-
-
-
-其中b_i独立同分布于,后验分布由下面表出:
-
-
-
-
-
-标准化常数b_i与参数θ独立,因此对参数θ的估计,如后验众数或后验均值的估计可以由f (θ,y)单独导出。如果θ的先验分布π( i )是常数(称作平面先验或无信息先验),那么它的后验分布有效的正比于它的似然函数。因此,后验众数在数值上与极大似然估计相同。所以,我们通常需要β和D的平面先验或无信息先验(与共轭先验相对)。
-
-
-
-
-
-对于上述模型,后验分布的积分往往难以计算,这就需要引入本文第二章所介绍的随机模拟方法。其中,广泛认可的MCMC方法-Gibbs抽样解决了积分的问题。但随着研究的深入,Gibbs抽样的不足也逐渐被认识。基于这些不足,本文在第三章引入了Slice Sampler(切片抽样),它均匀地从密度函数的图像上抽样,可以作为一种分布抽样的方法。我们可以这样构建一个收敛到一个均匀分布Markov链:交替的在垂直方向均匀抽样以及从这个垂直位置所定义的水平切片抽样来实现。在这种切片抽样上的变化可以很容易的在单变量分布上实现,同时也可以通过轮流更新变量使其从多变量分布抽样,其模型如下:
-
-
-
-
-
-1.指定u及条件分布π( u |x)
-
-
-
-
-
-2.构建联合分布π( x , u ) =π( x )π( u |x)
-
-
-
-
-
-3.定义转移核以及,使得两个核都服从π( x ,u)
-
-
-
-
-
-4.通过系统扫描转移核Px Pu生成现实值
-
-
-
-
-
-这种方法比Gibbs抽样更容易实现,而且可能比简单构造的Metropolis算法更有效。
-
-
-
-
-
-本文的第五章中,我给出了前面介绍的切片抽样法的计算程序,替换了WinBUGS软件默认的抽样方法。通过比较分析,发现切片抽样方法效率更高。文末进一步讨论了所给出算法的实用意义,以及未来改进的方向。},
   keywords = {贝叶斯推断;;切片抽样;;MCMC;;Gibbs抽样},
 }
 
@@ -777,33 +685,31 @@ Panel数据模型是一种线性混合模型，常常产生于重复测量试验
 }
 
 @Article{Laird1982,
-  author        = {Nan M. Laird and James H. Ware},
-  title         = {Random-Effects Models for Longitudinal Data},
-  journal       = {Biometrics},
-  year          = {1982},
-  volume        = {38},
-  number        = {4},
-  pages         = {963--974},
-  issn          = {0006341X, 15410420},
-  __markedentry = {[qq:]},
-  abstract      = {Models for the analysis of longitudinal data must recognize the relationship between serial observations on the same unit. Multivariate models with general covariance structure are often difficult to apply to highly unbalanced data, whereas two-stage random-effects models can be used easily. In two-stage models, the probability distributions for the response vectors of different individuals belong to a single family, but some random-effects parameters vary across individuals, with a distribution specified at the second stage. A general family of models is discussed, which includes both growth models and repeated-measures models as special cases. A unified approach to fitting these models, based on a combination of empirical Bayes and maximum likelihood estimation of model parameters and using the EM algorithm, is discussed. Two examples are taken from a current epidemiological study of the health effects of air pollution.},
-  publisher     = {[Wiley, International Biometric Society]},
-  url           = {http://www.jstor.org/stable/2529876},
+  author    = {Nan M. Laird and James H. Ware},
+  title     = {Random-Effects Models for Longitudinal Data},
+  journal   = {Biometrics},
+  year      = {1982},
+  volume    = {38},
+  number    = {4},
+  pages     = {963--974},
+  issn      = {0006341X, 15410420},
+  abstract  = {Models for the analysis of longitudinal data must recognize the relationship between serial observations on the same unit. Multivariate models with general covariance structure are often difficult to apply to highly unbalanced data, whereas two-stage random-effects models can be used easily. In two-stage models, the probability distributions for the response vectors of different individuals belong to a single family, but some random-effects parameters vary across individuals, with a distribution specified at the second stage. A general family of models is discussed, which includes both growth models and repeated-measures models as special cases. A unified approach to fitting these models, based on a combination of empirical Bayes and maximum likelihood estimation of model parameters and using the EM algorithm, is discussed. Two examples are taken from a current epidemiological study of the health effects of air pollution.},
+  publisher = {[Wiley, International Biometric Society]},
+  url       = {http://www.jstor.org/stable/2529876},
 }
 
 @Article{Gilmour1985,
-  author        = {A. R. Gilmour and R. D. Anderson and A. L. Rae},
-  title         = {The Analysis of Binomial Data by a Generalized Linear Mixed Model},
-  journal       = {Biometrika},
-  year          = {1985},
-  volume        = {72},
-  number        = {3},
-  pages         = {593--599},
-  issn          = {00063444},
-  __markedentry = {[qq:6]},
-  abstract      = {Methods for generalized linear models are extended to provide estimates of location and variance parameters for mixed models fitted to binomial data formed by classifying samples from an underlying normal distribution. The method estimates the parameters directly on the underlying scale. For a balanced one-way random effects model, the variance estimator simplifies to the usual analysis of variance one. The estimation of variances and the prediction of random effects for binomial traits is required by animal breeders. The predictors given are analogous to best linear unbiased predictors (Henderson, 1973) but differ from those presented by Harville & Mee (1984).},
-  publisher     = {[Oxford University Press, Biometrika Trust]},
-  url           = {http://www.jstor.org/stable/2336731},
+  author    = {A. R. Gilmour and R. D. Anderson and A. L. Rae},
+  title     = {The Analysis of Binomial Data by a Generalized Linear Mixed Model},
+  journal   = {Biometrika},
+  year      = {1985},
+  volume    = {72},
+  number    = {3},
+  pages     = {593--599},
+  issn      = {00063444},
+  abstract  = {Methods for generalized linear models are extended to provide estimates of location and variance parameters for mixed models fitted to binomial data formed by classifying samples from an underlying normal distribution. The method estimates the parameters directly on the underlying scale. For a balanced one-way random effects model, the variance estimator simplifies to the usual analysis of variance one. The estimation of variances and the prediction of random effects for binomial traits is required by animal breeders. The predictors given are analogous to best linear unbiased predictors (Henderson, 1973) but differ from those presented by Harville & Mee (1984).},
+  publisher = {[Oxford University Press, Biometrika Trust]},
+  url       = {http://www.jstor.org/stable/2336731},
 }
 
 @Article{fisher1922mathematical,
@@ -2764,6 +2670,476 @@ Panel数据模型是一种线性混合模型，常常产生于重复测量试验
   number   = {4},
   pages    = {685--692},
   language = {Chinese},
+}
+
+@Article{Zeger1994,
+  author        = {Zeger, S. L. and Diggle, P. J.},
+  title         = {Semi-parametric models for longitudinal data with application to CD4 cell numbers in HIV seroconverters},
+  journal       = {Biometrics},
+  year          = {1994},
+  volume        = {50},
+  pages         = {689--699},
+  __markedentry = {[JL:]},
+}
+
+@Article{Osullivan1986,
+  author        = {Osullivan, Finbarr and Yandell, Brian S and Raynor, J William},
+  title         = {Automatic Smoothing of Regression Functions in Generalized Linear Models},
+  journal       = {Journal of the American Statistical Association},
+  year          = {1986},
+  volume        = {81},
+  number        = {393},
+  pages         = {96--103},
+  __markedentry = {[JL:]},
+}
+
+@Article{Tierney1986,
+  author        = {Tierney, Luke and Kadane, Joseph B},
+  title         = {Accurate Approximations for Posterior Moments and Marginal Densities},
+  journal       = {Journal of the American Statistical Association},
+  year          = {1986},
+  volume        = {81},
+  number        = {393},
+  pages         = {82--86},
+  __markedentry = {[JL:]},
+}
+
+@Article{Harville1974,
+  author        = {Harville, David A},
+  title         = {Bayesian inference for variance components using only error contrasts},
+  journal       = {Biometrika},
+  year          = {1974},
+  volume        = {61},
+  number        = {2},
+  pages         = {383--385},
+  __markedentry = {[JL:]},
+}
+
+@Article{Wang1998,
+  author        = {Wang, Yuedong},
+  title         = {Mixed effects smoothing spline analysis of variance},
+  journal       = {Journal of The Royal Statistical Society Series B-statistical Methodology},
+  year          = {1998},
+  volume        = {60},
+  number        = {1},
+  pages         = {159--174},
+  __markedentry = {[JL:]},
+}
+
+@Article{Lee1996,
+  author        = {Lee, Youngjo and Nelder, J A},
+  title         = {Hierarchical generalized linear models. Discussion},
+  journal       = {Journal of the royal statistical society series b-methodological},
+  year          = {1996},
+  volume        = {58},
+  number        = {4},
+  pages         = {619--656},
+  __markedentry = {[JL:]},
+}
+
+@Article{Rodriguez1995,
+  author        = {Rodriguez, Germaan and Goldman, Noreen},
+  title         = {An Assessment of Estimation Procedures for Multilevel Models with Binary Responses},
+  journal       = {Journal of The Royal Statistical Society Series A-statistics in Society},
+  year          = {1995},
+  volume        = {158},
+  number        = {1},
+  pages         = {73--89},
+  __markedentry = {[JL:]},
+}
+
+@Article{Thompson1985,
+  author        = {Thompson, R.},
+  title         = {Discussion on Some aspects of the spline smoothing approach to non-parametric regression curve fitting (by B. W. Silverman)},
+  journal       = {Journal of the royal statistical society series b-methodological},
+  year          = {1985},
+  volume        = {47},
+  pages         = {43--44},
+  __markedentry = {[JL:]},
+}
+
+@Article{Speed1991,
+  author        = {Speed, T.},
+  title         = {Discussion on BLUP is a good thing: the estimation of random effects, by Robinson, G. K},
+  journal       = {Statistical Science},
+  year          = {1991},
+  volume        = {6},
+  pages         = {15--51},
+  __markedentry = {[JL:]},
+}
+
+@Article{Wolfinger1996,
+  author        = {Wolfinger, R.},
+  title         = {The GLIMMIX SAS macro},
+  journal       = {Cary: SAS Institute},
+  year          = {1996},
+  __markedentry = {[JL:]},
+}
+
+@Book{Cressie1993,
+  title         = {Statistics for Spatial Data, 2nd edn.},
+  publisher     = {New York: Wiley.},
+  year          = {1993},
+  author        = {Cressie, N. A. C.},
+  __markedentry = {[JL:]},
+}
+
+@Book{Davison2003,
+  title         = {Statistical Models},
+  publisher     = {Cambridge: Cambridge University Press},
+  year          = {2003},
+  author        = {Davison, A. C.},
+  __markedentry = {[JL:]},
+}
+
+@Book{Wood2015,
+  title         = {Core Statistics},
+  publisher     = {Cambridge University Press},
+  year          = {2015},
+  author        = {Wood, S.N.},
+  __markedentry = {[JL:]},
+}
+
+@Article{Shun1995,
+  author        = {Shun, Z. and P. McCullagh},
+  title         = {Laplace approximation of high dimensional integrals},
+  journal       = {Journal of the Royal Statistical Society. Series B (Methodological)},
+  year          = {1995},
+  volume        = {54},
+  number        = {4},
+  pages         = {749–760},
+  __markedentry = {[JL:]},
+}
+
+@Article{Wood2013,
+  author        = {Wood, Simon N},
+  title         = {On p-values for smooth components of an extended generalized additive model},
+  journal       = {Biometrika},
+  year          = {2013},
+  volume        = {100},
+  number        = {1},
+  pages         = {221--228},
+  __markedentry = {[JL:]},
+}
+
+@Article{Wood2013a,
+  author        = {Wood, Simon N},
+  title         = {A simple test for random effects in regression models},
+  journal       = {Biometrika},
+  year          = {2013},
+  volume        = {100},
+  number        = {4},
+  pages         = {1005--1010},
+  __markedentry = {[JL:]},
+}
+
+@Article{Zhao2006,
+  author        = {Zhao, Yihua and Staudenmayer, John and Coull, Brent A and Wand, M P},
+  title         = {General design Bayesian generalized linear mixed models},
+  journal       = {Statistical Science},
+  year          = {2006},
+  volume        = {21},
+  number        = {1},
+  pages         = {35--51},
+  __markedentry = {[JL:]},
+}
+
+@Article{Neal2003,
+  author        = {Neal, R.},
+  title         = {Slice sampling (with discussion)},
+  journal       = {The Annals of Statistics},
+  year          = {2003},
+  volume        = {35},
+  pages         = {705--767},
+  __markedentry = {[JL:]},
+}
+
+@Article{Smith1996,
+  author        = {Smith,M. and R. Kohn},
+  title         = {Nonparametric Regression using Bayesian Variable Selection},
+  journal       = {Journal of Econometrics},
+  year          = {1996},
+  volume        = {75},
+  pages         = {317--343},
+  __markedentry = {[JL:]},
+}
+
+@Article{Denison1998,
+  title={Automatic Bayesian curve fitting},
+  author={Denison, DGT and Mallick, BK and Smith, AFM},
+  journal={Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  volume={60},
+  number={2},
+  pages={333--350},
+  year={1998},
+  publisher={Wiley Online Library}
+}
+
+@Article{Biller2000,
+  author        = {Biller, Clemens},
+  title         = {Adaptive Bayesian Regression Splines in Semiparametric Generalized Linear Models},
+  journal       = {Journal of Computational and Graphical Statistics},
+  year          = {2000},
+  volume        = {9},
+  number        = {1},
+  pages         = {122--140},
+  __markedentry = {[JL:]},
+}
+
+@Article{Heikkinen1998,
+  author        = {Heikkinen, J. and E. Arjas},
+  title         = {Nonparametric Bayesian Estimation of a Spatial Possion Intensity},
+  journal       = {Scandinavian Journal of Statistics},
+  year          = {1998},
+  volume        = {25},
+  pages         = {435--450},
+  __markedentry = {[JL:]},
+}
+
+@Article{Knorrheld2000,
+  author        = {Knorrheld, Leonhard and Raser, Gunter},
+  title         = {Bayesian Detection of Clusters and Discontinuities in Disease Maps},
+  journal       = {Biometrics},
+  year          = {2000},
+  volume        = {56},
+  number        = {1},
+  pages         = {13--21},
+  __markedentry = {[JL:]},
+}
+
+@Article{Hastie2000,
+  author        = {Hastie, Trevor and Tibshirani, Robert},
+  title         = {Bayesian backfitting},
+  journal       = {Statistical Science},
+  year          = {2000},
+  volume        = {15},
+  number        = {3},
+  pages         = {196--223},
+  __markedentry = {[JL:]},
+}
+
+@Article{Besag1991,
+  author        = {Besag, Julian and York, Jeremy and Mollie, Annie},
+  title         = {Bayesian Image Restoration,with two Applications in Spatal Statistics},
+  journal       = {Annals of the Institute of Statistical Mathematics},
+  year          = {1991},
+  volume        = {43},
+  number        = {1},
+  pages         = {1--59},
+  __markedentry = {[JL:]},
+}
+
+@Article{Fahrmeir2001a,
+  author        = {Fahrmeir, Ludwig and Lang, Stefan},
+  title         = {Bayesian Semiparametric Regression Analysis of Multicategorical Time-Space Data},
+  journal       = {Annals of the Institute of Statistical Mathematics},
+  year          = {2001},
+  volume        = {53},
+  number        = {1},
+  pages         = {11--30},
+  __markedentry = {[JL:]},
+}
+
+@Article{Lang2001,
+  author        = {Lang, Stefan and Brezger, Andreas},
+  title         = {Bayesian P-splines},
+  journal       = {SFB 386 Discussion Paper 236,University of Munich},
+  year          = {2001},
+  __markedentry = {[JL:]},
+}
+
+@Article{Smith1998,
+  author        = {Smith, Michael S and Wong, Chiming and Kohn, Robert},
+  title         = {Additive nonparametric regression with autocorrelated errors},
+  journal       = {Journal of The Royal Statistical Society Series B-statistical Methodology},
+  year          = {1998},
+  volume        = {60},
+  number        = {2},
+  pages         = {311--331},
+  __markedentry = {[JL:]},
+}
+
+@Article{Bernardinelli1995,
+  author        = {Bernardinelli, Luisa and Clayton, David and Montomoli, Cristina},
+  title         = {Bayesian estimates of disease maps: How important are priors?},
+  journal       = {Statistics in Medicine},
+  year          = {1995},
+  volume        = {14},
+  pages         = {2411--2431},
+  __markedentry = {[JL:]},
+}
+
+@Article{Knorr-Held1998,
+  author        = {Knorr-Held, L. and J. Basag},
+  title         = {Modelling Risk from a Desease in Time and Space},
+  journal       = {Statistics and Medicine},
+  year          = {1998},
+  volume        = {17},
+  pages         = {2045--2060},
+  __markedentry = {[JL:]},
+}
+
+@Article{Knorrheld1999,
+  author        = {Knorrheld, Leonhard},
+  title         = {Conditional Prior Proposals in Dynamic Models},
+  journal       = {Scandinavian Journal of Statistics},
+  year          = {1999},
+  volume        = {26},
+  number        = {1},
+  pages         = {129--144},
+  __markedentry = {[JL:]},
+}
+
+@Article{Gamerman1997,
+  author        = {Gamerman, Dani},
+  title         = {Sampling from the posterior distribution in generalized linear mixed models},
+  journal       = {Statistics and Computing},
+  year          = {1997},
+  volume        = {7},
+  number        = {1},
+  pages         = {57--68},
+  __markedentry = {[JL:]},
+}
+
+@Article{Wong1996,
+  author        = {Wong, Chiming and Kohn, Robert},
+  title         = {A Bayesian Approach to Estimation and Forecasting Addtive Nonparametric Autoregressive Models},
+  journal       = {Journal of Time Series Analysis},
+  year          = {1996},
+  volume        = {17},
+  number        = {2},
+  pages         = {203--220},
+  __markedentry = {[JL:]},
+}
+
+@TechReport{Rue2000,
+  author        = {Havard Rue},
+  title         = {Fast Sampling of Gaussian Markov Random Fields with Applications},
+  institution   = {Norwegian University for Science and Technology},
+  year          = {2000},
+  address       = {Trondheim},
+  __markedentry = {[JL:]},
+  publisher     = {Technical Report. Norwegian University for Science and Technology, Trondheim},
+}
+
+@article{Mallick2000,
+  title={Semiparametric generalized linear models: Bayesian approaches},
+  author={Mallick, Bani K and Denison, David GT and Smith, Adrian FM},
+  journal={BIOSTATISTICS-BASEL-},
+  volume={5},
+  pages={217--230},
+  year={2000},
+  publisher={MARCEL DEKKER INC}
+}
+
+@Article{Besag1974,
+  author        = {Besag, Julian},
+  title         = {Spatial Interaction and the Statistical Analysis of Lattice Systems(with discussion)},
+  journal       = {Journal of the royal statistical society series b-methodological},
+  year          = {1974},
+  volume        = {36},
+  number        = {2},
+  pages         = {192--236},
+  __markedentry = {[JL:]},
+}
+
+@Article{Basag1995,
+  author        = {Basag, J. and Kooperberg, C.},
+  title         = {On conditional and intrinsic autoregressions},
+  journal       = {Biometrika},
+  year          = {1995},
+  volume        = {82},
+  pages         = {733--746},
+  __markedentry = {[JL:]},
+}
+
+@Article{Berzuini1996,
+  author        = {Berzuini , C. and Larizza，Ch.},
+  title         = {A unified approach for modeling longitudinal and failure time data, with application in medical monitoring},
+  journal       = {IEEE Trans. Pattn Anal. Mach. Intell.},
+  year          = {1996},
+  volume        = {18},
+  pages         = {109--122},
+  __markedentry = {[JL:]},
+}
+
+@Article{Biller1997,
+  author        = {Biller, C. and Fahrmeir, L.},
+  title         = {Bayesian spline-type smoothing in additive generalized regression},
+  journal       = {Computational Statistics},
+  year          = {1997},
+  volume        = {12},
+  pages         = {135--151},
+  __markedentry = {[JL:]},
+}
+
+@Article{Kohn1987,
+  author        = {Kohn, Robert and Ansley, Craig F},
+  title         = {A new algorithm for spline smoothing based on smoothing a stochastic process},
+  journal       = {Siam Journal on Scientific and Statistical Computing},
+  year          = {1987},
+  volume        = {8},
+  number        = {1},
+  pages         = {33--48},
+  __markedentry = {[JL:]},
+}
+
+@Article{Besag1995,
+  author        = {Besag, Julian and Green, Peter and Higdon, David and Mengersen, Kerrie},
+  title         = {Bayesian Computation and Stochastic Systems},
+  journal       = {Statistical Science},
+  year          = {1995},
+  volume        = {10},
+  number        = {1},
+  pages         = {3--41},
+  __markedentry = {[JL:]},
+}
+
+@Article{Hobert1996,
+  author        = {Hobert, James P and Casella, George},
+  title         = {The Effect of Improper Priors on Gibbs Sampling in Hierarchical Linear Mixed Models},
+  journal       = {Journal of the American Statistical Association},
+  year          = {1996},
+  volume        = {91},
+  number        = {436},
+  pages         = {1461--1473},
+  __markedentry = {[JL:]},
+}
+
+@Article{Carlin1992,
+  author        = {Carlin, Bradley P and Polson, Nicholas G and Stoffer, David S},
+  title         = {A monte carlo approach to nonnormal and nonlinear state–space modeling},
+  journal       = {Journal of the American Statistical Association},
+  year          = {1992},
+  volume        = {87},
+  number        = {418},
+  pages         = {493--500},
+  __markedentry = {[JL:]},
+}
+
+@Article{Carter1994,
+  author        = {Carter, Chris and Kohn, Robert},
+  title         = {On Gibbs sampling for state space models},
+  journal       = {Biometrika},
+  year          = {1994},
+  volume        = {81},
+  number        = {3},
+  pages         = {541--553},
+  __markedentry = {[JL:]},
+}
+
+@Book{Fahrmeir1997,
+  title     = {Muitivariate Statistical Modelling based on Generalized Linear models},
+  publisher = {New York: Springer},
+  year      = {1997},
+  author    = {Fahrmeir, L. and Tutz, G.},
+}
+
+@Book{Green1984,
+  title     = {Nonparametric Regression and Generalized Linear Models},
+  publisher = {London:Chapman and Hall},
+  year      = {1984},
+  author    = {Green, P. J. and Silverman, B. W},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
