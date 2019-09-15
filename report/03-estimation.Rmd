@@ -459,8 +459,7 @@ $f[r, s]$ 的条件分布，在给定其余的 $f(l)， l[r, s]$
 让 $K[r, s]$ 表示 $K$ 的给定行和列数的子矩阵,让 $K [1, r-1]$ 和 $K [s + 1,m]$ 表示矩
 阵 $K[r, s]$ 的左矩阵和右矩阵。由此，就可以通过以下表达式得出条件均值 $\mu[r,s]$ 
 和协方差矩阵 $\Sigma[r,s]$ 
-$$\mu[r, s]=\tau^{2}\left\{\begin{array}{ll}{-K[r, s]^{-1} K[s+1, m] f[s+1, m]} & {r=1} \\ {-K[r, s]^{-1} K[1, r-1] f[1, r-1]} & {s=m} \\ {-K[r, s]^{-1}(K[1, r-1] f[1, r-1]+K[s+1, m] f[s+1, m])} & {\text { otherwise }}\end{array}\right.
-$$
+$$\mu[r, s]=\tau^{2}\left\{\begin{array}{ll}{-K[r, s]^{-1} K[s+1, m] f[s+1, m]} & {r=1} \\ {-K[r, s]^{-1} K[1, r-1] f[1, r-1]} & {s=m} \\ {-K[r, s]^{-1}(K[1, r-1] f[1, r-1]+K[s+1, m] f[s+1, m])} & {\text {其他}}\end{array}\right.$$
 和
 $$\Sigma[r, s]=\tau^{2} K[r, s]^{-1}$$
 以上结果或许也可以利用通常的条件正态分布公式得出。 $f[r, s]$ 的MH模块移动更新是通过从条件高

@@ -1539,17 +1539,17 @@ $$
 个任意地点更相似。因此，对于有效的先验定义，必须为每个地点 $x_t$ 定义一组相邻点。
 对于本文所考虑的地理数据，我们通常假设两个地点 $x_t$ 和 $x_j$ ;如果他们有共同的边界，他们就
 是相邻点。但对相邻更复杂的定义也是可能的;参见Besag等人(1991)[@Besag1991]。我们为函数估计
-$f(t),t=1,\cdot,m$，$m$个不同地点$x_j$ ,设定如下的空间光滑先验:
+ $f(t),t=1,\cdot,m$ ， $m$ 个不同地点 $x_j$ ,设定如下的空间光滑先验:
 $$\begin{array}{l}{\qquad f(t) \,|\, f(j) \,\, j \neq t, \tau^{2} \sim
-  N\left\{\sum_{j\in \partial_{j}} f(j) / N_{t}, \tau^{2} / N_{t}\right\}}  \end{array}$$ {#eq:m-bayes-10}
+  N\left\{\sum_{j\in \partial_{j}} f(j) / N_{t}, \tau^{2} / N_{t}\right\}} \end{array}$$ {#eq:m-bayes-10}
+
 其中 $N_{t}$ 表示邻近地点的数目， $j \in \partial_{t}$ 表示地点 $x_{j}$ 与地点 $x_{k}$ 
 相邻。因此 $f(t)$ 的条件均值是相邻地点函数估计的未加权平均。对于空间数据，由于 $x_t$ 之间没
 有固定的顺序，所以同时间或连续自变量一样，其设定是无定向的。
 
 一个更一般的先验可由式 [@eq:m-bayes-11] 给出，式 [@eq:m-bayes-10] 是式 [@eq:m-bayes-11] 的特例。
 $$f(t) | f(j) \,\,j \neq t\,, \tau^{2} \sim N\left\{\sum_{j \in \partial_{t}} w_{t j}/
-  w_{t+} f(j), 1 / w_{t+} \tau^{2}\right\}
-  $$ {#eq:m-bayes-11}
+  w_{t+} f(j), 1 / w_{t+} \tau^{2}\right\}$$ {#eq:m-bayes-11}
 其中 $w_{tj}$ 是已知的相等权重，加号表示其它下标的总和。
 
 这种先验称为正态固有自回归;参见Besag et al.(1991)和Besag and Kooperberg(1995)[@Besag1991;@Basag1995]。当指定
@@ -1564,7 +1564,7 @@ $$f|\tau^{2} \propto \exp \left(-\frac{1}{2 \tau^{2}} f^{T} K f\right)$$ {#eq:m-
 $$k_{t t}=w_{t+}$$
 并且
 $$k_{t j}=\left\{\begin{array}{ll}{-w_{t j}} & {j \in \partial_{t}} \\ {0} & {\text { 
-otherwise }}\end{array}\right.$$
+其他 }}\end{array}\right.$$
 通常这个先验是不恰当的，因为 $K$ 非满秩，因此不可逆。
 
 对于连续自变量或空间自变量的函数$f$，其先验的密切形式相似性允许有一个统一的MCMC算法，该
@@ -1592,7 +1592,7 @@ $$b_{g} | v^{2} \sim N\left(0, v^{2}\right), \quad g=1, \ldots, G$$
 并且为 $v^{2}$ 再定义一个高度离散的超先验，即
 $$f=\left(f_{1}, \ldots, f_{p}\right), \qquad \tau^{2}=\left(\tau_{1}^{2}, \ldots, 
 \tau_{p}^{2}\right), \qquad \beta=\left(\beta_{1}, \ldots, \beta_{r}\right), \quad 
-b=\left(b_{1}, \ldots, b_{G}\right)$$
+b=\left(b_{1}, \ldots, b_{G}\right)$$ 
 
 表示函数估计、方差效应、固定效应和随机效应的参数向量。于是便可以通过以下的条件独立假设完
 成贝叶斯模型的设定：
@@ -1601,8 +1601,7 @@ b=\left(b_{1}, \ldots, b_{G}\right)$$
 
 （b）先验 $p\left(f_{j} | \tau_{j}^{2}\right), j=1, \ldots, p$ 是条件独立的；
 
-（c）固定效应和随机效应的先验以及超先验 $\tau_{j}^{2}, j=1, \ldots, p$ 是彼此独立
-的。
+（c）固定效应和随机效应的先验以及超先验 $\tau_{j}^{2}, j=1, \ldots, p$ 是彼此独立的。
 
 <!-- # 参考文献 {-} -->
 <!--[//]: # (\bibliography{Bibfile})-->

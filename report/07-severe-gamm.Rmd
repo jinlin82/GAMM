@@ -1,0 +1,856 @@
+---
+title: "开题报告"
+author: "Li"
+date: "2019-04-15"
+css: ./style/markdown.css
+autoEqnLabels: true
+eqnPrefixTemplate: ($$i$$)
+linkReferences: true
+bibliography: Bibfile.bib
+notice: '@*'
+csl: ./style/chinese-gb7714-2005-numeric.csl
+link-citations: true
+---
+
+
+
+```{r setup, echo=F}
+knitr::opts_knit$set(root.dir = getwd())
+knitr::opts_chunk$set(echo = FALSE, results = 'hide')
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+```
+
+```{r prepare}
+rm(list=ls())
+options(digits=4)
+options(scipen=100)
+graphics.off()
+Sys.setlocale("LC_ALL", "Chinese")
+```
+
+
+
+# 基于广义可加混合模型的空气严重污染影响因素分析
+
+上一章我们对城市空气质量的基本状况及其影响因素的基本状况进行了概述，并分析了空气
+质量指数的时空间分布特征。从中可以发现，影响城市空气质量好坏的原因很复杂，并不是
+某一方面决定的，而是各个方面多因素综合作用的结果。因此，本章在上一章的基础上，对
+城市空气质量的影响因素进行分析，探明哪些因素对城市空气质量会产生影响及其具体影响
+方式。
+
+## 年度数据分析
+
+### 自变量筛选
+
+以同样的方法对年度空气严重污染天数为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m-excel) 
+所示。在图 \@ref(fig:fig-var-sel-m-excel) 中，横轴表示各自变量，纵轴表示标准化后的年度空气
+严重污染的天数。由图 \@ref(fig：fig-var-sel-m-excel) 可知，地区生产总值、地区生产总值增长率、
+固定资产投资额、城市公路客运量、房屋建筑施工面积、全社会用电量、工业二氧化硫排放量、工业烟
+粉尘排放量、工业污染治理完成投资额、废气治理完成投资额、平均气温、平均气压、经度、海拔对年
+度空气严重污染的天数无影响，这些变量被剔除，而剩下的变量有常住人口、建成区绿化覆盖率、私人
+汽车拥有量、降水量、平均相对湿度、平均风速、日照时数、纬度。且在剩下的这些变量中，可以看出，
+私人汽车拥有量、纬度对年度空气严重污染的天数呈正向影响，而降水量、平均相对湿度对年度空气严重
+污染的天数呈负向影响，常住人口、建成区绿化覆盖率、平均风速、日照时数与年度空气严重污染的天数
+呈非线性相关关系。
+
+```{r fig-var-sel-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度严重污染天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.y.severe <- read.csv("./results/dat.sel.y.severe.csv")
+
+varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.y.severe$city <- factor(dat.sel.y.severe$city)
+dat.sel.y.severe$year <- factor(dat.sel.y.severe$year)
+dat.sel.y.severe$heating <- factor(dat.sel.y.severe$heating)
+dat.sel.y.severe$coast <- factor(dat.sel.y.severe$coast)
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.severe[,3]), gamma = 0.5)
+gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.y.severe[,-c(1:3, 23:24)]),
+         index=18, which = i, main = y, cex.main = 0.95, ylim = c(-3, 3))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:3, 23:24)]))
+```
+
+解释 60.46%
+
+### 泊松回归模型
+作为比较的基准，首先建立泊松回归模型，结果如表 \@ref(tab:tab-severe-lm-y) 所示。由
+表 \@ref(tab:tab-severe-lm-y) 可知，在筛选出的变量中，常住人口、建成区绿化覆盖率、
+私人汽车拥有量、平均相对湿度、平均风速、日照时数、供暖、临海这些变量在10%的显著性
+水平下通过显著性检验，且其系数分别为-0.0005、0.0312、0.0033、-0.0369、-0.7383、
+-0.002、0.1682、1.5828，说明建成区绿化覆盖率、私人汽车拥有量、供暖、临海对年度空气
+严重污染天数呈正向影响，而常住人口、平均相对湿度、平均风速、日照时数对年度空气严重
+污染优天数呈负向影响。也就是说，在其他变量保持不变的条件下，建成区绿化覆盖率越高、
+私人汽车拥有量越多、供暖、临海地区，年度空气严重污染的天数越多，空气质量越差；而常
+住人口越多、平均相对湿度越大、平均风速越大、日照时数越多，年度空气严重污染的天数越
+少，空气质量越好。但根据我们的认知，建成区绿化覆盖率越多，空气质量应该越好，临海地
+区比非临海地区的空气质量好，在这里，这两个变量的符号与我们的预期的不一致。
+
+```{r tab-severe-lm-y, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 18, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+glm.y.severe <- glm(dat.sel.y.severe[, c("severe", varsel)], family = "poisson")
+lm.y.severe.coef <- summary(glm.y.severe)$coef
+
+
+dimnames(lm.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+```
+
+
+```{r tab-severe-lm-y-res-spatial, eval=F, results='markup'}
+library(ape)
+source("./codes/geodistance.R")
+city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+df.cities <- city[,c(1, 5, 6)]
+names(df.cities) <- c("name", "lat", "lon")
+city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
+city.dists.inv <- 1/city.dist.km
+diag(city.dists.inv) <- 0
+
+moran.g.lm <- tapply(resid(glm.y.severe), as.factor(dat.sel.y.severe$year), 
+              function(x) Moran.I(x, city.dists.inv)
+)
+
+moran.g.lm <- sapply(moran.g.lm, function(x) c(x$observed, x$p.v))
+dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+
+library("kableExtra")
+knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型残差空间自相关检验",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+### 泊松混合效应模型
+
+之后将城市作为随机效应建立泊松混合效应模型，对空气质量影响因素进行分析。拟合结果如
+表 \@ref(tab:tab-severe-lme-y) 所示。由表 \@ref(tab:tab-severe-lme-y) 可以看出，在
+10%的显著性水平下，常住人口、降水量、平均风速、日照时数、纬度通过显著性检验，且其
+系数分别为0.0606、-0.0009、-0.7571、-0.0013、0.1575。表明在其他变量保持不变的条件下，
+常住人口越多、纬度越高，年度严重污染的天数越多，空气质量越差；而降水量越多、平均风速
+越大、日照时数越多，年度空气严重污染的天数越少，空气质量越好。
+
+
+```{r tab-severe-lme-y-model, eval=T, results='hide'}
+
+library(mgcv)
+lme.y.severe <- gamm(severe~green+pop+car
+                    +rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   random=list(city=~1), data=dat.sel.y.severe,
+                   family="poisson", method = "REML")
+```
+
+```{r tab-severe-lme-y, eval=T, results='markup'}
+lme.y.severe.coef <- summary(lme.y.severe$lme)$tTable[,-3]
+
+dimnames(lme.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+### 泊松可加模型
+
+由之前变量筛选的结果可知，常住人口、建成区绿化覆盖率、平均风速、日照时数与年度空气
+严重污染天数之间存在非线性相关关系。进一步建立泊松可加模型，结果如表 \@ref(tab:tab-severe-gam-y) 
+所示。由表 \@ref(tab:tab-severe-gam-y) 可知，在10%的显著性水平下，降水量、临海、纬度
+对年度空气严重污染天数存在显著影响，其系数分别为-0.0011、-0.8987、0.0921。表明在其他
+变量保持不变的条件下，纬度越高的地方，年度空气严重污染天数越多，空气质量越差；而降水
+量越多、临海的地区，年度空气严重污染天数越少，空气质量越好。且图 \@ref(fig:fig-severe-gam-y) 
+中显示了常住人口、建成区绿化覆盖率、平均风速、日照时数的拟合曲线，阴影部分表示95%的
+置信区间。同时由表 \@ref(tab:tab-severe-gam-y-smooth) 可知，在10%的显著性水平下，
+常住人口、建成区绿化覆盖率、平均风速、日照时数均通过显著性检验，表明常住人口、建成
+区绿化覆盖率、平均风速、日照时数对年度空气严重污染天数存在非线性影响。由图 \@ref(fig:fig-severe-gam-y) 
+可以发现，年度空气严重污染的天数随常住人口的增加呈现先上升后下降的趋势，具体来讲，
+在常住人口在2000万人之后，年度空气严重污染的天数会下降；同时，年度空气严重污染天数
+随建成区绿化覆盖率的增加而有所增加，随平均风速的增加而有所减小，随日照时数的增加呈
+先增加后下降的平缓趋势。
+
+```{r tab-severe-gam-y, eval=T, results='markup'}
+
+library(mgcv)
+gam.y.severe <- gam(severe~s(pop)+s(green)+car
+                    +rain+humid+s(wind_speed)+s(sun)
+                   +heating+coast+lat,
+                   data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+gam.y.severe.coef <- summary(gam.y.severe)$p.table
+
+dimnames(gam.y.severe.coef) <- list(c("截距项", varselname[c(3:5,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "绿化率"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均风速"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe,
+         select=4,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gam-y-smooth, eval=T, results='markup'}
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe)$s.table[,-2])
+
+dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)], c("经验自由度", "卡方统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+### 泊松可加混合效应模型
+
+进一步建立泊松可加混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-severe-gamm-y) 
+所示。由表 \@ref(tab:tab-severe-gamm-y) 可知，在10%的显著性水平下，降水量、临海、纬度
+通过显著性检验，且其系数分别为-0.001、-0.448、-0.4746。表明在其他条件不变的前提下，
+降水量越多，临海区域、纬度越高，年度空气严重污染天数越少，空气质量越好。图 \@ref(fig:fig-severe-gamm-y) 
+显示了泊松可加混合效应模型的非参数曲线，其非参数项为常住人口、建成区绿化覆盖率、平均
+风速、日照时数，且由表 \@ref(tab:tab-severe-gamm-y-smooth) 的非参数项显著性检验可知，
+在10%的显著性水平下，为常住人口、建成区绿化覆盖率、平均风速、日照时数均通过显著性检验，
+表明为常住人口、建成区绿化覆盖率、平均风速、日照时数对年度空气严重污染天数存在非线性
+影响。且从图 \@ref(fig:fig-severe-gamm-y) 可以看出，年度空气严重污染天数随常住人口的
+增加而增加，随平均风速、日照时数的增加而减少，随建成区绿化覆盖率的增加呈先增加后下降的趋势。
+
+
+```{r tab-severe-gamm-y-model, eval=T, results='hide'}
+
+library(mgcv)
+gamm.y.severe <- gamm(severe~s(green)+s(pop)+car
+                    +rain+humid+s(wind_speed)+s(sun)
+                  +heating+coast+lat,
+                   random=list(city=~1), data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+```
+
+```{r tab-severe-gamm-y, eval=T, results='markup'}
+gamm.y.severe.coef <- summary(gamm.y.severe$lme)$tTable[-(6:9),-3]
+
+dimnames(gamm.y.severe.coef) <- list(c("截距项", varselname[c(3:5, 8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gamm-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "绿化率"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均风速"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.y.severe$gam,
+         select=4,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gamm-y-smooth, eval=T, results='markup'}
+gamm.smooth.tab.y.severe <- as.data.frame(summary(gamm.y.severe$gam)$s.table[,-2])
+
+dimnames(gamm.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)],c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+### 模型比较与选择
+
+上述分析中，我们选取年度空气严重污染天数作为因变量，基于lasso筛选出的变量为自变量，
+分别建立泊松回归模型、泊松混合效应模型、泊松可加模型和泊松可加混合效应模型对空气
+质量的影响因素进行分析。根据以上分析结果可知，在泊松回归模型中，显著的变量有常住
+人口、建成区绿化覆盖率、私人汽车拥有量、平均相对湿度、平均风速、日照时数、供暖、
+临海；在泊松混合效应模型中，显著的变量有常住人口、降水量、平均风速、日照时数、
+纬度；在泊松可加模型中，显著的变量有降水量、临海、纬度、常住人口、建成区绿化覆盖率、
+平均风速、日照时数；在泊松可加混合效应模型中，显著的变量有降水量、临海、纬度、
+常住人口、建成区绿化覆盖率、平均风速、日照时数。从模型结果来看，泊松可加模型效果
+最好，但是从模型变量来讲，结合之前的分析及我们的预期，这些模型尚未很好地表明变量
+与年度空气严重污染天数之间的关系。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以年度空气严重污染天数为因变量，
+降水量、平均风速、是否供暖、是否临海、纬度。常住人口、日照时数为自变量建立泊松可
+加模型，结果如表 \@ref(tab:tab-severe-gam-y-best) 所示。由表 \@ref(tab:tab-severe-gam-y-best) 
+可知，在10%的显著性水平下，降水量、平均风速、是否供暖、是否临海、纬度均通过显著性
+检验，且参数项系数分别为-0.0011、-0.8767、1.3932、-1.2146、0.0794。表明在其他条件
+不变的情况下，纬度越高的地区，年度空气严重污染天数越多，空气质量越差；且供暖区域
+比非供暖区域空气质量差。而降水量越多、平均风速越大、临海地区，年度空气严重污染天
+数越少，空气质量越好。图 \@ref(fig:fig-severe-gam-y-best) 表明了常住人口、日照时数
+的非参数曲线，且从表 \@ref(tab:tab-severe-gam-y-smooth-best) 中可以看出，在10%的显
+著性水平下，常住人口、日照时数对年度空气严重污染天数有非线性影响。且从图 \@ref(fig:fig-severe-gam-y-best) 
+中可以看出，年度空气严重污染天数随常住人口和日照时数的增加均呈先上升后下降的趋势。
+
+```{r tab-severe-gam-y-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.y.severe.best <- gam(severe~s(pop)
+                    +rain+wind_speed+s(sun)
+                   +heating+coast+lat,
+                   data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
+
+
+gam.y.severe.best.coef <- summary(gam.y.severe.best)$p.table
+
+dimnames(gam.y.severe.best.coef) <- list(c("截距项", varselname[c(4,6,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-y-best, eval=T, fig.height=3.0, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+
+par(mar=c(5,4,2,1))
+plot.gam(gam.y.severe.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "日照时数"
+         )
+
+```
+
+```{r tab-severe-gam-y-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe.best)$s.table[,-2])
+
+dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,7)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+## 月度数据分析
+
+### 自变量筛选
+
+以同样的方法对月度是否出现严重污染进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m) 
+所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变量。由图 \@ref(fig:fig-var-sel-m) 
+可知，地区生产总值、地区生产总值增长率、固定资产投资额、建成区绿化覆盖率、城市公路客运量、
+房屋建筑施工面积、全社会用电量、工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成
+投资额、废气治理完成投资额、平均气压、经度、海拔对月度是否出现严重污染无影响，这些变量
+被剔除，而剩下的变量有常住人口、私人汽车拥有量、平均气温、降水量、平均相对湿度、平均风速、
+日照时数、纬度。且在剩下的这些变量中，可以看出，私人汽车拥有量对月度是否出现严重污染呈
+正向影响，而降水量、平均相对湿度、平均风速、日照时数对月度是否出现严重污染呈负向影响，
+常住人口、平均气温、纬度与月月是否出现严重污染呈非线性相关关系。
+
+```{r fig-var-sel-m-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现严重污染自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+rm(list=ls())
+varlist <- read.csv("./data/var_list.csv")
+dat.sel.m.severe <- read.csv("./results/dat.sel.m.severe.csv")
+
+varinfo <- varlist[match(names(dat.sel.m.severe), as.character(varlist$var_code)), c(1:3,7)]
+varinfo <- varinfo[order(varinfo$var_no), ]
+
+dat.sel.m.severe$city <- factor(dat.sel.m.severe$city)
+dat.sel.m.severe$year <- factor(dat.sel.m.severe$year)
+dat.sel.m.severe$month <- factor(dat.sel.m.severe$month)
+dat.sel.m.severe$heating <- factor(dat.sel.m.severe$heating)
+dat.sel.m.severe$coast <- factor(dat.sel.m.severe$coast)
+
+dat.sel.m.severe$severe[dat.sel.m.severe$severe>0] <- 1
+
+library(gamsel)
+gam1 <- gamsel(as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.severe[,4]), gamma = 0.48, family = "binomial", num_lambda = 50)
+## gam1
+
+par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
+## plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1, 23:24)]), index=22)
+mapply(function(i, y) {
+    plot(gam1,newx=as.matrix(dat.sel.m.severe[,-c(1:4, 24:25)]),
+         index=37, which = i, main = y, cex.main = 0.95, ylim = c(-0.2, 0.2))},
+    as.list(1:22),
+    as.list(varinfo[,2][-c(1:4, 24:25)]))
+
+```
+
+解释 26.53%
+
+
+### Logistic回归模型
+
+作为比较的基准，首先建立logistic回归模型，结果如表 \@ref(tab:tab-severe-lm-m) 所示。
+由表 \@ref(tab:tab-severe-lm-m) 可知，在筛选出的变量中，常住人口、私人汽车拥有量、
+平均气温、降水量、平均相对湿度、平均风速、日照时数、纬度这些变量在10%的显著性水平
+下通过显著性检验，说明私人汽车拥有量、纬度对月度是否出现严重污染呈正向影响，而常住
+人口、平均气温、降水量、平均相对湿度、平均风速、日照时数对月度是否出现严重污染呈
+负向影响。也就是说，在其他变量保持不变的条件下，私人汽车拥有量越多，纬度越高，月度
+出现严重污染的概率越大；而常住人口越多、平均气温越高、降水量越大、平均相对湿度
+越大、平均风速越大、日照时数越长，月度出现严重污染的概率越小。
+
+
+```{r tab-severe-lm-m, eval=T, results='markup'}
+varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzero")[[1]]]),
+            "heating", "coast")
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
+varselname <- as.character(varselname[order(varselname$var_no), 2])
+
+glm.m.severe <- glm(severe~pop+car
+                   +mean_temp+rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial)
+
+lm.m.severe.coef <- summary(glm.m.severe)$coef
+
+
+dimnames(lm.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性回归模型回归系数表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+### Logistic混合效应模型
+
+之后将城市作为随机效应建立logistic混合效应模型，对空气质量影响因素进行分析。拟合结果
+如表 \@ref(tab:tab-severe-lme-m) 所示。由表 \@ref(tab:tab-severe-lme-m) 可以看出，在
+10%的显著性水平下，私人汽车拥有量、平均气温、降水量、平均相对湿度、平均风速、日照时数、
+纬度均通过显著性检验，同样表明在其他变量保持不变的条件下，私人汽车拥有量越多，纬度
+越高，月度出现严重污染的概率越大；而平均气温越高、降水量越大、平均相对湿度越大、
+平均风速越大、日照时数越长，月度出现严重污染的概率越小。
+
+```{r tab-severe-lme-m-model, eval=T, results='hide'}
+
+library(mgcv)
+
+lme.m.severe <- gamm(severe~pop+car
+                   +mean_temp+rain+humid+wind_speed+sun
+                   +heating+coast+lat,
+                   data=dat.sel.m.severe,
+                   family = binomial, 
+                   random=list(city=~1), method = "REML")
+```
+
+```{r tab-severe-lme-m, eval=T, results='markup'}
+lme.m.severe.coef <- summary(lme.m.severe$lme)$tTable[,-3]
+
+dimnames(lme.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(lme.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+### Logistic可加模型
+
+由之前变量筛选的结果可知，常住人口、平均气温、纬度与月度是否出现严重污染之间存在非线性相关
+关系。进一步建立logistic可加模型，结果如表 \@ref(tab:tab-severe-gam-m) 所示。由
+表 \@ref(tab:tab-severe-gam-m) 可知，在10%的显著性水平下，私人汽车拥有量、降水量、平均
+相对湿度、平均风速、日照时数对月度是否出现严重污染存在显著影响，且其系数均为负，表明在
+其他变量保持不变的条件下，私人汽车拥有量越多、降水量越大、平均相对湿度越大、平均风速越
+高、日照时数越长，月度出现严重污染的概率越大。且图 \@ref(fig:fig-severe-gam-m) 中
+显示了常住人口、平均气温、纬度的拟合曲线，阴影部分表示95%的置信区间。同时由
+表 \@ref(tab:tab-severe-gam-m-smooth) 可知，在10%的显著性水平下，常住人口、平均气温、纬度
+通过显著性检验，表明常住人口、平均气温、纬度对月度是否出现严重污染存在非线性影响。
+
+```{r tab-severe-gam-m, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.severe <- gam(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                   +heating+coast+s(lat),
+                   data=dat.sel.m.severe,
+                   family = binomial, method = "REML")
+gam.m.severe.coef <- summary(gam.m.severe)$p.table
+
+dimnames(gam.m.severe.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+plot.gam(gam.m.severe,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+plot.gam(gam.m.severe,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+```
+
+```{r tab-severe-gam-m-smooth, eval=T, results='markup'}
+gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe)$s.table[,-2])
+
+dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "卡方统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+### Logistic可加混合效应模型
+
+进一步建立logistic可加混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-severe-gamm-m) 
+所示。由表 \@ref(tab:tab-severe-gamm-m) 可知，在10%的显著性水平下，降水量、平均相对湿度、
+平均风速、日照时数均通过显著性检验，且其系数均为负，表明在其他条件不变的前提下，降水量越
+多、平均相对湿度越大、平均风速越大、日照时数越长，月度出现严重污染的概率越大。
+图 \@ref(fig:fig-severe-gamm-m) 显示了logistic可加混合效应模型的非参数曲线，其非参数项为
+常住人口、平均气温、纬度，且由表 \@ref(tab:tab-severe-gamm-m-smooth) 的非参数项显著性
+检验可知，在10%的显著性水平下，只有纬度通过显著性检验，表明纬度对月度是否出现严重污染
+存在非线性影响。
+
+
+```{r tab-severe-gamm-m-model, eval=T, results='hide'}
+
+library(mgcv)
+gamm.m.severe <- gamm(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                   +heating+coast+s(lat),
+                      random=list(city=~1), data=dat.sel.m.severe,
+                     family = "binomial", method = "REML")
+
+```
+
+```{r tab-severe-gamm-m, eval=T, results='markup'}
+gamm.m.severe.coef <- summary(gamm.m.severe$lme)$tTable[-(9:11),-3]
+
+dimnames(gamm.m.severe.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="可加混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gamm-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gamm.m.severe$gam,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+
+```
+
+```{r tab-severe-gamm-m-smooth, eval=T, results='markup'}
+gamm.smooth.tab.m.severe <- t(as.data.frame(summary(gamm.m.severe$gam)$s.table[,-2]))
+
+dimnames(gamm.smooth.tab.m.severe) <- list(varselname[c(1,3,10)],c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gamm.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="可加混合模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+
+### 模型比较与选择
+
+上述分析中，我们选取月度是否出现严重污染作为因变量，基于lasso筛选出的变量为自变量，
+分别建立logistic回归模型、logistic混合效应模型、logistic可加模型和logistic可加混合
+效应模型对空气质量的影响因素进行分析。根据以上分析结果可知，在logistic回归模型中，
+显著的变量有常住人口、私人汽车拥有量有平均气温、降水量、平均相对湿度、平均风速、
+日照时数、纬度；在logistic混合效应模型中，显著的变量有私人汽车拥有量、平均气温、
+降水量、平均相对湿度、平均风速、日照时数、纬度；在logistic可加模型中，显著的变量
+有私人汽车拥有量、降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、
+纬度；在logistic可加混合效应模型中，显著的变量有降水量、平均相对湿度、平均风速、
+日照时数、纬度。根据以上结果，结合之前的分析及我们的预期，综合所有显著的变量，
+进一步建立logistic可加模型进行相应分析。
+
+进一步选取上述所有模型中显著的变量，考虑实际情况，以月度是否出现严重污染为因变量，
+私人汽车拥有量、降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、纬度
+为自变量，建立logistic可加模型，结果如表 \@ref(tab:tab-severe-gam-m-best) 所示。
+由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，私人汽车拥有量、
+降水量、平均相对湿度、平均风速、日照时数均通过显著性检验，且其系数均为负，表明在
+其他条件不变的情况下，私人汽车拥有量越多、降水量越大、平均相对湿度越大、平均风速
+越大、日照时数越长，月度出现严重污染的概率越大。图 \@ref(fig:fig-severe-gam-m-best) 
+表明了常住人口、平均气温、纬度的非参数曲线，且从表 \@ref(tab:tab-severe-gam-m-smooth-best) 
+中可以看出，在10%的显著性水平下，纬度对月度是否出现严重污染的概率有非线性影响。
+
+```{r tab-severe-gam-m-best, eval=T, results='markup'}
+
+library(mgcv)
+gam.m.severe.best <- gam(severe~s(pop)+car
+                   +s(mean_temp)+rain+humid+wind_speed+sun
+                  +s(lat),
+                   data=dat.sel.m.severe,
+                   family = "binomial", method = "REML")
+
+
+gam.m.severe.best.coef <- summary(gam.m.severe.best)$p.table
+
+dimnames(gam.m.severe.best.coef) <- list(c("截距项", varselname[-c(1,3,8:10)]), c("估计值", "标准误", "t值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="半参数回归模型参数估计结果",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+
+```
+
+```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(2,2))
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=1,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "常住人口数"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=2,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "平均温度"
+         )
+par(mar=c(5,4,2,1))
+plot.gam(gam.m.severe.best,
+         select=3,
+         col="blue",
+         shade=T,
+         shade.col="grey",
+         ylab="severe",xlab = "纬度"
+         )
+```
+
+```{r tab-severe-gam-m-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.m.severe <- t(as.data.frame(summary(gam.m.severe.best)$s.table[,-2]))
+
+dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "F统计量值", "P值"))
+
+library("kableExtra")
+knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="半参数回归模型非参数项显著性",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
+```
+
