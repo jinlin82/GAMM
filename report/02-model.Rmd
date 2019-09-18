@@ -1,15 +1,16 @@
 ---
 title: "开题报告"
 author: "Li"
-date: "2019-04-15"
+date: '2019-04-15'
+output: pdf_document
 css: ./style/markdown.css
-autoEqnLabels: false
+bibliography: Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
-linkReferences: true
-bibliography: [Bibfile.bib, ]
+link-citations: yes
+linkReferences: yes
 notice: '@*'
 csl: ./style/chinese-gb7714-2005-numeric.csl
-link-citations: true
+autoEqnLabels: no
 ---
 
 
@@ -34,14 +35,14 @@ Sys.setlocale("LC_ALL", "Chinese")
 到的广义可加混合模型(GAMM)。
 
 ## 广义线性模型(GLM) {#sec:glm}
-在实际数据分析过程中，分类数据非常广泛。分类数据模型，像Logistic回归模型和泊松回
+在实际数据分析过程中，经常会遇到分类数据。分类数据模型，像Logistic回归模型和泊松回
 归模型的用途很广。在统计理论上，分类数据模型一般属于广义线性模型(Generalized
 Linear Model，GLM)。广义线性模型是经典线性模型的自然推广，最先由Nelder和
 Wedderburn在1972年提出[@nelder1972generalized]。广义线性模型为这些常用统计模型提
 供了一套统一的框架。许多在统计分析中常见的模型都可以看作是广义线性模型的特殊情况，
 例如线性回归和方差分析，处理定性因变量的logit和probit模型，用于分析计数数据的对
 数线性模型和泊松回归模型，生存数据分析中一些常见统计模型等。上面这些模型虽然名称
-各异，但它们具有一些共同的特征，例如其本质具有线性，它们的参数估计可以使用相同的
+各异，但它们具有一些共同的特征，例如它们的本质都具有线性，它们的参数估计可以使用相同的
 估计方法。这些共同点使得我们可以把这些模型放在一起作为一类模型来研究，而不是把它
 们看着是无关联的模型。下面我们就讨论广义线性模型框架。这一部分内容主要参考了
 McCullagh，Nelder (1989)[@mccullagh1989generalized]，Fahrmeir，
@@ -105,7 +106,7 @@ $$\eta_{i}=g(\mu_{i})$$
 
 #### 指数分布簇
 
-指数分布簇是一大类包括许多常见分布的分布集合，它包括常见的分布，如正态
+指数分布簇是一大类包括许多常见分布的分布集合，它包括许多常见的分布，如正态
 分布，指数分布，二项分布，泊松分布，伽马分布和逆正态分布等等。而常见的
 不属于指数分布簇的分布有$t$分布和柯西分布。指数分布簇的概率密度函数具有以
 下形式 
@@ -140,7 +141,7 @@ $$\label{eq:semipara-9}
 数$g^{-1}(\cdot)$，此时有$g^{-1}(g(\mu))=\mu$。联接函数的选择依赖于数据
 的类型。在经典线性模型中，因变量服从连续的正态分布，期望和线性预测子是
 相同的，所以恒等联接是合理的，此时$\bm \eta$和 $\bm \mu$都可以取实数轴上
-的任意值。对于计算数据和泊松分布，期望必然大于0，此时使用恒等联接函数则
+的任意值。对于计数数据和泊松分布，期望必然大于0，此时使用恒等联接函数则
 不太合适，因为$\bm \eta$可以为负值而$\bm \mu$不可以。对于泊松分布，联接
 函数可以为对数函数，即$\bm \eta=\log \bm \mu$，它的逆函数为$\bm
 \mu=e^{\bm \eta}$。对于二项分布，我们有$0<\bm \mu<1$。联接函数应该把区
@@ -174,8 +175,9 @@ $$\bm \eta= \left \{
       \bm \mu^{\lambda},& \lambda \neq 0,\\
       \log \bm \mu, & \lambda=0.
     \end{array} \right .$$
-指数函数联接的例子有：$\bm \eta= \bm \mu^{2};\bm \eta= 1/ \bm \mu;\bm
-\eta= \sqrt(\bm \mu)$和 $\bm \eta= \log(\bm \mu)$，即log联接是指数函数联
+指数函数联接的例子有：
+$\bm \eta= \bm \mu^{2};\bm \eta= 1/ \bm \mu;\bm\eta= \sqrt{\bm \mu}$
+和 $\bm \eta= \log(\bm \mu)$，即log联接是指数函数联
 接的特殊情况。这些都属于Box-Cox型变换。当$\lambda \neq 0$，指数函数联接
 逆函数为$\bm \mu =e^{\frac{\ln (\lambda \bm
     \eta+1)}{\lambda}}$。当$\lambda = 0$，逆函数为$\bm \mu= e^{\bm
@@ -186,6 +188,7 @@ $$\bm \eta= \left \{
 模型。
 
 #### 线性预测子
+
 广义线性模型中的线性预测子 $\bm \eta= \bm{X\beta}$ 和经典线性模型中是相
 同的。用 $p\times 1$ 维向量 $\bm x_{i}$ 表示第 $i$ 个单位的 $p$ 个自变量观测值
 即 $\bm x_{i}=[x_{i1},\cdots, x_{ip}]^{T}$ ， $\bm \beta$ 是 $p \times 1$ 维
@@ -214,8 +217,7 @@ $\bm X$被称为**设计矩阵**。
 可以表示为 
 $$\label{eq:1}
   y_{i}|x=f(x)+\epsilon_{i},$$
-其中$f$ 表示$y$ 与$x$之间关系的函数形式，$f$的限制条件为其为光滑
-[^2]的。熟悉的线 性方程形式是这种类型函数的一种特殊情形： 
+其中$f$ 表示$y$ 与$x$之间关系的函数形式，$f$的限制条件是 $f$ 为光滑函数。熟悉的线 性方程形式是这种类型函数的一种特殊情形： 
 $$\label{eq:2}
   f(x)=\alpha+\beta x$$
   
@@ -226,16 +228,16 @@ $$\label{eq:2}
 据来估计$f$的函数形式。所以，事先的线性假设被更弱的假设即任意光滑总体函数所代替。
 这个更弱的假设的代价是两方面的：第一，计算方面的代价是巨大的，但考虑到现代计算技
 术的速度，这不再是很大的问题；第二，光滑函数的可解释性比线性函数差，虽然丧失了一
-些可解释性，但得到的回归方程一个更具代表性的估计。光滑函数$f$的估计方法很多，下
+些可解释性，但得到的回归方程是一个更具代表性的估计。光滑函数$f$的估计方法很多，下
 面就介绍几种常见光滑方法。
 
 ### 常见光滑方法
 #### 核光滑
-最简单光滑方法是使用 $y$的均值作为局部估计，但是简单均值作为局部估计具有严重的缺
+最简单的光滑方法是使用 $y$的均值作为局部估计，但是简单均值作为局部估计具有严重的缺
 陷。非参数回归的目的是得到忠于 $x$与 $y$之间局部关系的估计。但简单均值无论离关注
 点的距离如何，都赋予 $x$和 $y$的值以相等的权重。不考虑观测值与关注点之间的距离而
 赋予所有的观测值以相同的权重是不合理的。如果我们赋予靠近关注点的观测值更大的权重，
-而赋予靠近窗的边界处的观测点以更小的权重，就可以得到一个更忠于$y$ 与 $x$之间局部
+而赋予靠近边界处的观测点以更小的权重，就可以得到一个更忠于$y$ 与 $x$之间局部
 关系的非参数估计量。
 
 核光滑非参数回归模型通过使用加权平均重新定义了移动平均光滑方法。我们所
@@ -299,7 +301,8 @@ $$\label{eq:11}
 
 Cleveland(1979)首先提出局部回归光滑器，大部分统计软件包使用他提出的算法。
 他提出的局部回归方法**loess**及其变种**lowess**是使用最多的非
-参数回归模型之一[@cleveland1979robust]。这两种光滑器在几个方面都比
+参数回归模型之一[@cleveland1979robust]。前者是**local regression**的简称，
+后者是 **localweighted regression**的简称。这两种光滑器在几个方面都比
 目前为止介绍的局部回归思想复杂。下面对Cleveland的非参数回归模型进行讨
 论。
 
@@ -307,8 +310,8 @@ Cleveland提出了一个多项式回归模型而不是线性回归的局部估
 计[@cleveland1979robust]。预测变量$x$的 $p$阶多项式回归为 
 $$\label{eq:12}
   y=\alpha+\beta_{1}x+\beta_{2}x^{2}+\cdots+\beta_{p}x^{p}+\epsilon.$$
-如果$p=1$那么拟合是线性的，如果$p=2$那么拟合是平方的，等等。多项式阶数
-的选择可以根据研究的需要，但一般高于2阶的多项式对于通过非参数估计的表
+如果$p=1$ ,那么拟合是线性的，如果$p=2$那么拟合是抛物线，等等。多项式阶数
+的选择可以根据研究的需要，但一般高于2阶的多项式对于提高非参数估计的表
 现作用有限。
 
 下面的递归拟合过程得到非参数回归估计量：
@@ -340,8 +343,7 @@ $$\label{eq:14}
 计。
 
 局部回归程序没有权重时也可以进行。实际上，有无权重就是**loess**和
-**lowess**的区别。前者是**local regression**的简称，后者是 **local
-weighted regression**的简称。这两者之间的区别在实际使用中一般很小。
+**lowess**的区别。这两者之间的区别在实际使用中一般很小。
 
 局部多项式回归中带宽的选择仍然是重要的。界定带宽的方法不是通过定义在关
 注点两侧观测值的个数来确定，而是通过窗中包含的观测值的个数占总数据点个
@@ -384,12 +386,12 @@ Gijbels(1992)和Fan(1993)展示了局部线性拟合具有一些局部平均所�
 目前为止，我们已经介绍了几种不同的非参数回归模型。下面对这些模型进行简单比较。一
 个常见的问题是某一种非参数回归方法是否优于其它方法。对于许多实际问题来说，没有哪
 一种方法完全优于另一种方法，但光滑样条方法确实具有一些优点。它是唯一对在拟合中使
-用的参数施加惩罚项的光滑器。非参数回归的主要批评之一就是其易于过拟合数据，光滑样
-条直接面对这个批评的并加以解决。而且，光滑样条的混合模型框架为这些光滑器提供了一
+用的参数施加惩罚项的光滑器。非参数回归的主要不足之一就是其易于过拟合数据，光滑样
+条直接面对这个不足的并加以解决。而且，光滑样条的混合模型框架为这些光滑器提供了一
 个分析基础。
 
 提供一些模拟的证据来展示不同的光滑器对一个高度非线性函数形式的拟合效果。在这个模
-拟中，我们产生一个函数$f$并使用4个不同的光滑器进行拟合，两个局部多项式拟合，两个
+拟中，我们产生一个函数$f$并使用4个不同的光滑器进行拟合，分别为两个局部多项式拟合，两个
 样条光滑器来对模拟的数据进行拟合。这个非线性方程为： 
 $$\label{eq:60}
 y=\sin^{3}(2\pi x^{2})+\varepsilon.$$
@@ -446,10 +448,10 @@ lines(fit, se=FALSE, lwd=1)
 
 ```
 
-第一个非参数模型是光滑器。采用目测试错方法，选取0.1作为带宽值。拟合效果不错
+第一个非参数模型是Loess局部回归光滑器。采用目测试错方法，选取0.1作为带宽值。拟合效果不错
 但存在一些欠光滑，因为它缺失了一些峰和谷。右上角的图是使用AIC准则选择节点的自然
 三次B样条拟合。这个模型中显示了明显的欠光滑，在$x$的后半部分拟合效果较差。左下角
-图中是估计。估计与估计几乎是完全相同的，因此我们再次发现中使用的权重对于估计几乎
+图中是Lowess局部回归估计。Loess估计与Lowess估计几乎是完全相同的，因此我们再次发现使用的权重对于估计几乎
 没有什么作用。最后使用目测试错方法选择自由度为31的光滑样条估计。光滑样条估计
 很好的拟合了非线性，只有轻微的欠光滑出现。光滑样条的表现与两个局部多项式回归相类
 似。模拟显示光滑样条和两个局部多项式都是不错的选择。对于基本的散点图光滑来说，没
@@ -483,14 +485,14 @@ lines(fit, se=FALSE, lwd=1)
 但是在大部分应用研究中需要考虑多元模型。局部多项式非参数回归模型可以推广到多元框
 架下。一般地，我们可以假设$k$元非参数回归模型为：
 $$\label{eq:semipara-72}
-  Y_{i}=f(X_{1},\cdots,X_{k})+\varepsilon.$$
+Y=f(X_{1},\cdots,X_{k})+\varepsilon.$$
 
 这个模型的估计与一个自变量的非参数回归模型相类似。这时，局部估计使用多
 元局部多项式回归而不是一元局部多项式回归。像以前一样，靠近关注点的数据
 比远离关注点的数据得到更多的权重。但由于窗的大小变成了平面的距离从而使
 得局部窗宽的定义更为复杂。用来自多元局部多项式回归模型的预测值作为局部
 估计，把其连接起来就得到了估计的曲面，这个曲面表示
-了$x_{1i}$和$x_{2i}$对$y$的交互作用。二元非参数回归模型等价于非线性交互
+了$x_{1}$和$x_{2}$对$y$的交互作用。二元非参数回归模型等价于非线性交互
 模型的设定，其得到的估计是代表两个自变量对$y$的联合作用的曲面。
 
 在这种形式中，有人可能会认为非参数回归适合于标准的多元条件，因此可以在实际建模过
@@ -567,15 +569,15 @@ title ("完全非参数模型")
 就是完全的多元非参数回归模型。图 \@ref(fig:fig-multi-nonpara) 中的两个对角处
 给出了完全参数模型和完全非参数模型。
 
-考虑到估计多个自变量的完全的非参数模型的困难，研究者一般寻求简约的混合
-模型。一个这样的例子就是部分线性模型,也就是我们将要讨论的半参数回归模型。
+考虑到估计多个自变量的完全非参数模型存在的困难，研究者一般寻求简约的组合
+模型。一个例子就是部分线性模型,也就是我们将要讨论的半参数回归模型。
 我们从图 \@ref(fig:fig-multi-nonpara) 中可以看到，对于任意固定的$x$，回归函数
 是$\bm{z}$的线性函数。部分参数模型是部分线性模型的一个推广，其
 中$y=g(\bm{z;\beta})+f(x)+\varepsilon$， $g$是一个已知的函数。对于
 图 \@ref(fig:fig-multi-nonpara) 中的部分参数模型曲面，对于任意固定
-的$x$值 $g$ 是$z-a$的二次函数。
+的$x$值, $g$ 是$z-a$的二次函数。
 
-单指标模型构成了另一种混合。在$y=f(\bm{x\beta})+\varepsilon$的情况下，
+单指标模型构成了另一种组合。在$y=f(\bm{x\beta})+\varepsilon$的情况下，
 对于任意固定的指数值$\bm{x\beta}$，函数$f(\bm{x\beta})$是固定的。
 图 \@ref(fig:fig-multi-nonpara) 中描述的指数模型由$y=\cos(x_{1}+x_{2})$给出。
 因此，在$x_{1}+x_{2}=$固定值时，函数是平的直线。部分线性指数模型是另一
@@ -592,7 +594,7 @@ $f$可以写为$f_{a}(x_{a})+f_{b}(x_{b})$的形式，那么这个模型成为�
 ### 可加模型 {#sec:addtive_models}
 
 多元非参数回归模型由于“维数灾难”等局限性导致其难以运用到实际建模过程
-中。我们希望能找到既能达到数据降维同时又能保留非参数光滑优点方法。主要
+中。我们希望能找到既能达到数据降维同时又能保留非参数光滑优点的方法。主要
 的方法就是可加模型。
 
 把非参数回归模型推广到两个以上的自变量需要额外的假设：可加。尽管可加
@@ -686,7 +688,7 @@ $f_{j}(\cdot)$是自变量$x_{k}$的光滑函数。
 GLM的估计可以使用Newton-Raphson算法的直接最大似然估计法或迭代再加权最小二乘法
 (Iteratively Reweighted Least Squares, IRLS)(Hardin，Hilbe,2007)得到[@hardin2007generalized]，具体可以参考Hardin，
 Helbe(2007)给出的一个关于每种算法的概述。IRLS更适合于GAM的估计，因为它把GLM的估
-计减少到加权最小二乘的迭代应用。我们可以使用backfitting算法来估计GAM中系统部分的
+计减少化到加权最小二乘的迭代应用。我们可以使用backfitting算法来估计GAM中系统部分的
 光滑函数。基于样条混合模型的GAM采用了Newton-Raphson方法，详细参见Ruppert，Wand，
 Carrol(2003)对这个估计程序的介绍[@ruppert2003semiparametric]。关于用于估计GAM的
 IRLS算法的基本步骤，详细可以参 考Hastie，Tibshirani(1990)和Wood(2006)的著作
@@ -695,7 +697,7 @@ IRLS算法的基本步骤，详细可以参 考Hastie，Tibshirani(1990)和Wood(
 IRLS方法的优点是其估计GAM并没有比估计一个可加模型困难多少，而GAM模型的估计明显比
 可加模型的计算强度更大。在可加模型里面，我们仅需要运行一次backfitting算法，而在
 GAM里面，在IRLS的每一次迭代过程中，我们都必须估计一个可加模型。在现代计算机上一
-般估计GAM会稍微慢一点，但对于大数据集来说，估计GAM等待的时间可能会很明显。
+般估计GAM会稍微慢一点，对于大数据集来说，估计GAM等待的时间可能会更长。
 
 我们将前面讨论的光滑方法和非参数回归模型应用到GLM就可以得到GAM。在使用广义可加模
 型时，一个值得注意的问题是非参数估计比参数估计需要更多的数据。GAM有时候不能收敛，
@@ -711,7 +713,7 @@ GAM里面，在IRLS的每一次迭代过程中，我们都必须估计一个可�
 混合效应模型是分析分组数据的灵活、强大的工具。分组数据在许多领域中广泛存在，例如
 农业、生物、经济、制造业和地质学。纵向数据、重复测量数据，多水平数据、层次数据等
 都属于分组数据。经典线性模型中一个典型的假设就是观测值来自一个相同的总体，即是独
-立同分布的。而分组数据一般组内的观测值是相依的，因为它们属于相同的自总体，而组间
+立同分布的。而一般分组数据的组内观测值是相关的，因为它们属于相同的子总体，而组间
 是独立的。混合效应模型可以对分组数据中存在的组内相关进行建模，并且为平衡数据和非
 平衡数据提供了统一的分析框架。混合效应模型是非线性统计模型，主要是因为其具有复杂
 的方差结构。混合效应模型的出现把线性模型带入了一个更广阔的空间。从混合效应模型的
@@ -726,9 +728,9 @@ GAM里面，在IRLS的每一次迭代过程中，我们都必须估计一个可�
 长曲线模型；计量经济学文献称之为随机系数模型 (random coefficient models)和面板数
 据模型。
 
-混合效应模型除了用于分组数据建模外，其对于理解其他一些统计方法也有重要作用。混合
+除了用于分组数据建模外，混合效应模型对理解其他一些统计方法也有重要作用。混合
 模型的作用非常广泛，Demidenko(2004)指出混合效应模型可以用于以下目的
-[@demidenko2004mixed]：拟合复杂的相关数据，包括纵向数据，分层数据、空间数据等。
+[@demidenko2004mixed]：拟合复杂的相关数据，包括纵向数据，分层数据、空间数据等；
 拟合具有多变异性的数据；拟合异方差数据；作为频率方法和贝叶斯方法的折衷方法；作为
 罚似然统计模型；处理参数多维性。
 
@@ -745,7 +747,7 @@ GAM里面，在IRLS的每一次迭代过程中，我们都必须估计一个可�
 机变量。
 
 从前面的叙述我们看到，混合模型包括一大类模型，适用于各种类型的相关数据。下面就以
-纵向数据为例的给出线性混合模型的模型设定。纵向数据研究一般是考查对个体单位重复测
+纵向数据为例给出线性混合模型的模型设定。纵向数据研究一般是考查对个体单位重复测
 量的特征随时间的变化规律。每个个体单位在不同的时间点，甚至不同的外界条件下进行重
 复观测。通常，我们不能控制观测时的外界条件，并且被观测的个体数量和观测时间可能发
 生较大变化。纵向数据通常难以用未限制协方差结构的普通多元模型分析，而混合模型是分
@@ -870,21 +872,21 @@ $$\label{eq:18}
       \boldsymbol 0 &  \boldsymbol{\Lambda_{2}+Z_{2}\Psi Z_{2}^{T}} & \boldsymbol 0&\boldsymbol 0\\
       \boldsymbol \vdots &\boldsymbol \vdots &\boldsymbol \ddots &\boldsymbol \vdots \\
       \boldsymbol 0 &\boldsymbol 0 &\boldsymbol \ldots &  \boldsymbol{\Lambda_{M}+Z_{M}\Psi Z_{M}^{T}}
-    \end{array} \right ].$$ 
+    \end{array} \right ].$$ [#eq:m-2.3.1]
 
 上面的设定尽管模型和的形式比简单，但其符号的说明比较复杂。
 
 在随机效应和随机误差项服从正态分布的假设下，混合模型可以表示为因变量的边际分布 
 $$\label{eq:20}
   \boldsymbol{y \thicksim \mathcal{N}(X\beta,V)},$$ 
-其中 $\boldsymbol{V}$为式所定义。
+其中 $\boldsymbol{V}$为式 [@eq:m-2.3.1] 所定义。
 
 
 ### 半参数模型和混合模型的关系
 随机效应是解决统计模型中未观测到的异质性一种常见方法。例如，面板数据模型就容易受
 到异质性影响。在面板数据模型中，模型的截距随着数据中的个体而变化，随机效应可以用
 于对这些个体截距中的变异性进行建模。在随机效应模型中，一个来自均值为0，方差为
-$\sigma^{2}$的正态分布的随机冲击加上每一个个体截距上。这个随机冲击就可以消除异质
+$\sigma^{2}$的正态分布的随机冲击加在每一个个体截距上。这个随机冲击就可以消除异质
 性。因此，我们可以使用混合模型来估计样条。实际上，光滑样条刚好可以表示为混合模型
 框架中的最优预测量(Ruppert, Wand and Carroll 2003)[@ruppert2003semiparametric]。
 尽管混合模型框架对于样条方法在实际数据分析中没有很大作用，但是从混合模型框架的角
@@ -898,7 +900,7 @@ Carroll(2003)[@ruppert2003semiparametric]。
   Y_{ij}=\beta_{0j}+\beta_{1j}X_{ij}+e_{ij}.$$
 对于混合模型，一般地模型公式中每一项都有两个下标(或者更多)。在这种记号
 中，我们有嵌套在$j$个个体当中的$i$个观测值。这可以是嵌套在$j$个学校中
-的$i$个学生或者是嵌套在$j$个郡的$i$个投票者。我们认为在不同的$j$个体之
+的$i$个学生。我们认为在不同的$j$个个体之
 间具有异质性，也即斜率和截距随着$j$个体的不同而变化。如果我们怀疑在截
 距和斜率之间存在这样的变异性，那么一个来自正态分布的随机数就可以按照以
 下方式加入到截距和斜率参数中： $$\begin{aligned}
@@ -924,7 +926,7 @@ $\gamma_{00}$是$j$个个体的平均结果，$\gamma_{10}$是$j$个个体的平
 评价。收缩得到的估计的均方误差优于聚合模型和个体模型的均方误差。线性混
 合模型估计是最佳线性无偏预测(BLUP)(Pinero and Bates 2000; Ruppert, Wand
 and Carroll
-2003)[@pinheiro2000mixed; @ruppert2003semiparametric]。因此，当$j$个
+2003)[@pinheiro2000mixed; @ruppert2003semiparametric]。因此，当$j$个个
 体之间具有显著的差异时，依据均方误差原则，混合模型就提供了最佳拟合。
 
 非线性可以看作是另一种形式的组间异质性。节点之间的数据就形成了一个组。
@@ -934,7 +936,7 @@ and Carroll
 性拟合是有偏的。一个标准样条模型就是一个没有聚合的模型。此时，我们对每
 个节点之间的数据都得到一个参数。这样得到的模型将非常确切的反映了局部变
 异性，但是在节点之间的数据不多时，得到的估计将具有较大的变异性。与线性
-模型和标准样条模型不同，光滑样条模型与混合模型具有类型的结构，其考虑了
+模型和标准样条模型不同，光滑样条模型与混合模型具有类似的结构，其考虑了
 局部变异性但同时从所有的节点段之间“借力”。这表明，光滑样条估计是均方
 误差意义上的最佳估计。光滑样条估计是具有非线性导致的异质性模型的最佳线
 性无偏预测(BLUP)，其从一个高度局部性的拟合向全局估计收缩。
@@ -1004,14 +1006,14 @@ $\boldsymbol u$是随机效应向量，每一个元素都来自于正态分布
 $\mathcal{N}(0,\sigma_{u_{k}}^{2})$。我们可以把改写成以 下混合模型：
 $$\label{eq:119}
   \boldsymbol{y=X\beta+Zu+\varepsilon}.$$
-这个两个模型的差异是在每个节点上的系数用随机效应来代替。方程 的解为：
+这两个模型的差异在于混合模型中每个节点的系数用随机效应来代替。方程的解为：
 $$\label{eq:120}
   \boldsymbol {\widehat f} =\boldsymbol C(\boldsymbol{C'C}+\lambda^{2} \boldsymbol D)^{-1}\boldsymbol{C'y}$$
 其中$\boldsymbol{C=[XZ]}$，$\boldsymbol{D}=\text{diag}(0,0,1,\cdots,1)$，
 $\lambda^{2}=\sigma_{\varepsilon}^{2}/\sigma_{u}^{2}$。Ruppert, Wand and
 Carroll(2003)证明了方程等价于 
 $$\label{eq:121}
-  \text{SS}(f,\lambda)=\sum_{i=1}^{n}[(y_{1}-f(x_{1}))]^{2}
+  \text{SS}(f,\lambda)=\sum_{i=1}^{n}[(y_{i}-f(x_{i}))]^{2}
   +\lambda \int_{x_{1}}^{x_{n}}f''(x)^{2}\text{d}x$$
 这是光滑样条的表示形式。
 
@@ -1022,29 +1024,30 @@ $x$ 与 $y$ 之间的非线性关系概念化为未观测的异质性。如果�
 被拟合，模型就存在设定误差。非参数回归提供了拟合这种异质性的工具。这样，非参数回
 归背后的逻辑与混合模型背后的逻辑就没有多大区别。非线性是一种形式的异质性，对于这
 种异质性，光滑样条提供了平衡拟合与使用参数个数之间的最佳估计。光滑样条的混合模型
-表示方法容易转换为贝叶斯估计框架，并且其更容易把光滑样条集成到标准混合模型中具体
+表示非参数方法容易转换为贝叶斯估计框架，并且其更容易把光滑样条集成到标准混合模型中,具体
 可以参见Ruppert, Wand and Carroll (2003)[@ruppert2003semiparametric]。
 
 ### 广义线性混合模型
 像广义线性模型对线性模型的推广一样，广义线性混合模型是正态线性混合模型的推广。
 设 $Y_i$ 是指数族随机变量，并有期望均值 $\mu_i$ ,广义线性混合模型可表示为：
-$$g\left(\mu_{i}\right)=\mathbf X_{i} \mathbf \beta+\mathbf Z_{i} \mathbf b, \quad
+$$g\left(\mu_{i}\right)=\mathbf X_{i} \boldsymbol{\beta}+\mathbf Z_{i} \mathbf b, \quad
   \mathbf b \sim N\left(\mathbf{0}, \psi_{\theta}\right)$$
 
 也就是说，GLMM是一个GLM，其中线性预测子依赖于一些正态随机效应 $\mathbf b$ 乘以随
 机效应模型矩阵 $\mathbf Z$ 。从线性混合模型过渡到广义线性混合模型的主要困难是不
-再可能准确地计算对数似然值，因为从 $\mathbf y$ 和 $\mathbf b$ 的联合密度中积分
-$\mathbf b$ 来获得似然函数通常在分析方法上是不可处理的。
+再可能准确地计算对数似然值，因为在 $\mathbf y$ 和 $\mathbf b$ 的联合密度中，对b积分
+$\mathbf b$ 获得似然函数通常在分析方法上是不可行的。
 
-一个有效的解决办法是用在 $\hat {\mathbf b}$ 点的泰勒展开式，则$f(\mathbf{y},
-\mathbf{b} | \boldsymbol{\beta})$可以写成
+一个有效的解决办法是使用在 $\hat {\mathbf b}$ 点的泰勒展开式，
+$f(\mathbf{y},\mathbf{b} | \boldsymbol{\beta})$
+可以写成
 $$f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq \int \exp \left\{\log f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta})+\frac{1}{2}(\boldsymbol{b}-\hat{\boldsymbol{b}})^{\top} \frac{\partial^{2} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})}{\partial \boldsymbol{b} \partial \boldsymbol{b}^{\top}}(\boldsymbol{b}-\hat{\boldsymbol{b}})\right\} d \boldsymbol{b}
 $$
 
-这里忽略了泰勒展开式中的高阶项，而不是等于零的那些项。在当前情况下所需的海赛矩阵
+这里忽略了泰勒展开式中的高阶项，而不是等于零的那些项。在当前情况下所需的海塞矩阵
 是 $-\mathbf{Z}^{\top} \mathbf{W} \mathbf{Z} / \phi-\psi^{-1}$ ,其中 $\mathbf{W}$ 
-是IRLS权向量，基于由$\hat {\mathbf b}$ 和 $\mathbf \beta$ 表示的 $\mathbf \mu$ 。因此有：
-$$f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta}) \frac{(2 \pi)^{p / 2}}{\left|\boldsymbol{Z}^{\top} \boldsymbol{W} \boldsymbol{Z}^/\phi+\psi_{\theta}^{-1}\right|^{1 / 2}}
+是IRLS权向量，基于由$\hat {\mathbf b}$ 和 $\boldsymbol{\beta}$ 表示的 $\mathbf \mu$ 。因此有：
+$$f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta}) \frac{(2 \pi)^{p / 2}}{\left|\boldsymbol{Z}^{\top} \boldsymbol{W} \boldsymbol{Z}^/ \phi+\psi_{\theta}^{-1}\right|^{1 / 2}}
 $$
 这种积分近似称为“拉普拉斯近似”积分，用显式形式代替随机效应密度并取对数则有
 $$l(\theta, \boldsymbol \beta) \simeq \log f(\boldsymbol y | \boldsymbol {\hat{b}}, \boldsymbol \beta)-\boldsymbol {\hat{b}}^{\top} \psi_{\theta}^{-1} \boldsymbol{\hat{b}} / 2-\log \left|\psi_{\theta}\right| / 2-\log \left|\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z/ \phi+\psi_{\theta}^{-1}\right| / 2 $$ {#eq:m3.16}
@@ -1052,7 +1055,7 @@ $$l(\theta, \boldsymbol \beta) \simeq \log f(\boldsymbol y | \boldsymbol {\hat{b
 注意 [@eq:m3.16] 式中的直接依赖关系，等式右边通过 $\mathbf {\hat{b}}$ 和
 $\mathbf{W}$ 依赖于 $\boldsymbol {\beta}$和 $\theta$ 。$\mathbf{W}$ 对
 $\boldsymbol \beta$ 的依赖意味着相比LMM的情况， $\boldsymbol \beta$ 的MAP估计和
-极大似然估计MLE不再完全对应。尽管如此，使用MAP估计值还是很方便的，因为使用GLMs中
+极大似然估计MLE不再完全对应。尽管如此，使用MAP估计值还是很方便的，因为使用GLM模型中
 使用的IRLS方法的惩罚版本，可以很容易地计算出各参数值和相应的 $\boldsymbol{\hat
 b}$。如果我们这样做，我们也可以定义拉普拉斯近似截面似然
 $l_{p}(\boldsymbol{\theta})=l(\boldsymbol{\theta}, \hat{\boldsymbol{\beta}})$，
@@ -1062,7 +1065,7 @@ $l_{p}(\boldsymbol{\theta})=l(\boldsymbol{\theta}, \hat{\boldsymbol{\beta}})$，
 $$\begin{aligned} l_{r}(\theta) \simeq & \log f(\boldsymbol y | \hat{\boldsymbol b} , \hat{\boldsymbol \beta})-\hat{\boldsymbol b}^{\top} \psi_{\theta}^{-1} \hat{\boldsymbol b} / 2-\log \left|\psi_{\theta}\right| / 2 \\ &-\log \left|\begin{array}{cc}{\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z^{T} \phi+\psi_{\theta}^{-1}} & {\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z^{T} \phi} \\ {\boldsymbol X^{\top} \boldsymbol W \boldsymbol Z^{T} \phi} & {\boldsymbol X^{\top} \boldsymbol W \boldsymbol Z^{T} \phi}\end{array}\right| / 2+M \log (2 \pi) / 2 \end{aligned}$$ {#eq:3.17}
 
 正如在线性混合模型中一样，可以数值优化 $l_{p}$ 或 $l_{r}$ 来得到 $\hat{\theta}$
-一样， $\theta$ 的每次迭代值都要求计算相应的
+， $\theta$ 的每次迭代值都要求计算相应的
 $\hat{\boldsymbol{\beta}},\hat{\boldsymbol{b}}$ 。与线性情况相反，这些计算不再是
 直接的，而是需要迭代，且惩罚IRLS方案通常在使用时更快速和可靠。拉普拉斯近似在
 Davison(2003)或Wood(2015)中有更详细的讨论[@Davison2003;@Wood2015]。Shun和
@@ -1070,9 +1073,9 @@ McCullagh(1995)表明，如果随机效应的数量以不高于 $n^{l/3}$ 的速
 提供了有充分根据的推断[@Shun1995]。下面分别对惩罚IRLS和PQL方法进行介绍。
 
 #### 惩罚IRLS
-可以在IRLS算法中的加入惩罚项来计算 $\hat {\mathbf b}$ 和 $\boldsymbol \beta$ 。
+可以在IRLS算法中加入惩罚项来计算 $\hat {\mathbf b}$ 和 $\boldsymbol \beta$ 。
 通过以下方式计算 $\hat {\mathbf b}$ 和 $\boldsymbol \beta$，
-$$\hat{\boldsymbol{\beta}}, \hat{\boldsymbol{b}}=\underset{\beta, \boldsymbol{b}}{\operatorname{argmax}} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})=\underset{\beta, \boldsymbol{b}}{\operatorname{argmax}}\left\{\log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})-\boldsymbol{b}^{\top} \psi_{\theta}^{-1} \boldsymbol{b} / 2\right\} $$ {#eq:m3.18}
+$$\hat{\boldsymbol{\beta}}, \hat{\boldsymbol{b}}=\underset{\boldsymbol \beta, \boldsymbol{b}}{\operatorname{argmax}} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})=\underset{\boldsymbol \beta, \boldsymbol{b}}{\operatorname{argmax}}\left\{\log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})-\boldsymbol{b}^{\top} \psi_{\theta}^{-1} \boldsymbol{b} / 2\right\} $$ {#eq:m3.18}
 
 [@eq:m3.18] 式中不依赖于 $\boldsymbol b$ 和 $\boldsymbol \beta$ 的项已从最终对象即惩罚似然函数中剔除。为了简化符号，将
  $\boldsymbol b$ 和 $\boldsymbol \beta$ 写成向量形式：
@@ -1081,9 +1084,9 @@ $\mathcal{B}^{\top}=\left(\boldsymbol{b}^{\top},\boldsymbol{\beta}^{\top}\right)
 $$\boldsymbol \chi=(\boldsymbol Z,\boldsymbol X) \text { 和 } \boldsymbol S=\left[\begin{array}{cc}{\psi_{\theta}^{-1}} & {\boldsymbol0} \\ {\boldsymbol 0} & {\boldsymbol 0}\end{array}\right]
 $$
 
-包括了二次惩罚项的惩罚似然函数的海赛矩阵为$-\boldsymbol\chi^{\top}
+包括了二次惩罚项的惩罚似然函数的海塞矩阵为$-\boldsymbol\chi^{\top}
 \boldsymbol{W} \boldsymbol \chi/ \phi-\boldsymbol{S}$，其中$\boldsymbol{W}$ 是由
-当前的 $\hat{\boldsymbol \mu}$ 推导出来的诊断权重矩阵(Fisher或full Newton),
+当前的 $\hat{\boldsymbol \mu}$ 推导出来的诊断权重矩阵，使用Fisher或Newton方法),
 $\hat{\boldsymbol \mu}$ 反过来依赖于当前$\mathcal{B}^{[k]}$ 的估计值，则相应的梯
 度向量可以写为：
 $$\boldsymbol \chi^{\top} \boldsymbol{W}
@@ -1096,7 +1099,7 @@ $$\mathcal{B}^{[k+1]}=\mathcal{B}^{[k]}+\left(\boldsymbol \chi^{\top} \boldsymbo
 带入上式可得到
 $$\mathcal{B}^{[k+1]}=\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\boldsymbol \chi^{\top}\boldsymbol{W} \{ \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})+\boldsymbol \chi\mathcal{B}^{[k]}\}$$
 它可以立即被识别为惩罚加权最小二乘目标的最小值
-$$\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\|_{W}^{2}+\phi \mathcal{B}^{\top} S \mathcal{B}= \left\| \boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b \right\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b
+$$\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\|_{W}^{2}+\phi \mathcal{B}^{\top} \boldsymbol S \mathcal{B}= \left\| \boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b \right\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b
 $$
 其中
 $z_{i}=g^{T}\left(\hat{\mu}_{i}\right)\left(y_{i}-\hat{\mu}_{i}\right)+\hat{\eta}_{i}.$
@@ -1128,36 +1131,36 @@ $$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_
 此，执行一个惩罚IRLS迭代，每一步都基于以下工作混合效应模型估计$\theta,\phi$:
 $$\boldsymbol z | \boldsymbol{b}, \boldsymbol{\beta} \sim N\left(\boldsymbol{X}
   \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{b}, \boldsymbol{W}^{-1}
-  \phi\right), \boldsymbol{b} \sim N\left(\boldsymbol{0}, \psi_{\theta}\right)$$
+  \phi\right), \boldsymbol{b} \sim N\left(\boldsymbol{0}, \boldsymbol \psi_{\theta}\right)$$
   
 其中用到了Fisher权重。也就是说，惩罚IRLS算法的步骤3中，
-$\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\beta}}, \hat{\boldsymbol{\beta}},
+$\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{b}}, \hat{\boldsymbol{\beta}},
 \hat{\boldsymbol{\phi}}$是对工作线性混合效应模型进行拟合得到的。这种方法在混合效
 应模型的框架下(Breslow和Clayton, 1993)被称为PQL(惩罚拟似然)方法[@Breslow1993]。
 
 一个显而易见的问题是当 $\mathbf{z}|\mathbf{b}, \boldsymbol{\beta}$ 显然不服从正
 态分布时，为什么使用正态线性混合模型或受限制的似然函数是有效的。对于工作模型，在
 假定 $\boldsymbol z$ 服从正态分布时，考虑受限制的似然函数，可以得到：
-$$2 l_{r}=-\left\| \boldsymbol z-\boldsymbol \chi \hat{\mathcal{B}}\right\|_{W} ^{2} /\phi-\hat{\mathcal{B}}^{\top} S \hat{\mathcal{B}}-n \log \phi+\log |S|_{+} -\log \left|\boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi/ \phi+\boldsymbol S\right|-(n-M) \log (2 \pi) $$ {#eq:m3.19}
+$$2 l_{r}=-\left\| \boldsymbol z-\boldsymbol \chi \hat{\mathcal{B}}\right\|_{W} ^{2} /\phi-\hat{\mathcal{B}}^{\top} \boldsymbol S \hat{\mathcal{B}}-n \log \phi+\log |\boldsymbol S|_{+} -\log \left|\boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi/ \phi+\boldsymbol S\right|-(n-M) \log (2 \pi) $$ {#eq:m3.19}
 
-其中 $\log |\mathbf{S}|_{+}\left(=-\log |\psi|_{+}\right)$ 是S的非零特征值
+其中 $\log |\mathbf{S}|_{+}\left(=-\log |\psi|_{+}\right)$ 是$\boldsymbol S$的非零特征值
 的乘积(广义行列式)，则REML估计量 $\phi$ 为
-$$\hat{\phi}=\frac{\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B} \right\|_{W}^{2}}{n-\tau} \text { 其中 } \tau=\operatorname{tr}\left\{\left(\boldsymbol\chi^{\top} \boldsymbol W \boldsymbol\chi^{/} \phi+S\right)^{-1} \boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi^{T} \phi\right\}$$
+$$\hat{\phi}=\frac{\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B} \right\|_{W}^{2}}{n-\tau} \text { 其中 } \tau=\operatorname{tr}\left\{\left(\boldsymbol\chi^{\top} \boldsymbol W \boldsymbol\chi^{/} \phi+\boldsymbol S\right)^{-1} \boldsymbol\chi^{\top}\boldsymbol W \boldsymbol\chi^{T} \phi\right\}$$
 
 现在考虑QR分解 $\boldsymbol Q \boldsymbol R=\sqrt{\boldsymbol W} \boldsymbol \chi$ ，其中 $\boldsymbol Q$ 是列正交的，R是上三角的(这里用的是
 Fisher权重)，令 $\boldsymbol f=\boldsymbol{Q}^{\top} \sqrt{\boldsymbol W} \boldsymbol z$ ，
-则${\left\|\boldsymbol f-R\mathcal{B}\right\|}^{2}+c=\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\right\|_{W}^{2}$，
+则${\left\|\boldsymbol f-\boldsymbol R\mathcal{B}\right\|}^{2}+c=\left\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\right\|_{W}^{2}$，
 其中 $c=\left\|\boldsymbol z\right\|_{W}^{2}-\left\|\boldsymbol f\right\|^{2}$ 。有均值函数
 $\mathrm{E}(\boldsymbol{f})=\boldsymbol{R} \mathcal{B}$， $\boldsymbol f$ 的协方差矩阵是
 $\boldsymbol I \phi$ 。如果$n /(\mathrm{M}+p) \rightarrow \infty$，多元中心极限
 定理表明 $\boldsymbol f$ 具有多元正态分布。所以没有假设$\boldsymbol z$的正态性,我们也可以基于
 正态线性混合模型合理地推断和 $\mathcal{B}$ 和 $\theta$ 。正态线性混合为：
-$$\boldsymbol{f} | \boldsymbol{B} \sim N(\boldsymbol{R} \mathcal{B}, \boldsymbol{I} \phi) \quad \text {其中 } \boldsymbol{b} \sim N\left(\mathbf{0}, \psi_{\theta}\right)$$
+$$\boldsymbol{f} | \boldsymbol{B} \sim N(\boldsymbol{R} \mathcal{B}, \boldsymbol{I} \phi) \quad \text {其中 } \boldsymbol{b} \sim N\left(\mathbf{0}, \boldsymbol \psi_{\theta}\right)$$
 
 并且受限制的似然函数为：
 $$2 l_{r}={-\left\|\boldsymbol f-\boldsymbol R \hat{\mathcal{B}} \right\|^{2}}/{\phi}-{\hat{\mathcal{B}}}^{\top}\boldsymbol S \hat{\mathcal{B}}-p \log \phi+\log |\boldsymbol{S}|_{+} -\log \left|\boldsymbol{R}^{\top} \boldsymbol{R}/\phi+\boldsymbol{S}\right|-p \log (2 \pi)$$ {#eq:m3.20}
 
-对于固定的 $\phi$ ,式 [@eq:m3.20] 和 [@eq:m3.19] 是相同的。除了相差可加的常数项,因此
+对于固定的 $\phi$ ,式 [@eq:m3.20] 和 [@eq:m3.19] 是相同的。除了相差可加的常数项,
 他们将被相同的 $\theta$ 和 $\mathcal{B}$ 最大化。另外，不适合基于式 [@eq:m3.20]
 作关于 $\phi$ 的推断，因为这将忽略 $\phi$ 包含在 $c$ 中的信息。但是，如果把以上
 的Pearson估计量 $\hat{\phi}$
@@ -1177,9 +1180,8 @@ $$2 l_{r}={-\left\|\boldsymbol f-\boldsymbol R \hat{\mathcal{B}} \right\|^{2}}/{
 #### 估计量分布
 由于$\boldsymbol {A}_{\theta}^{-1} = \boldsymbol {W}^{-1} \phi$，可以得到作为关于
 $\boldsymbol {\beta}$ 的近似推断的大样本分布结果，以及 $\boldsymbol b$ 的预测分布。
-$$\hat{\boldsymbol{\beta}} \sim N\left(\boldsymbol{\beta},\left\{\boldsymbol{X}^{T}\left(\boldsymbol{Z} \psi \boldsymbol{Z}^{T}+\boldsymbol{W}^{-1} \phi\right)^{-1} \boldsymbol{X}\right\}^{-1}\right)
-$$
-尽管更倾向于用基于[#eq:m21]式的大样本估计结果：
+$$\hat{\boldsymbol{\beta}} \sim N\left(\boldsymbol{\beta},\left\{\boldsymbol{X}^{T}\left(\boldsymbol{Z} \psi \boldsymbol{Z}^{T}+\boldsymbol{W}^{-1} \phi\right)^{-1} \boldsymbol{X}\right\}^{-1}\right)$$
+尽管更倾向于用基于[@eq:m21}式的大样本估计结果：
 $$\mathcal{B} | \boldsymbol{y} \sim N\left(\hat{\mathcal{B}},\left(\boldsymbol\chi^{T} \boldsymbol{W} \boldsymbol\chi/ \phi+\boldsymbol{S}\right)^{-1}\right)$$ {#eq:m21}
 但由第二个大样本结果推导的 $\boldsymbol{\beta}$ 的协方差矩阵再次对应于第一个大样本结
 果的 $\boldsymbol{\beta}$ 的协方差矩阵。
@@ -1213,7 +1215,7 @@ GLMM一个关键特征是其使用参数均值函数来对自变量的效应进�
 Green and Silverman,
 1993)[@hardle1990applied; @green1993nonparametric]。Hastie and
 Tibshirani (1990)的广义可加模型应用非常广
-泛[@hastie1990generalized]。然后，对于相关数据非参数回归的研究却非
+泛[@hastie1990generalized]。然而，对于相关数据非参数回归的研究却非
 常有限。大部分研究都局限于具有正态因变量的纵向数据并带有一个非参数函
 数(Hart, 1994; Rice and Silverman,
 1991)[@hart1994automated; @rice1991estimating]。还有一些研究在线性混
@@ -1242,7 +1244,7 @@ Wahba, 1978)强调过的至关重要的问题是如何选择好的光滑参数�
 Lin，Zhang(1999)提出广义可加混合模型(GAMM)来解决这些问
 题[@Lin1999]。GAMM是根据Hastie and Tibshirani (1990)的思
 想对GLMM的可加模型推广[@hastie1990generalized]。这种新类型模型使用
-可加非参数函数来拟合自变量的效应，而通过对可加预测子上增加随机效应来应
+可加非参数函数来拟合自变量的效应，并通过对可加预测子增加随机效应来应
 对数据中的过离散化和相关性。GAMM可以用于分组、层次和空间数据。
 
 ### 广义可加混合模型设定
@@ -1278,7 +1280,7 @@ Brumback and Rice(1998)和Wang(1998)用在正态非参数混合模型 中
 [@Zhang1998; @brumback1998smoothing; @wang1998smoothing]
 ，这些学者把光滑参数看作是额外的方差成分。因为在最大化目标函数时需要求
 数值积分，双重惩罚拟似然(DPQL)被用来作近似推断。上面方法的一个关键特征
-是在统一的参数混合模型框架下对GAMMs的所有部分同时进行了系统推断。具体地
+是在统一的参数混合模型框架下对GAMM的所有部分同时进行了系统推断。具体地
 讲，GAMM的非参数函数、光滑参数和方差成分的估计可以通过已有的统计软件拟
 合一个GLMM来得到。当数据是稀疏的时候(例如二分类数据)，方差成分的DPQL估
 计具有一定的偏倚，这个偏倚可以通过一定的方法修正以改进这个估计。关于广
@@ -1294,7 +1296,7 @@ Wood(2006)[@Lin1999; @wood2006generalized]。
 加混合模型的一个特例，半参数混合模型。
 
 ### 特例：半参数混合模型设定
-最近以来，半参数混合模型得到了广泛关注。当建立混合模型时，我们一般使用线性函数形
+最近，半参数混合模型得到了广泛关注。当建立混合模型时，我们一般使用线性函数形
 式。与其他参数模型一样，对于一个给定的混合模型我们并没有先验的理由认为线性函数形
 式是正确的。尽管线性函数形式有可能是合适的，我们仍然可以使用非参数方法来诊断和拟
 合混合模型中的非线性关系。这一部分我们主要从半参数方法如何融入到混合模型的角度来
@@ -1302,7 +1304,7 @@ Wood(2006)[@Lin1999; @wood2006generalized]。
 具有以下形式
 $$\label{eq:additive-mixed}
   y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
-  + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i},$$
+  + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i}$$
 其中 $y_{i}$ 是因变量， $\boldsymbol{\beta}$ 是固定效应参数向量，
  $\boldsymbol{X_{i}}$ 是固定
 效应设计矩阵， $f_{j}$ 是自变量 $x_{k}$ 的光滑函数， $\boldsymbol{Z_{i}}$ 是随机效应
@@ -1324,11 +1326,11 @@ Zhang(1999)在扩展Breslow和Clayton(1993)以及Breslow和Lin（1995）广义�
 为另外一种具有吸引力的选择。
 
 对于正态因变量，Gibbs采样可用于基于光滑先验的完全贝叶斯分析;参见Wong和Kohn(1996)，
-他们在不包含任何非结构化或空间随机效应的加性模型中使用状态空间或样条的动态模型，
+他们在不包含任何非结构化或空间随机效应的加性模型中使用状态空间或样条的动态模型。
 或者是Hastie和Tibshirani(2000)，他们将Gibbs采样器推导作为贝叶斯的逆拟合过程
 [@Wong1996;@Hastie2000]。Smith and Kohn(1996)和Denison等人(1998)提出了使用回归样
 条或更一般的分段多项式的贝叶斯基函数方法，同样没有随机效应
-[@Smith1996;@Denison1998]。我们在实现中使用的更直接的方法，利用具有置信区间的后
+[@Smith1996;@Denison1998]。我们在实现中使用更直接的方法，利用具有置信区间的后
 验精度矩阵;参见Rue(2000)或Lang and Brezger(2000)[@Rue2000]。
 
 对于基本的非正态模型，需要比Gibbs采样更通用的MCMC技术。而现有的建议方法和实践经
@@ -1341,13 +1343,12 @@ Zhang(1999)在扩展Breslow和Clayton(1993)以及Breslow和Lin（1995）广义�
 
 贝叶斯非参数函数估计和贝叶斯半参数函数估计的快速发展主要基于两个概念：(1)自适应
 基函数方法和(2)光滑先验。在基函数方法中，可以选择不同的先验分布以控制基函数系数
-的显著性（例如Smith和Kohn，1996）[@Smith1996]，分段常数函数或回归样条的节点的数
-量和位置（Denison等，1998; Biller，2000)[@Denison1998;@Biller2000;]，或者一个空
-间背景下空间域的划分（Heikkinen和Arjas，1998; Knorr-Held和RafBer，2000）
-[@Heikkinen1998;@Knorrheld2000]。光滑先验方法可以被称为随机惩罚似然方法。光滑先
+的显著性（例如Smith和Kohn,1996[@Smith1996]，分段常数函数或回归样条的节点的数
+量和位置（Denison等,1998;Biller,2000)[@Denison1998;@Biller2000]，或者一个空
+间背景下空间域的划分（Heikkinen和Arjas，1998; Knorr-Held和RafBer，2000）[@Heikkinen1998;@Knorrheld2000]。光滑先验方法可以被称为随机惩罚似然方法。光滑先
 验方法主要是通过为参数设置不同种类或光滑度的先验分布来解决问题。这些概念在动态模
 型中的贝叶斯光滑样条（Hastie和Tibshirani，2000）和马尔可夫随机场模型中的空间光滑
-等方面都有所应用[@Hastie2000]。（Besag等，1991,Fahrmeir和Lang（2001a，b）将这些
+等方面都有所应用[@Hastie2000]。Besag等以及Fahrmeir和Lang将这些
 概念结合起来，对广义可加混合模型进行统一处理
 [@Besag1991;@Fahrmeir2001;@Fahrmeir2001a]。由于光滑先验分布服从一般的多元正态分
 布，所以对于后验分布的推断可以通过有效的MCMC方法进行。 最后，Lang和Brezger（2001）
@@ -1362,7 +1363,7 @@ Zhang(1999)在扩展Breslow和Clayton(1993)以及Breslow和Lin（1995）广义�
 结果是不够的。Smith，Wong和Kohn（1998），Smith和Kohn（1996）以及Ber nardinelli，
 Clayton和Montomoli（1995）等人对这些问题进行了初步研究
 [@Smith1998;@Smith1996;@Bernardinelli1995]，Fahrmeir和Lang（2001a，b）通过模拟研
-究，对这些问题在经验基础上进一步给出部分答案。下面贝叶斯广义可加混合模型内容主要参考了
+究，对这些问题在经验基础上进一步给出部分答案。下面的贝叶斯广义可加混合模型内容主要参考了
 Fahrmeir和Lang（2001a，b）的两篇文章[@Fahrmeir2001;@Fahrmeir2001a]。
 
 ### 贝叶斯广义可加混合模型
@@ -1370,7 +1371,7 @@ Fahrmeir和Lang（2001a，b）的两篇文章[@Fahrmeir2001;@Fahrmeir2001a]。
 线性预测子为 $\eta =\gamma^{T} w$ ，连接函数 $\mu = h(\eta)$ 将
  $\mu$ 与 $\eta$ 连接起来。这里 $h$ 是一个已知的单调函数，并且
 $\gamma=\left(\gamma_1,\ldots,\gamma_q\right)$ 是要估计的未知回归系数的向量。广义
-可加混合模型通过灵活的半参数可加性预测器替换简单的参数线性预测器来扩展GLM模型。
+可加混合模型通过灵活的半参数可加性预测子替换简单的参数线性预测子来扩展GLM模型。
 $$\eta=f_{1}\left(x_{1}\right)+\cdots+f_{p}\left(x_{p}\right)+
 \gamma^{T} w+b_{g}$$
 
@@ -1409,8 +1410,8 @@ $$\beta | \tau^{2} \sim N\left(0, \tau^{2} K^{-}\right)$$ {#eq:m-bayes-2}
 
 空间自变量的光滑函数 $f(x)$ 中，$x_{i}$ 表示在一个空间域内观测对象 $i$ 的位置，该光滑
 函数也可以表示 $f=X \beta$ 。最简单的情况中， $\beta$ 的一个 具体值 $\beta_{s}$ 与 $f(s)$
-是相等的，即在 $f(\cdot)$ 在 $s$ 点的值。并且在 Besag et al. (1991) 中，$\boldsymbol \beta$
-的先验被假设是马尔科夫随机场先验，这同样可以用在 [@eq:m-bayes-1] 的一般形式中[@Besag1991]。
+是相等的，即 $f(\cdot)$ 在 $s$ 点的值。并且在 Besag et al. (1991) 中，$\boldsymbol \beta$
+的先验被假设是马尔可夫随机场先验，这同样可以用在式 [@eq:m-bayes-1] 的一般形式中[@Besag1991]。
 
 对于非结构化的随机效应，一个常用的先验假设是 $b_{g}$ 符合独立同分布，并服从正态形式，其
 中需要有关于 $v^2$ 的高度离散的超先验。
@@ -1428,18 +1429,18 @@ Lang（2001b）中有详细描述，参见Hastie和Tibshirani（2000）关于正
 （Gamerman，1997）的MH法也可以使用[@Knorrheld1999;@Gamerman1997]。
 
 ### 贝叶斯半参数混合模型
-有观测值 $\left(y_{i}, x_{n},\ldots, x_{i p},w_{i}\right),i=1,\ldots,n$ ,
+有观测值 $\left(y_{i}, x_{i1},\ldots, x_{i p},w_{i}\right),i=1,\ldots,n$ ,
  $y$ 是因变量， $x=\left(x_{1}, \ldots, x_{p}\right)$ 是表示连续自变量或空间
 自变量构成的向量， $w$ 也表示自变量。
 
 广义可加模型和半参数模型假定，给定
- $x_{i}=\left(x_{11}, \ldots, x_{i p}\right)$ 和 $w_{i}$ 以及属于指数族的 $y_{i}$ ，
+ $x_{i}=\left(x_{i1}, \ldots, x_{i p}\right)$ 和 $w_{i}$ 以及属于指数族的 $y_{i}$ ，
 并且 $y_{i}$ 具有均值 $\mu_{i}=E\left(y_{i} | x_{i}, w_{i}\right)$ ，通过如下公式
 $$\begin{array}{c}{\mu_{i}=h\left(\eta_{i}\right)} \\ {\eta_{i}=f_{1}\left(x_{i 
 1}\right)+\ldots+f_{p}\left(x_{i p}\right)+w_{i}^{T} \beta}\end{array}$$ {#eq:m-bayes-4}
 可将均值 $\mu_{i}$ 与半参数预测子 $\eta_{i}$ 相连接[@hastie1990generalized]。
 
- $h$ 是一个已知连接或已经的因变量函数, $f_{1}, \ldots, f_{p}$ 是自变量的未知光滑函数。
+ $h$ 是一个已知连接或已知的因变量函数, $f_{1}, \ldots, f_{p}$ 是自变量的未知光滑函数。
 并且空间自变量 $x_{j}$ 的空间相关效应（随机效应）以$f_{j}\left(x_{i}\right)$ 的形式
 被包含在模型中。如果自变量不足以解释研究单位间的异质性或者研究对象是纵向研究中具有相
 关性的数据，则构建具有形式 [@eq:m-bayes-4] 的模型或许是不合适的。一种常见的处理这个问题的方法
@@ -1534,16 +1535,16 @@ $$K=\left(\begin{array}{cccccccc}
 $$
 
 #### 空间自变量先验分布的选取
-现在考虑空间自变量 $x$ ，其中 $x$ 的值表示连接的地理区域中的位置或位置。例如，在失
+现在考虑空间自变量 $x$ ，其中 $x$ 的值表示连接的地理区域中的位置。例如，在失
 业研究中，$x$ 代表了失业人口居住的地区。处理空间自变量的一种常见方法是假设相邻地点比两
 个任意地点更相似。因此，对于有效的先验定义，必须为每个地点 $x_t$ 定义一组相邻点。
 对于本文所考虑的地理数据，我们通常假设两个地点 $x_t$ 和 $x_j$ ;如果他们有共同的边界，他们就
 是相邻点。但对相邻更复杂的定义也是可能的;参见Besag等人(1991)[@Besag1991]。我们为函数估计
- $f(t),t=1,\cdot,m$ ， $m$ 个不同地点 $x_j$ ,设定如下的空间光滑先验:
+ $f(t),t=1,\cdots,m$ ， $m$ 个不同地点 $x_j$ ,设定如下的空间光滑先验:
 $$\begin{array}{l}{\qquad f(t) \,|\, f(j) \,\, j \neq t, \tau^{2} \sim
   N\left\{\sum_{j\in \partial_{j}} f(j) / N_{t}, \tau^{2} / N_{t}\right\}} \end{array}$$ {#eq:m-bayes-10}
 
-其中 $N_{t}$ 表示邻近地点的数目， $j \in \partial_{t}$ 表示地点 $x_{j}$ 与地点 $x_{k}$ 
+其中 $N_{t}$ 表示邻近地点的数目， $j \in \partial_{t}$ 表示地点 $x_{j}$ 与地点 $x_{t}$ 
 相邻。因此 $f(t)$ 的条件均值是相邻地点函数估计的未加权平均。对于空间数据，由于 $x_t$ 之间没
 有固定的顺序，所以同时间或连续自变量一样，其设定是无定向的。
 
