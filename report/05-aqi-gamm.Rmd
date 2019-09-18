@@ -208,27 +208,6 @@ legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), 
 后正态分布），月度空气质量为优的天数（泊松分布）、月度是否发生严重污染（二点分
 布）。
 
-```{r tab-dep-dis, eval=T, results='markup'}
-rm(list=ls())
-dat.y <- read.csv("./data/yearly.csv")
-
-dimnames(norm.test) <- list(c("年均AQI","年度空气质量为优天数","年度严重污染天数",
-                              "月均AQI","月度空气质量为优天数","月度严重污染天数"),
-                            c("W 统计量","P值", "JB统计量", "P值"))
-
-write.csv(norm.test, "./results/aqi.y17.csv", row.names=F)
-
-library("kableExtra")
-knitr::kable(norm.test, row.names =T, align = c(rep("r",4)),
-             caption="因变量正态性检验",digits = 3,
-             longtable = TRUE, booktabs = TRUE, linesep  = c("","","\\hline"), escape = F) %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)")%>%
-    kable_styling(full_width = T) %>%
-    column_spec(1, width = c("4.5cm"))
-```
-
 通过以上分析，我们需要分别对年均AQI、年度空气质量为优的天数、年度严重污染的天数、
 月均AQI、月度空气质量为优的天数、月度是否存在严重污染进行建模，通过这些因变量来
 分析空气质量的影响因素。根据因变量的具体分布，且遵循模型由简单到复杂的原则，对服
