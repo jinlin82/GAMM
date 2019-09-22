@@ -30,7 +30,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-# 广义可加混合模型参数估计 
+# 广义可加混合模型参数估计 {#sec:chap-3}
 ## 广义可加混合模型
 假如 $n$ 个单位中的第 $i$ 个观测对象包含一个因变量 $y_i$ ,和 $p$ 个与固定效应相联系的自变量
  $x_{i}=\left(1, x_{i 1}, \ldots, x_{i p}\right)^{\mathrm{T}}$ 以及 $q$ 个与随机效应相联系的
@@ -132,10 +132,10 @@ $$\left(\begin{array}{ccccc}{1} & {S_{0} N_{1}} & {\cdots} & {S_{0} N_{p}} & {S_
 $$Y=\beta_{0} \mathbf{1}+\sum_{j=1}^{p} N_{j} f_{j}+Zb+\Delta\left(y-\mu^{b}\right)$$
 是一个改进的广义可加模型的工作权向量， $S_j$ 是 $f_j$ 的中心化光滑器，并且满足
 $S_{j}^{\mathrm{T}} \mathbf{1}=0$ ， $S_{j}$ 和 $S_{b}$ 被定义为：
-$$\begin{array}{c}{S_{0}=\left(\mathbf{1}^{\mathrm{T}} W \mathbf{1}\right)^{-1} 
+$$\begin{array}{l}{S_{0}=\left(\mathbf{1}^{\mathrm{T}} W \mathbf{1}\right)^{-1} 
 \mathbf{1}^{\mathrm{T}} W} \\ {S_{j}=\left(I-\frac{\mathbf1 
 \mathbf{1}^{\mathrm{T}}}{r_{j}}\right)\left(N_{j}^{\mathrm{T}} W N_{j}+\lambda_{j} 
-K_{j}\right)^{-1} N_{j}^{\mathrm{T}} W}，j=(1,\cdots,p) \\ {S_{b}=\left(Z^{\mathrm{T}} W 
+K_{j}\right)^{-1} N_{j}^{\mathrm{T}} W},\qquad j=(1,\cdots,p) \\ {S_{b}=\left(Z^{\mathrm{T}} W 
 Z+D^{-1}\right)^{-1} Z^{\mathrm{T}} W}\end{array}$$
 由此得到的估计值 $\hat f_j$ 是中心化的[@hastie1990generalized]。
 
@@ -632,15 +632,15 @@ knitr::include_graphics("gibbs.png")
 假设 $B$ 足够大，达到可接受的收敛水平，则保留的样本可以作为各自后验分布的提取，以用于近似贝叶
 斯推理。
 
-对于一般参数 $s1,s2,s3,s4$ ，仍然需要描述来
-自 $\mathcal{H}_{b}\left(s_{1}, s_{2}, \boldsymbol{s}_{3},\boldsymbol{s}_{4}\right)$ 的抽样过程。
-因为相应的密度函数[@eq:m-18-16] 在归一化因子之前具有一个简单的封闭形式表达式，
-因此可以使用切片采样获得所需的样本提取。Neal(2003)描述了易于实现的过程，他的“逐
-步退出”方法是gammSlice中使用的默认方法[@Neal2003]。
+对于一般参数 $s1,s2,s3,s4$ ，仍然需要描述来自 $\mathcal{H}_{b}\left(s_{1},
+s_{2}, \boldsymbol{s}_{3},\boldsymbol{s}_{4}\right)$ 的抽样过程。因为相应的密度
+函数[@eq:m-18-16] 在归一化因子之前具有一个简单的封闭形式表达式，因此可以使用切片
+采样获得所需的样本提取。Neal(2003)描述了易于实现的过程，他的“逐步退出”方法是
+gammSlice中使用的默认方法[@Neal2003]。切片抽样的这种简单性使得算法实现非常直观和
+稳健。然而,由于 $\boldsymbol Z$ 矩阵中经常出现稀疏形式，导致即使简单的算法实现，
+效率可能也不高。在gammSlice中，必需小心地避免了由这些稀疏形式引起的冗余计算。
 
-切片抽样的这种简单性使得算法实现非常直观和稳健。然而,由于 $\boldsymbol Z$ 矩阵中经
-常出现稀疏形式，导致即使简单的算法实现，效率可能也不高。在gammSlice中，必需小心地
-避免了由这些稀疏形式引起的冗余计算。
+本章对广义可加混合模型的参数估计方法进行了讨论，下面章节将转向空气质量实证部分。
 
 <!--# 参考文献 {-}-->
 [//]: # (\bibliography{Bibfile})

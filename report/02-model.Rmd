@@ -29,10 +29,11 @@ Sys.setlocale("LC_ALL", "Chinese")
 ```
 
 
-# 广义可加混合模型背景与设定
+# 广义可加混合模型背景与设定 {#sec:chap-2}
 这一部分先介绍几个基础回归模型，包括广义线性模型，非参数回归模型及线性混合模型的
 概念。在这些概念的基础上，就可以讨论广义线性模型、半参数方法和混合模型三者结合得
-到的广义可加混合模型(GAMM)。
+到的广义可加混合模型(GAMM)。本章基础模型部分主要参考了金林(2016)的著作
+[@Jin2016]。
 
 ## 广义线性模型(GLM) {#sec:glm}
 在实际数据分析过程中，经常会遇到分类数据。分类数据模型，像Logistic回归模型和泊松回
@@ -110,9 +111,9 @@ $$\eta_{i}=g(\mu_{i})$$
 分布，指数分布，二项分布，泊松分布，伽玛分布和逆正态分布等等。而常见的
 不属于指数分布簇的分布有$t$分布和柯西分布。指数分布簇的概率密度函数具有以
 下形式 
-$$\label{eq:semipara-6}
+$$
   f(y;\theta,\phi)=
-  \exp \left[\frac{y\theta-b(\theta)}{a(\phi)}+c(y,\phi) \right],$$
+  \exp \left[\frac{y\theta-b(\theta)}{a(\phi)}+c(y,\phi) \right],$${#eq:semipara-6}
   
 其中 $a(\cdot)$ ， $b(\cdot)$ 和 $c(\cdot)$ 是一些具体的函数。当 $\phi$ 已知时，
 参数 $\theta$ 被称为标准参数(canonical parameter)。当 $\phi$ 未知
@@ -215,11 +216,11 @@ $\bm X$被称为**设计矩阵**。
 
 假设有两个连续变量 $x$ 和 $y$ ，我们希望估计给定 $x$ 时 $y$ 的期望值。这个关系
 可以表示为 
-$$\label{eq:1}
-  y_{i}|x=f(x)+\varepsilon_{i},$$
+$$
+  y_{i}|x=f(x)+\varepsilon_{i},$${#eq:old-1-1}
 其中$f$ 表示$y$ 与$x$之间关系的函数形式，$f$的限制条件是 $f$ 为光滑函数。熟悉的线 性方程形式是这种类型函数的一种特殊情形： 
-$$\label{eq:2}
-  f(x)=\alpha+\beta x$$
+$$
+  f(x)=\alpha+\beta x$${#eq:old-1-2}
   
 线性关系也可以看作是光滑函数的特殊情况。线性回归模型是参数模型，因为参数$\beta$
 概括了$x$ 与$y$之间的统计依赖性。如果我们使用非参数回归模型，将不存在参数，这时
@@ -302,14 +303,14 @@ $$\label{eq:11}
 Cleveland(1979)首先提出局部回归光滑器，大部分统计软件包使用他提出的算法。
 他提出的局部回归方法**loess**及其变种**lowess**是使用最多的非
 参数回归模型之一[@cleveland1979robust]。前者是**local regression**的简称，
-后者是 **localweighted regression**的简称。这两种光滑器在几个方面都比
+后者是 **local weighted regression**的简称。这两种光滑器在几个方面都比
 目前为止介绍的局部回归思想复杂。下面对Cleveland的非参数回归模型进行讨
 论。
 
 Cleveland提出了一个多项式回归模型而不是线性回归的局部估
 计[@cleveland1979robust]。预测变量$x$的 $p$阶多项式回归为 
-$$\label{eq:12}
-  y=\alpha+\beta_{1}x+\beta_{2}x^{2}+\cdots+\beta_{p}x^{p}+\varepsilon.$$
+$$
+  y=\alpha+\beta_{1}x+\beta_{2}x^{2}+\cdots+\beta_{p}x^{p}+\varepsilon.$${#eq:old-1-12}
 如果$p=1$ ,那么拟合是线性的，如果$p=2$那么拟合是抛物线，等等。多项式阶数
 的选择可以根据研究的需要，但一般高于2阶的多项式对于提高非参数估计的表
 现作用有限。
@@ -321,10 +322,9 @@ $$\label{eq:12}
 
 其次，在窗内使用权重为$w_{i}$的加权最小二乘估计拟合局部多项式回归模型。
 具体地，我们估计下面的局部回归模型： 
-$$\label{eq:13}
-  \frac{y_{i}}{w_{i}}=
+$$\frac{y_{i}}{w_{i}}=
   \alpha+\beta_{1}\frac{x_{i}}{w_{i}}+\beta_{2}\frac{x_{1}^{2}}{w_{i}}+\cdots
-  +\beta_{p}\frac{x_{i}^{p}}{w_{i}}+\frac{\varepsilon_{i}}{w_{i}},$$
+  +\beta_{p}\frac{x_{i}^{p}}{w_{i}}+\frac{\varepsilon_{i}}{w_{i}},$${#eq:old-1-13}
   
 可以通过最小化加权残差平方和$\sum_{i=1}^{n}w_{i}e_{i}^{2}$来得到参数的
 估计值。尽管一般使用三次立方核，但其它权重也是可能的。在最初的加权最小
@@ -393,8 +393,7 @@ Gijbels(1992)和Fan(1993)展示了局部线性拟合具有一些局部平均所�
 提供一些模拟的证据来展示不同的光滑器对一个高度非线性函数形式的拟合效果。在这个模
 拟中，我们产生一个函数$f$并使用4个不同的光滑器进行拟合，分别为两个局部多项式拟合，两个
 样条光滑器来对模拟的数据进行拟合。这个非线性方程为： 
-$$\label{eq:60}
-y=\sin^{3}(2\pi x^{2})+\varepsilon.$$
+$$y=\sin^{3}(2\pi x^{2})+\varepsilon.$${#eq:old-1-60}
   
 其图形呈现周期样式。这种形式的函数在实际中非常罕见，但对于非参数回归来说，是难
 以估计的。图 \@ref(fig:fig-nonpara-compare) 给出了这4个非参数拟合，其中虚线代表真实函数形式，实线代表非参数估计。
@@ -484,8 +483,7 @@ lines(fit, se=FALSE, lwd=1)
 前面我们主要关注的是两个变量，即一个因变量和一个自变量关系，没有涉及到多个自变量。
 但是在大部分应用研究中需要考虑多元模型。局部多项式非参数回归模型可以推广到多元框
 架下。一般地，我们可以假设$k$元非参数回归模型为：
-$$\label{eq:semipara-72}
-Y=f(X_{1},\cdots,X_{k})+\varepsilon.$$
+$$Y=f(X_{1},\cdots,X_{k})+\varepsilon.$${#eq:semipara-72}
 
 这个模型的估计与一个自变量的非参数回归模型相类似。这时，局部估计使用多
 元局部多项式回归而不是一元局部多项式回归。像以前一样，靠近关注点的数据
@@ -600,18 +598,18 @@ $f$可以写为$f_{a}(x_{a})+f_{b}(x_{b})$的形式，那么这个模型成为�
 把非参数回归模型推广到两个以上的自变量需要额外的假设：可加。尽管可加
 性的条件比完全的多元非参数回归模型具有限制性，但它是统计建模过程中使用
 的参数模型中几个最常见的假设之一。对于参数线性回归模型，一般假设其函数
-形式为： $$\label{eq:semipara-73}
- Y_{i}=\alpha+\beta_{1}X_{1}+\cdots+\beta_{k}X_{k}+\varepsilon.$$
+形式为： 
+$$Y_{i}=\alpha+\beta_{1}X_{1}+\cdots+\beta_{k}X_{k}+\varepsilon.$${#eq:semipara-73}
 在这个函数形式中，我们一般假设自变量对$Y$的作用是可加的：$X_{1}$和
 $X_{2}$的作用是$\beta_{1}+\beta_{2}$。可加假设有时候可以放松到含有交
 互项的模型： 
-$$\label{eq:semipara-74}
-  Y=\alpha+\beta_{1}X_{1}+\beta_{2}X_{2}+\beta_{3}X_{1}X_{2}+\varepsilon.$$
+$$
+  Y=\alpha+\beta_{1}X_{1}+\beta_{2}X_{2}+\beta_{3}X_{1}X_{2}+\varepsilon.$${#eq:semipara-74}
 可加条件是相当严格的，但它已经在我们估计的大部分模型中出现，因此我们
 可以把它推广到非参数回归模型。具有可加条件的非参数回归模型具有以下形
 式： 
-$$\label{eq:semipara-75}
-  Y_{i}=\alpha+f_{1}(X_{1})+\cdots+f_{k}(X_{k})+\varepsilon$$
+$$
+  Y_{i}=\alpha+f_{1}(X_{1})+\cdots+f_{k}(X_{k})+\varepsilon$${#eq:semipara-75}
 其中$f_{1},\cdots,f_{k}$是任意的光滑函数，我们将用数据通过光滑器进行估
 计。具有可加条件的非参数回归模型称为**可加模型**。可加的动
 机来源于把非参数回归模型推广到多元数据分析中的愿望(Hastie，
@@ -628,8 +626,8 @@ Tibshirani,1990)[@hastie1990generalized]。可加性假设获得了更多的
 参数足够描述$X$ 与$Y$之间的关系，就没有必要使用额外的参数来估计非参数回归。总之，
 最具灵活性的模型应是在同一个模型中既包含参数项又包含非参数项。我们可以直接修改可
 加模型来同时估计参数项和非参数项。混合参数项和非参数项的一个模型可以采取以下形式：
-$$\label{eq:semipara-77}
-  Y_{i}=\alpha+f_{1}(X_{1})+\cdots+f_{j}(X_{j})+\beta_{1}X_{j+1}+\cdots+\beta_{k}X_{k}+\varepsilon.$$
+$$
+  Y_{i}=\alpha+f_{1}(X_{1})+\cdots+f_{j}(X_{j})+\beta_{1}X_{j+1}+\cdots+\beta_{k}X_{k}+\varepsilon.$${#eq:semipara-77}
   
 在上面模型中，前$j$个自变量被认为对$Y$有非线性作用，因此用非参数光滑器进行拟合。
 其它的自变量以参数形式进入模型。在可加模型中添加参数项就得到**半参数回归模型**。
@@ -656,8 +654,8 @@ Probit模型中，Probit模型的系统部分是线性的，在使用正态分�
 中增加额外的部分以引入交互项。重要的是，如果真实模型是变量的非线性形式，
 那么这个非线性必须在系统部分中建模。连接函数对于自变量的非线性无能为力。例
 如，如果系统部分的真实形式为 
-$$\label{eq:semipara-93}
-  \eta_{i}=\alpha+\beta_{1}X_{1i}+\beta_{2}X_{2i}^{2}.$$
+$$
+  \eta_{i}=\alpha+\beta_{1}X_{1i}+\beta_{2}X_{2i}^{2}.$${#eq:semipara-93}
 无论使用什么样的连接函数，二次项都必须在系统部分中引入。因此，如果系统
 部分使用线性函数，一些非线性将不能被拟合，此时，模型中仍存在设计误差，
 尽管它们是非线性模型。实际上，在GLM框架中对于大多数模型来说，设计误差变
@@ -670,8 +668,7 @@ $$\label{eq:semipara-93}
 
 为了设定GAM，我们允许GLM中系统部分的线性函数变为一些来自自变量的光滑函
 数。一般地，广义可加模型具有以下形式： 
-$$\label{eq:semipara-gam}
-g(\mu_{i})=\bm{X\beta}+f_{1}(x_{1i}) + f_{2}(x_{2i}) + \cdots$$ 
+$$g(\mu_{i})=\bm{X\beta}+f_{1}(x_{1i}) + f_{2}(x_{2i}) + \cdots $${#eq:semipara-gam} 
 其中
 $$\mu_{i} = \mathbb{E}(Y_{i}),\text{并且~} Y_{i}
   \overset{\text{i.i.d}}{\sim} \text{~指数分布簇中某一分布.}$$
@@ -754,7 +751,8 @@ GAM里面，在IRLS的每一次迭代过程中，我们都必须估计一个可�
 析纵向数据的有力工具。纵向数据混合模型的研究最先由Laird，Ware(1982)年的一篇论文
 中给出[@laird1982random]。
 
-线性混合模型可以表示成 $$\begin{aligned}
+线性混合模型可以表示成 
+$$\begin{aligned}
   \label{eq:13}
   y_{ij}=&\beta_{1}x_{1ij}+\cdots+\beta_{p}x_{pij}
   +b_{i1}z_{1ij}+\cdots+b_{iq}z_{qij}+\varepsilon_{ij} \\
@@ -782,7 +780,8 @@ j'\text{时})$，此时唯一需要估计的参数就是相同的误差项方差
 当组内的观测值表示来自同一个个体的纵向数据时，此时$\lambda$的结构必须设
 定为可以体现误差项之间自相关关系。
 
-将模型改写成矩阵形式有 $$\begin{aligned}
+将模型改写成矩阵形式有 
+$$\begin{aligned}
   \label{eq:14}
   \boldsymbol{y_{i}}=&\boldsymbol{X_{i}\beta+Z_{i}b_{i}+\varepsilon_{i}}, \quad
   i=1,\cdots , M,\\
@@ -798,8 +797,10 @@ $\sigma^{2}\boldsymbol{\Psi}$是随机效应的$q\times q$协方差矩阵。
 $\sigma^{2}\boldsymbol{\Lambda_{i}}$是第$i$组误差项的$n_{i}\times n_{i}$
 协方差矩阵。
 
-形式中的$M$个等式可以表示成一个更浓缩的形式 $$\label{eq:15}
-  \boldsymbol{y=X\beta+Zb+\varepsilon},$$ 其中 $$\label{eq:16}
+上式中的$M$个等式可以表示成一个更浓缩的形式 
+$$\boldsymbol{y=X\beta+Zb+\varepsilon},$${#eq:15}
+其中 
+$$\label{eq:16}
   \boldsymbol{y=}
      \left [
       \begin{array}{c}
@@ -845,8 +846,7 @@ b)=\sigma^{2}(\boldsymbol{I \otimes \Psi})$， $\text{Cov}(\boldsymbol
 \varepsilon)=\sigma^{2}(\boldsymbol{I \otimes \Lambda_{i}})$。
 
 进一步，模型可以写成只包含一个误差项的形式为 
-$$\label{eq:17}
-  \boldsymbol{y=X\beta+\eta},$$ 
+$$\boldsymbol{y=X\beta+\eta},$${#eq:17}
 其中 
   $$\boldsymbol \eta= \left[
     \begin{array}{c}
@@ -865,20 +865,18 @@ $$\label{eq:17}
 	
 此时， $E[\boldsymbol \eta]=\boldsymbol 0$ ，$\boldsymbol \eta$ 的协方差矩阵为
 $N \times N$ 阶块状对角矩阵形式： 
-$$\label{eq:18}
-  \boldsymbol V =\sigma^{2} \left [
+$$\boldsymbol V =\sigma^{2} \left [
     \begin{array}{cccc}
       \boldsymbol{\Lambda_{1}+Z_{1}\Psi Z_{1}^{T}} & \boldsymbol 0 & \boldsymbol 0 &\boldsymbol 0 \\
       \boldsymbol 0 &  \boldsymbol{\Lambda_{2}+Z_{2}\Psi Z_{2}^{T}} & \boldsymbol 0&\boldsymbol 0\\
       \boldsymbol \vdots &\boldsymbol \vdots &\boldsymbol \ddots &\boldsymbol \vdots \\
       \boldsymbol 0 &\boldsymbol 0 &\boldsymbol \ldots &  \boldsymbol{\Lambda_{M}+Z_{M}\Psi Z_{M}^{T}}
-    \end{array} \right ].$$ [#eq:m-2.3.1]
+    \end{array} \right ].$$ {#eq:m-2.3.1}
 
 上面的设定尽管模型和的形式比简单，但其符号的说明比较复杂。
 
 在随机效应和随机误差项服从正态分布的假设下，混合模型可以表示为因变量的边际分布 
-$$\label{eq:20}
-  \boldsymbol{y \thicksim \mathcal{N}(X\beta,V)},$$ 
+$$\boldsymbol{y \thicksim \mathcal{N}(X\beta,V)},$${#eq:old-20}
 其中 $\boldsymbol{V}$为式 [@eq:m-2.3.1] 所定义。
 
 
@@ -896,8 +894,9 @@ $\sigma^{2}$的正态分布的随机冲击加在每一个个体截距上。这�
 滑样条表示为混合模型。把样条视为混合模型的详细讨论参见Ruppert, Wand and
 Carroll(2003)[@ruppert2003semiparametric]。
 
-在混合模型框架中，对$Y$我们可以写出以下线性回归模型： $$\label{eq:112}
-  Y_{ij}=\beta_{0j}+\beta_{1j}X_{ij}+e_{ij}.$$
+在混合模型框架中，对$Y$我们可以写出以下线性回归模型： 
+$$
+  Y_{ij}=\beta_{0j}+\beta_{1j}X_{ij}+e_{ij}.$${#eq:112}
 对于混合模型，一般地模型公式中每一项都有两个下标(或者更多)。在这种记号
 中，我们有嵌套在$j$个个体当中的$i$个观测值。这可以是嵌套在$j$个学校中
 的$i$个学生。我们认为在不同的$j$个个体之
@@ -942,16 +941,16 @@ and Carroll
 性无偏预测(BLUP)，其从一个高度局部性的拟合向全局估计收缩。
 
 样条回归模型(具有线性基)可以表示为： 
-$$\label{eq:114}
-  f(x_{i})=\beta_{0}+\beta_{1}x_{i}+
-  \sum_{k=1}^{K}\beta_{k}^{*}(x_{i}-c_{k})_{+}+\varepsilon$$ 其中
-$$\label{eq:115eq}
+$$f(x_{i})=\beta_{0}+\beta_{1}x_{i}+
+  \sum_{k=1}^{K}\beta_{k}^{*}(x_{i}-c_{k})_{+}+\varepsilon$$ 
+其中
+$$
   (x_{i}-c_{k})_{+}= \left \{
     \begin{array}{lr}
       0 & x \leq c_{k}\\
       x-c_{k} & x > c_{k}
     \end{array}
-    \right.$$
+    \right.$${#eq:114-1}
 表示节点在$c_{k}$的分段线性拟合。下面把方程中的每一项写成矩阵形式： 
 $$\label{eq:116}
   \boldsymbol X = \left [
@@ -991,8 +990,7 @@ $$\boldsymbol \beta= \left [
 \right].$$
 其中向量$\boldsymbol \beta^{*}$表示分段函数的系数。使用上面的这些记号就可以把
 方程写成矩阵形式 
-$$\label{eq:117}
-  \boldsymbol {y=X\beta+Z\beta^{*}+\varepsilon}.$$
+$$\boldsymbol {y=X\beta+Z\beta^{*}+\varepsilon}.$${#eq:old-117}
 为了把线性样条模型改写成混合模型，需要 
 $$\label{eq:118}
   \boldsymbol u= \left[
@@ -1012,9 +1010,8 @@ $$\label{eq:120}
 其中$\boldsymbol{C=[XZ]}$，$\boldsymbol{D}=\text{diag}(0,0,1,\cdots,1)$，
 $\lambda^{2}=\sigma_{\varepsilon}^{2}/\sigma_{u}^{2}$。Ruppert, Wand and
 Carroll(2003)证明了方程等价于 
-$$\label{eq:121}
-  \text{SS}(f,\lambda)=\sum_{i=1}^{n}[(y_{i}-f(x_{i}))]^{2}
-  +\lambda \int_{x_{1}}^{x_{n}}f''(x)^{2}\text{d}x$$
+$$\text{SS}(f,\lambda)=\sum_{i=1}^{n}[(y_{i}-f(x_{i}))]^{2}
+  +\lambda \int_{x_{1}}^{x_{n}}f''(x)^{2}\text{d}x$${#eq:121}
 这是光滑样条的表示形式。
 
 光滑样条和混合模型之间的等价性具有重要意义。首先，这表明光滑样条拟合是 $x$ 和
@@ -1042,13 +1039,13 @@ $\mathbf b$ 获得似然函数通常在分析方法上是不可行的。
 $f(\mathbf{y},\mathbf{b} | \boldsymbol{\beta})$
 可以写成
 $$f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq \int \exp \left\{\log f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta})+\frac{1}{2}(\boldsymbol{b}-\hat{\boldsymbol{b}})^{\top} \frac{\partial^{2} \log f(\boldsymbol{y}, \boldsymbol{b} | \boldsymbol{\beta})}{\partial \boldsymbol{b} \partial \boldsymbol{b}^{\top}}(\boldsymbol{b}-\hat{\boldsymbol{b}})\right\} d \boldsymbol{b}
-$$
+$${#eq:121-1}
 
 这里忽略了泰勒展开式中的高阶项，而不是等于零的那些项。在当前情况下所需的海塞矩阵
 是 $-\mathbf{Z}^{\top} \mathbf{W} \mathbf{Z} / \phi-\psi^{-1}$ ,其中 $\mathbf{W}$ 
 是IRLS权向量，基于由$\hat {\mathbf b}$ 和 $\boldsymbol{\beta}$ 表示的 $\mathbf \mu$ 。因此有：
 $$f(\boldsymbol{y} | \boldsymbol{\beta}) \simeq f(\boldsymbol{y}, \hat{\boldsymbol{b}} | \boldsymbol{\beta}) \frac{(2 \pi)^{p / 2}}{\left|\boldsymbol{Z}^{\top} \boldsymbol{W} \boldsymbol{Z}^/ \phi+\psi_{\theta}^{-1}\right|^{1 / 2}}
-$$
+$${#eq:121-2}
 这种积分近似称为“拉普拉斯近似”积分，用显式形式代替随机效应密度并取对数则有
 $$l(\theta, \boldsymbol \beta) \simeq \log f(\boldsymbol y | \boldsymbol {\hat{b}}, \boldsymbol \beta)-\boldsymbol {\hat{b}}^{\top} \psi_{\theta}^{-1} \boldsymbol{\hat{b}} / 2-\log \left|\psi_{\theta}\right| / 2-\log \left|\boldsymbol Z^{\top} \boldsymbol W \boldsymbol Z/ \phi+\psi_{\theta}^{-1}\right| / 2 $$ {#eq:m3.16}
 
@@ -1082,7 +1079,7 @@ $$\hat{\boldsymbol{\beta}}, \hat{\boldsymbol{b}}=\underset{\boldsymbol \beta, \b
 $\mathcal{B}^{\top}=\left(\boldsymbol{b}^{\top},\boldsymbol{\beta}^{\top}\right)$，
 并定义相应的模型矩阵和精度矩阵为
 $$\boldsymbol \chi=(\boldsymbol Z,\boldsymbol X) \text { 和 } \boldsymbol S=\left[\begin{array}{cc}{\psi_{\theta}^{-1}} & {\boldsymbol0} \\ {\boldsymbol 0} & {\boldsymbol 0}\end{array}\right]
-$$
+$${#eq:121-4}
 
 包括了二次惩罚项的惩罚似然函数的海塞矩阵为$-\boldsymbol\chi^{\top}
 \boldsymbol{W} \boldsymbol \chi/ \phi-\boldsymbol{S}$，其中$\boldsymbol{W}$ 是由
@@ -1091,16 +1088,16 @@ $\hat{\boldsymbol \mu}$ 反过来依赖于当前$\mathcal{B}^{[k]}$ 的估计值
 度向量可以写为：
 $$\boldsymbol \chi^{\top} \boldsymbol{W}
 \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})/\phi-\boldsymbol{S}
-\mathcal{B}^{[k]}.$$
+\mathcal{B}^{[k]}.$${#eq:121-5}
 
 牛顿更新步骤有如下形式：
-$$\mathcal{B}^{[k+1]}=\mathcal{B}^{[k]}+\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\left\{ \boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})-\phi \boldsymbol{S} \mathcal{B}^{[k]}\right\}$$
+$$\mathcal{B}^{[k+1]}=\mathcal{B}^{[k]}+\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\left\{ \boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})-\phi \boldsymbol{S} \mathcal{B}^{[k]}\right\}$${#eq:121-6}
 将$\mathcal{B}^{[k]}=\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\left(\boldsymbol \chi^{\top} \boldsymbol{W}\boldsymbol \chi+\phi \boldsymbol{S}\right) \mathcal{B}^{[k]}$
 带入上式可得到
 $$\mathcal{B}^{[k+1]}=\left(\boldsymbol \chi^{\top} \boldsymbol{W} \boldsymbol \chi+\phi \boldsymbol{S}\right)^{-1}\boldsymbol \chi^{\top}\boldsymbol{W} \{ \boldsymbol{G}(\boldsymbol{y}-\hat{\boldsymbol{\mu}})+\boldsymbol \chi\mathcal{B}^{[k]}\}$$
 它可以立即被识别为惩罚加权最小二乘目标的最小值
 $$\|\boldsymbol z-\boldsymbol \chi \mathcal{B}\|_{W}^{2}+\phi \mathcal{B}^{\top} \boldsymbol S \mathcal{B}= \left\| \boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b \right\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b
-$$
+$${#eq:121-7}
 其中
 $z_{i}=g^{T}\left(\hat{\mu}_{i}\right)\left(y_{i}-\hat{\mu}_{i}\right)+\hat{\eta}_{i}.$
 
@@ -1121,7 +1118,7 @@ $$w_{i}=\frac{
 
 3\. 计算 $\hat{\boldsymbol b}$ 和 $\hat {\boldsymbol\beta}$ ，使得以下的加权最小
 二乘对象最小，
-$$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b$$
+$$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_{W}^{2}+\phi \boldsymbol b^{\top} \psi_{\theta}^{-1} \boldsymbol b$${#eq:121-9}
 然后更新$\hat{\boldsymbol \eta}=\boldsymbol X\hat{\boldsymbol \beta}+ \boldsymbol Z\boldsymbol b$ 和 $\hat{\mu_i}=g^{-1}(\hat{\eta_i})$。
 
 是否收敛可以根据惩罚的似然偏差或其梯度来判断。
@@ -1131,7 +1128,7 @@ $$\|\boldsymbol z-\boldsymbol X \boldsymbol \beta-\boldsymbol Z \boldsymbol b\|_
 此，执行一个惩罚IRLS迭代，每一步都基于以下工作混合效应模型估计$\theta,\phi$:
 $$\boldsymbol z | \boldsymbol{b}, \boldsymbol{\beta} \sim \mathcal{N}\left(\boldsymbol{X}
   \boldsymbol{\beta}+\boldsymbol{Z} \boldsymbol{b}, \boldsymbol{W}^{-1}
-  \phi\right), \boldsymbol{b} \sim \mathcal{N}\left(\boldsymbol{0}, \boldsymbol \psi_{\theta}\right)$$
+  \phi\right), \boldsymbol{b} \sim \mathcal{N}\left(\boldsymbol{0}, \boldsymbol \psi_{\theta}\right)$${#eq:121-10}
   
 其中用到了Fisher权重。也就是说，惩罚IRLS算法的步骤3中，
 $\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{b}}, \hat{\boldsymbol{\beta}},
@@ -1254,7 +1251,7 @@ $\text{var}(y_{i}|\boldsymbol{b})=\phi m_{i}^{-1}v(\mu_{i}^{\boldsymbol{b}})$，
 $v(\cdot)$是设定的方差函数，$m_{i}$是权重，$\phi$是尺度参数。那么广义
 可加混合模型为 
 $$g(\mu_{i}^{\boldsymbol{b}})=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
-  + \cdots + \boldsymbol{Z_{i}b},$$
+  + \cdots + \boldsymbol{Z_{i}b},$${#eq:121-1-1}
 
 其中$g(\cdot)$是联接函数，$\mu_{i}^{\boldsymbol{b}}$是 $y$
 的条件期望，$\boldsymbol{\beta}$ 是固定效应参数向量，$\boldsymbol{X_{i}}$是固定
@@ -1302,9 +1299,9 @@ Wood(2006)[@Lin1999; @wood2006generalized]。
 合混合模型中的非线性关系。这一部分我们主要从半参数方法如何融入到混合模型的角度来
 讨论半参数混合模型。下面我们给出半参数混合模型的模型设定。一般地，半参数混合模型
 具有以下形式
-$$\label{eq:additive-mixed}
+$$
   y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
-  + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i}$$
+  + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i}$${#eq:additive-mixed}
 其中 $y_{i}$ 是因变量， $\boldsymbol{\beta}$ 是固定效应参数向量，
  $\boldsymbol{X_{i}}$ 是固定
 效应设计矩阵， $f_{j}$ 是自变量 $x_{k}$ 的光滑函数， $\boldsymbol{Z_{i}}$ 是随机效应
@@ -1367,7 +1364,7 @@ Clayton和Montomoli（1995）等人对这些问题进行了初步研究
 Fahrmeir和Lang（2001a，b）的两篇文章[@Fahrmeir2001;@Fahrmeir2001a]。
 
 ### 贝叶斯广义可加混合模型
-广义线性模型假设，给定自变量 $w$ ，因变量 $y$ 的分布属于指数族，并且 $\mu=E（y|w）$ ，
+广义线性模型假设，给定自变量 $w$ ，因变量 $y$ 的分布属于指数族，并且 $\mu=E(y|w)$ ，
 线性预测子为 $\eta =\gamma^{T} w$ ，连接函数 $\mu = h(\eta)$ 将
  $\mu$ 与 $\eta$ 连接起来。这里 $h$ 是一个已知的单调函数，并且
 $\gamma=\left(\gamma_1,\ldots,\gamma_q\right)$ 是要估计的未知回归系数的向量。广义
