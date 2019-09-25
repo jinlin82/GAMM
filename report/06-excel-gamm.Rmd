@@ -32,25 +32,34 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 # 基于广义可加混合模型的空气质量为优天数影响因素分析 {#sec:chap-6}
 
-上一章我们对城市空气质量的基本状况及其影响因素的基本状况进行了概述，并分析了空气
-质量指数的时空间分布特征。从中可以发现，影响城市空气质量好坏的原因很复杂，并不是
-某一方面决定的，而是各个方面多因素综合作用的结果。因此，本章在上一章的基础上，对
-城市空气质量的影响因素进行分析，探明哪些因素对城市空气质量会产生影响及其具体影响
-方式。
+在第 \@ref(sec:chap-5) 章中，我们分别对35城市年度和月度空气质量指数(AQI)进行了建
+模分析，得出了空气质量指数影响因素。空气质量指数是一个综合指标，反应的是城市空气
+质量的平均水平。为了更全面的研究城市空气质量状况，我们需要从其他角度开展研究。空
+气质量为优是空气质量治理控制的最后目标。这一章我们采用空气质量为优的天数为考察变
+量，建立模型探讨可以增加或减少城市空气质量为优天数的因素。下面分析同样分别从年度
+和月度两个方面进行分析。
 
+## 年度空气质量为优天数影响因素分析
 
-## 年度数据分析
+我们收集了2014年-2017年35城市每一天的AQI值，根据每一天的AQI值和空气质量指数等级
+划分标准，就可以计算得到2014年-2017年35城市的年度空气质量为优天数。根据第
+\@ref(sec:dep-dist) 节的分析结果，年度空气质量为优天数取对数后近似服从正态分布。
+下面就以这个变量作为因变量开展分析，首先进行自变量筛选，然后建立正态可加混合模型
+框架下的各种具体模型。
 
-### 自变量筛选
+### 年度空气质量为优天数Lasso自变量筛选
 
-同样使用基于lasso的方法进行自变量筛选，由图 \@ref(fig-excel-var-sel-y) 可知，地区生产总值
-增长率、固定资产投资额、常住人口、建成区绿化覆盖率、城市公路客运量、房屋建筑施工面积、
-私人汽车拥有量、工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成投资、平均气温、
-平均气压、日照时数、经度、海拔对空气质量为优的天数无影响，这些变量被剔除，而剩下的变量
-有地区生产总值、全社会用电量、废气治理完成投资额、降水量、平均相对湿度、平均风速、纬度
-。且在剩下的这些变量中，可以看出，全社会用电量、降水量、平均相对湿度、平均风速与空气
-质量为优的天数呈正相关关系，而废气治理完成投资与空气质量为优的天数呈负相关关系，而地区
-生产总值、纬度对空气质量为优的天数呈非线性影响。
+以对数年度空气质量为优天数为自变量建立Lasso模型进行自变量筛选，结果显示在图
+\@ref(fig:fig-excel-var-sel-y) 中。由图 \@ref(fig:fig-excel-var-sel-y) 可知，地
+区生产总值增长率、固定资产投资额、常住人口、建成区绿化覆盖率、城市公路客运量、房
+屋建筑施工面积、私人汽车拥有量、工业二氧化硫排放量、工业烟粉尘排放量、工业污染治
+理完成投资、平均气温、平均气压、日照时数、经度和海拔对空气质量为优的天数无影响，
+这些变量被剔除。剩下的自变量有地区生产总值、全社会用电量、废气治理完成投资额、降
+水量、平均相对湿度、平均风速和纬度。在剩下的这些变量中，全社会用电量、降水量、平
+均相对湿度、平均风速与空气质量为优的天数呈正相关关系，而废气治理完成投资与空气质
+量为优的天数呈负相关关系，而地区生产总值、纬度对空气质量为优的天数呈非线性影响。
+下面将使用筛选出的自变量为基础建立正态可加混合模型框架下的各种模型，并选择最优模
+型得出空气质量为优天数的影响因素。
 
 ```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
@@ -70,7 +79,7 @@ dat.sel.y.excel$excellent <- log(dat.sel.y.excel$excellent)
 
 library(gamsel)
 gam1 <- gamsel(as.matrix(dat.sel.y.excel[,-c(1:3, 23:24)]), as.matrix(dat.sel.y.excel[,3]), gamma = 0.4)
-######## gam1
+######## gam1 解释 55.49%
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 mapply(function(i, y) {
@@ -81,22 +90,20 @@ mapply(function(i, y) {
 
 ```
 
-解释 55.49%
+### 年度空气质量为优天数线性回归模型
 
-
-### 线性回归模型
-
-作为比较的基准，首先建立线性回归模型，结果如表 \@ref(tab:tab-excel-lm-y) 所示。由
-表 \@ref(tab:tab-excel-lm-y) 可知，在筛选出的变量中，废气治理完成投资额、平均风速、
-临海、纬度这四个变量在10%的显著性水平下通过显著性检验，且其系数分别为-0.1342、
-0.6314、-0.988、0.4863，说明平均风速、纬度对年均空气质量为优天数呈正向影响，而废气
-治理完成投资、临海对年均空气质量为优天数呈负向影响。也就是说，在其他变量保持不变的
-条件下，废气治理完成投资额越多，年均空气质量为优的天数越少，空气质量越差；平均风速
-越大，年均空气质量为优天数越多，空气质量越好；纬度越高，年均空气质量为优天数越多，
-空气质量越好；平均来讲，临海地区比不临海地区年均空气质量为优天数少0.988天。但根据
-我们的认知，废气治理完成投资额越多，空气质量应该越好。在这里，我们同样可以做出如下
-解释，目前废气治理完成投资额不足，当空气污染严重时，才增加更多投资来缓解空气污染。
-因此，在线性回归模型中，在一定时间内，废气污染治理完成投资额越多，空气污染越严重。
+先建立最简单的多元线性回归模型，作为后面复杂模型的比较基准。模型估计结果如表
+\@ref(tab:tab-excel-lm-y) 所示。由表 \@ref(tab:tab-excel-lm-y) 可知，在筛选出的
+变量中，废气治理完成投资额、平均风速、临海、纬度这四个变量在10%的显著性水平下通
+过显著性检验，且其系数分别为-0.1342、0.6314、-0.988、0.4863，说明平均风速、纬度
+对年均空气质量为优天数呈正向影响，而废气治理完成投资、临海对年均空气质量为优天数
+呈负向影响。也就是说，在其他变量保持不变的条件下，废气治理完成投资额越多，年均空
+气质量为优的天数越少，空气质量越差；平均风速越大，年均空气质量为优天数越多，空气
+质量越好；纬度越高，年均空气质量为优天数越多，空气质量越好；平均来讲，临海地区比
+不临海地区年均空气质量为优天数少0.988天。但根据我们的认知，废气治理完成投资额越
+多，空气质量应该越好。在这里，我们同样可以做出如下解释，目前废气治理完成投资额不
+足，当空气污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一
+定时间内，废气污染治理完成投资额越多，空气污染越严重。
 
 ```{r tab-excel-lm-y, eval=T, results='markup'}
 varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 21, "nonzero")[[1]]]),
@@ -122,10 +129,12 @@ knitr::kable(lm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数存在空间自相关。
-因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，时间相对较短，因此不考虑时间
-相关。残差空间自相关检验结果如表 \@ref(tab:tab-excel-lm-y-res-spatial) 所示。由表 \@ref(tab:tab-excel-lm-y-res-spatial) 可知，在5%的显著性水平下，2014、2016、2017年的莫兰指数均未
-通过显著性检验，说明残差不存在空间自相关。
+上述模型中我们并未考虑空间相关，而之前的莫兰指数的结果显示出年均空气质量为优天数
+存在空间自相关。因此，对残差进行空间自相关检验。在我们的研究中，只涉及四年的数据，
+时间相对较短，因此不考虑时间相关。残差空间自相关检验结果如表
+\@ref(tab:tab-excel-lm-y-res-spatial) 所示。由表
+\@ref(tab:tab-excel-lm-y-res-spatial) 可知，在5%的显著性水平下，2014、2016、2017
+年的莫兰指数均未通过显著性检验，说明残差不存在空间自相关。
 
 ```{r tab-excel-lm-y-res-spatial, eval=T, results='markup'}
 library(ape)
@@ -146,7 +155,7 @@ dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
 
 library("kableExtra")
 knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性回归模型残差空间自相关检验",digits = 4,
+             caption="年度空气质量为优天数线性回归模型残差空间自相关检验",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -157,7 +166,7 @@ knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
 ```
 
 
-### 线性混合效应模型
+### 年度空气质量为优天数线性混合效应模型
 
 之后将城市作为随机效应建立线性混合模型，对空气质量为优的天数的影响因素进行分析。拟合结果如
 表 \@ref(tab:tab-excel-lme-y) 所示。由表 \@ref(tab:tab-excel-lme-y) 可以看出，在10%的显著性
@@ -181,7 +190,7 @@ dimnames(lme.y.excel.coef) <- list(c("截距项", varselname), c("估计值", "�
 
 library("kableExtra")
 knitr::kable(lme.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性混合效应模型回归固定效应表",digits = 4,
+             caption="年度空气质量为优天数线性混合效应模型回归固定效应表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -191,27 +200,15 @@ knitr::kable(lme.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-### 半参数回归模型
+### 年度空气质量为优天数半参数回归模型
 
-由之前变量筛选的结果可知，地区生产总值、纬度与年均空气质量为优天数之间存在非线性相关
-关系。进一步建立半参数回归模型，结果如表 \@ref(tab:tab-excel-gam-y) 所示。由
-表 \@ref(tab:tab-excel-gam-y) 可知，在10%的显著性水平下，全社会用电量、废气治理完成
-投资额、平均相对湿度、平均风速对年均空气质量为优天数存在显著影响，其系数分别为0.0013、
--0.1091、0.0364、0.5378。表明在其他变量保持不变的条件下，全社会用电量越多，年均空气
-质量为优的天数越多，空气质量越好；废气污染治理完成投资额越多，年均空气质量为优天数越少，
-空气质量越差；平均相对湿度越大，年均空气质量为优的天数越多，空气质量越好；平均风速越大，
-年均空气质量为优天数越多，空气质量越好。且图 \@ref(fig:fig-excel-gam-y) 中显示了地区生产
-总值和纬度的拟合曲线，阴影部分表示95%的置信区间。同时由表 \@ref(tab:tab-excel-gam-y-smooth) 可知，在10%的显著性水平下，地区生产总值和纬度均通过显著性检验，表明地区生产总值和纬度对
-年均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-y) 可以发现，年均空气
-质量为优天数随地区生产总值的增加呈先下降后增加的变动趋势，具体来讲，地区生产总值在16000
-亿元之前年均空气质量为优天数随地区生产总值的增加呈下降的趋势，在16000亿元之后，年均空气
-质量为优天数随地区生产总值的增加而缓慢上升，表明地区生产总值在达到一定程度之后，年均空气
-质量为优的天数会逐渐增加，空气质量会逐渐变好。且整体来讲，年均空气质量为优天数先随纬度的
-增加而下降，在纬度在34之后，年均空气质量为优的天数又随纬度的增加而增加。
+由之前变量筛选的结果可知，地区生产总值、纬度与年均空气质量为优天数之间存在非线性
+相关关系。进一步建立半参数回归模型，建立的半参数模型参数部分结果显示在表
+\@ref(tab:tab-excel-gam-y) 中，非参数项的曲线显示在图 \@ref(fig:fig-excel-gam-y)
+中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gam-y-smooth) 中。
+
 
 ```{r tab-excel-gam-y, eval=T, results='markup'}
-
-
 library(mgcv)
 gam.y.excel <- gam(excellent~s(gdp)+power+gas_control
                    +rain+humid+wind_speed
@@ -223,7 +220,7 @@ dimnames(gam.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估�
 
 library("kableExtra")
 knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="半参数回归模型参数估计结果",digits = 4,
+             caption="年度空气质量为优天数半参数回归模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -233,7 +230,14 @@ knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+由表 \@ref(tab:tab-excel-gam-y) 可知，在10%的显著性水平下，全社会用电量、废气治
+理完成投资额、平均相对湿度、平均风速对年均空气质量为优天数存在显著影响，其系数分
+别为0.0013、-0.1091、0.0364、0.5378。表明在其他变量保持不变的条件下，全社会用电
+量越多，年均空气质量为优的天数越多，空气质量越好；废气污染治理完成投资额越多，年
+均空气质量为优天数越少，空气质量越差；平均相对湿度越大，年均空气质量为优的天数越
+多，空气质量越好；平均风速越大，年均空气质量为优天数越多，空气质量越好。
+
+```{r fig-excel-gam-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.excel,
@@ -261,7 +265,7 @@ dimnames(gam.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度"
 
 library("kableExtra")
 knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="半参数回归模型非参数项显著性",digits = 4,
+             caption="年度空气质量为优天数半参数回归模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -271,22 +275,32 @@ knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c")
 
 ```
 
-### 半参数混合效应模型
+图 \@ref(fig:fig-excel-gam-y) 中显示了地区生产总值和纬度的拟合曲线，阴影部分表示
+95%的置信区间。同时由表 \@ref(tab:tab-excel-gam-y-smooth) 可知，在10%的显著性水
+平下，地区生产总值和纬度均通过显著性检验，表明地区生产总值和纬度对年均空气质量为
+优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-y) 可以发现，年均空气质量为优
+天数随地区生产总值的增加呈先下降后增加的变动趋势，具体来讲，地区生产总值在16000
+亿元之前年均空气质量为优天数随地区生产总值的增加呈下降的趋势，在16000亿元之后，
+年均空气质量为优天数随地区生产总值的增加而缓慢上升，表明地区生产总值在达到一定程
+度之后，年均空气质量为优的天数会逐渐增加，空气质量会逐渐变好。且整体来讲，年均空
+气质量为优天数先随纬度的增加而下降，在北纬34度之后，年均空气质量为优的天数又随纬
+度的增加而增加。
 
-进一步建立半参数混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-excel-gamm-y) 
-所示。由表 \@ref(tab:tab-excel-gamm-y) 可知，在10%的显著性水平下，全社会用电量、废气治理完成
-投资额、平均相对湿度、平均风速通过显著性检验，且其系数分别为0.0010、-0.0961、0.0358、0.4643。
-表明在其他条件不变的前提下，全社会用电量越多，年均空气质量为优的天数越多，空气质量越好；废气
-治理完成投资额越多，年均空气质量为优天数越少，空气质量越差；平均相对湿度越大，年均空气质量为
-优天数越多，空气质量越好；平均风速越大，年均空气质量为优天数越多，空气质量越好；图
-\@ref(fig:fig-excel-gamm-y) 显示了半参数混合效应模型的非参数曲线，其非参数项为地区生产总值和纬度，
-且由表 \@ref(tab:tab-excel-gamm-y-smooth) 的非参数项显著性检验可知，在10%的显著性水平下，
-地区生产总值和纬度均通过显著性检验，表明地区生产总值和纬度均对年均空气质量为优天数存在非线性影响。
-且从图 \@ref(fig:fig-excel-gamm-y) 可以看出，年均空气质量为优天数随地区生产总值和纬度的增加均呈
-先下降后上升的趋势，这一结果与半参数回归模型中结果一致。
+### 年度空气质量为优天数半参数混合效应模型
+以城市作为随机效应，进一步建立半参数混合效应模型，模型参数部分结果显示在表
+\@ref(tab:tab-excel-gamm-y) 中，非参数项的曲线显示在图 \@ref(fig:fig-excel-gamm-y)
+中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gamm-y-smooth) 中。
+
+由表 \@ref(tab:tab-excel-gamm-y) 可知，在10%的显著性水平下，全社会用电量、废气治
+理完成投资额、平均相对湿度、平均风速通过显著性检验，且其系数分别为0.0010、-0.0961、
+0.0358、0.4643。表明在其他条件不变的前提下，全社会用电量越多，年均空气质量为优的
+天数越多，空气质量越好；废气治理完成投资额越多，年均空气质量为优天数越少，空气质
+量越差；平均相对湿度越大，年均空气质量为优天数越多，空气质量越好；平均风速越大，
+年均空气质量为优天数越多，空气质量越好。
+
+
 
 ```{r tab-excel-gamm-y, eval=T, results='markup'}
-
 library(mgcv)
 gamm.y.excel <- gamm(excellent~s(gdp)+power+gas_control
                    +rain+humid+wind_speed
@@ -299,7 +313,7 @@ dimnames(gamm.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估�
 
 library("kableExtra")
 knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="可加混合效应模型回归固定效应表",digits = 4,
+             caption="年度空气质量为优天数半参数混合效应模型回归固定效应表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -309,7 +323,7 @@ knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gamm-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gamm-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数半参数混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.y.excel$gam,
@@ -337,7 +351,7 @@ dimnames(gamm.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度
 
 library("kableExtra")
 knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="可加混合模型非参数项显著性",digits = 4,
+             caption="年度空气质量为优天数半参数混合模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -347,10 +361,16 @@ knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"
 
 ```
 
+图\@ref(fig:fig-excel-gamm-y) 显示了半参数混合效应模型的非参数曲线，其非参数项为
+地区生产总值和纬度，且由表 \@ref(tab:tab-excel-gamm-y-smooth) 的非参数项显著性检
+验可知，在10%的显著性水平下，地区生产总值和纬度均通过显著性检验，表明地区生产总
+值和纬度均对年均空气质量为优天数存在非线性影响。且从图
+\@ref(fig:fig-excel-gamm-y) 可以看出，年均空气质量为优天数随地区生产总值和纬度的
+增加均呈先下降后上升的趋势，这一结果与半参数回归模型中结果一致。
 
-### 模型比较与选择
+### 年度空气质量为优天数模型比较与最优模型选择
 
-上述分析中，我们选取年均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，
+上述分析中，我们选取年均空气质量为优天数作为因变量，基于Lasso筛选出的变量为自变量，
 分别建立线性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空气
 质量的影响因素进行分析。根据以上分析结果可知，在线性回归模型中，显著的变量有废气
 治理完成投资额、平均风速、是否临海、纬度；在线性混合效应模型中，显著的变量有废气
@@ -361,28 +381,22 @@ knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"
 结合之前的分析及我们的预期，这些模型尚未很好地表明变量与年均空气质量为优天数之间的关系。
 
 进一步选取上述所有模型中显著的变量，考虑实际情况，以年均空气质量为优天数为因变量，
-全社会用电量、废气治理完成投资额、平均相对湿度、平均风速为自变量建立半参数回归模型，
-结果如表 \@ref(tab:tab-excel-gam-y-best) 所示。由表 \@ref(tab:tab-excel-gam-y-best) 
-可知，在10%的显著性水平下，全社会用电量、废气治理完成投资额、平均相对湿度、平均风速、
-地区生产总值、纬度均通过显著性检验，且参数项系数分别为0.0016、-0.1081、0.0497、0.6479。
-表明在其他条件不变的情况下，全社会用电量越多，年均空气质量为优的天数越多，空气质量越好；
-废气治理完成投资额越多，年均空气质量为优天数越少，空气质量越差；平均相对湿度越大，空气
-质量为优的天数越多，空气质量越好；平均风速越大，年均空气质量为优天数越多，空气质量越好。
-图 \@ref(fig:fig-excel-gam-y-best) 表明了地区生产总值和纬度的非参数曲线，且从表 
-\@ref(tab:tab-excel-gam-y-smooth-best) 中可以看出，在10%的显著性水平下，地区生产总值、
-纬度均对年均空气质量为优的天数有非线性影响。且从图 \@ref(fig:fig-excel-gam-y-best) 
-中可以看出，年均空气质量为优天数随地区生产总值呈先下降后上升的趋势，地区生产总值在1000
-亿元之前，年均空气质量为优的天数随地区生产总值的增加而增加，在1000-2000亿元之间，年均
-空气质量为优的天数随地区生产总值的增加基本保持不变，在2000亿元之后，年均空气质量为优的
-天数随地区生产总值的增加而显著上升。对于纬度来讲，年均空气质量为优的天数随纬度的上升呈
-增加-减少-增加的变动趋势，整体来讲，纬度在25之前，年均空气质量为优的天数随纬度的增加而
-缓慢增加，纬度在25-35之间，年均空气质量为优的天数随纬度的增加趋于下降，纬度在35之后，
-年均空气质量为优的天数又随纬度的增加而显著增加。进一步对残差进行空间自相关检验，检验结果如表 
-\@ref(tab:tab-excel-gam-y-res-spatial) 。从表 \@ref(tab:tab-excel-gam-y-res-spatial) 中
-可以看出，残差不存在空间自相关。
+全社会用电量、废气治理完成投资额、平均相对湿度、平均风速为自变量建立半参数回归模
+型，模型线性部分估计结果如表 \@ref(tab:tab-excel-gam-y-best) 所示，非参数项的曲
+线显示在图 \@ref(fig:fig-excel-gam-y-best) 中，非参数项显著性检验结果在表
+\@ref(tab:tab-excel-gam-y-smooth-best) 中。
+
+由表 \@ref(tab:tab-excel-gam-y-best) 可知，在10%的显著性水平下，全社会用电量、废
+气治理完成投资额、平均相对湿度、平均风速、地区生产总值、纬度均通过显著性检验，且
+参数项系数分别为0.0016、-0.1081、0.0497、0.6479。表明在其他条件不变的情况下，全
+社会用电量越多，年均空气质量为优的天数越多，空气质量越好；废气治理完成投资额越多，
+年均空气质量为优天数越少，空气质量越差；平均相对湿度越大，空气质量为优的天数越多，
+空气质量越好；平均风速越大，年均空气质量为优天数越多，空气质量越好。图
+\@ref(fig:fig-excel-gam-y-best) 表明了地区生产总值和纬度的非参数曲线，且从表
+\@ref(tab:tab-excel-gam-y-smooth-best) 中可以看出，在10%的显著性水平下，地区生产
+总值、纬度均对年均空气质量为优的天数有非线性影响。
 
 ```{r tab-excel-gam-y-best, eval=T, results='markup'}
-
 library(mgcv)
 gam.y.excel.best <- gam(excellent~s(gdp)+power+gas_control
                    +humid+wind_speed
@@ -396,7 +410,7 @@ dimnames(gam.y.excel.best.coef) <- list(c("截距项", varselname[c(2,3,5,6)]), 
 
 library("kableExtra")
 knitr::kable(gam.y.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="半参数回归模型参数估计结果",digits = 4,
+             caption="年度空气质量为优天数最优模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -406,7 +420,7 @@ knitr::kable(gam.y.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-y-best, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.excel.best,
@@ -435,7 +449,7 @@ dimnames(gam.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度"
 
 library("kableExtra")
 knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="半参数回归模型非参数项显著性",digits = 4,
+             caption="年度空气质量为优天数最优模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -444,6 +458,18 @@ knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c")
     column_spec(1, width = c("4.5cm"))
 
 ```
+
+从图 \@ref(fig:fig-excel-gam-y-best) 中可以看出，年均空气质量为优天数随地区生产
+总值呈先下降后上升的趋势，地区生产总值在1000亿元之前，年均空气质量为优的天数随地
+区生产总值的增加而增加，在1000-2000亿元之间，年均空气质量为优的天数随地区生产总
+值的增加基本保持不变，在2000亿元之后，年均空气质量为优的天数随地区生产总值的增加
+而显著上升。对于纬度来讲，年均空气质量为优的天数随纬度的上升呈增加-减少-增加的变
+动趋势，整体来讲，纬度在25之前，年均空气质量为优的天数随纬度的增加而缓慢增加，纬
+度在25-35之间，年均空气质量为优的天数随纬度的增加趋于下降，纬度在35之后，年均空
+气质量为优的天数又随纬度的增加而显著增加。
+
+进一步对最优模型的残差进行空间自相关检验，检验结果如表
+\@ref(tab:tab-excel-gam-y-res-spatial) 。
 
 ```{r tab-excel-gam-y-res-spatial, eval=T, results='markup'}
 library(ape)
@@ -456,15 +482,14 @@ city.dists.inv <- 1/city.dist.km
 diag(city.dists.inv) <- 0
 
 moran.g.gam.best <- tapply(resid(gam.y.excel.best), as.factor(dat.sel.y.excel$year), 
-              function(x) Moran.I(x, city.dists.inv)
-)
+              function(x) Moran.I(x, city.dists.inv))
 
 moran.g.gam.best <- sapply(moran.g.gam.best, function(x) c(x$observed, x$p.v))
 dimnames(moran.g.gam.best) <- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
 
 library("kableExtra")
 knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
-             caption="最优模型残差空间自相关检验",digits = 4,
+             caption="年度空气质量为优天数最优模型残差空间自相关检验",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -474,23 +499,30 @@ knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
+从表 \@ref(tab:tab-excel-gam-y-res-spatial) 中可以看出，2014年-2017年的莫兰指数
+均较小，对应的P值较大，表明模型残差不存在空间自相关。
 
+## 月度空气质量为优天数影响因素分析
 
+利用2014年-2017年35城市每一天的AQI值，根据每一天的AQI值和空气质量指数等级划分标
+准，可以得到2014年-2017年35城市的月度空气质量为优天数。根据第\@ref(sec:dep-dist)
+节中对因变量分布的分析，月度空气质量为优天数近似服从泊松分布。下面就以这个服从泊
+松分布的变量作为因变量开展分析，首先利用Lasso方法进行自变量筛选，然后建立泊松可
+加混合模型框架下的各种具体模型并进行模型比较和最优模型选择。
 
-## 月度数据分析
+### 月度空气质量为优天数Lasso自变量筛选
 
-### 自变量筛选
-
-之后以同样的方法以对数月均空气质量为优天数为因变量进行相应分析，变量筛选结果如图 \@ref(fig:fig-var-sel-m-excel) 
-所示。在图 \@ref(fig:fig-var-sel-m-excel) 中，横轴表示各自变量，纵轴表示标准化后的月均空气
-质量为优的天数。由图 \@ref(fig：fig-var-sel-m-excel) 可知，地区生产总值、地区生产总值增长率、
-固定资产投资额、常住人口、建成区绿化覆盖率、城市公路客运量、私人汽车拥有量、全社会用电量、
-工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成投资额、平均气压、日照时数、经度、海拔
-对月均空气质量为优的天数无影响，这些变量被剔除，而剩下的变量有房屋建筑施工面积、废气污染治理
-完成投资额、平均气温、降水量、平均相对湿度、平均风速、纬度。且在剩下的这些变量中，可以看出，
-平均气温、降水量、平均相对湿度、平均风速对月均空气质量为优的天数呈正向影响，而房屋建筑施工
-面积、废气治理完成投资对月均空气质量为优的天数呈负向影响，纬度与月均空气质量为优的天数呈非
-线性相关关系。
+以月均空气质量为优天数为因变量进行Lasso变量筛选，变量筛选结果如图
+\@ref(fig:fig-var-sel-m-excel) 所示。在图 \@ref(fig:fig-var-sel-m-excel) 中，横
+轴表示各自变量，纵轴表示标准化后的月均空气质量为优的天数。
+由图 \@ref(fig:fig-var-sel-m-excel) 可知，地区生产总值、地区生产总值增长率、
+固定资产投资额、常住人口、建成区绿化覆盖率、城市公路客运量、私人汽车拥有量、全社
+会用电量、工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成投资额、平均气压、
+日照时数、经度、海拔对月均空气质量为优的天数无影响，这些变量被剔除，而剩下的变量
+有房屋建筑施工面积、废气污染治理完成投资额、平均气温、降水量、平均相对湿度、平均
+风速、纬度。且在剩下的这些变量中，可以看出，平均气温、降水量、平均相对湿度、平均
+风速对月均空气质量为优的天数呈正向影响，而房屋建筑施工面积、废气治理完成投资对月
+均空气质量为优的天数呈负向影响，纬度与月均空气质量为优的天数呈非线性相关关系。
 
 ```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
@@ -508,7 +540,7 @@ dat.sel.m.excel$coast <- factor(dat.sel.m.excel$coast)
 
 library(gamsel)
 gam1 <- gamsel(as.matrix(dat.sel.m.excel[,-c(1:4, 24:25)]), as.matrix(dat.sel.m.excel[,4]), gamma = 0.39)
-####### gam1
+####### gam1 解释48.22%
 
 par(mfrow=c(6,4), mar=c(2.1, 3.1, 2.1, 1.1))
 ## plot(gam1,newx=as.matrix(dat.sel.m.excel[,-c(1, 23:24)]), index=22)
@@ -520,25 +552,10 @@ mapply(function(i, y) {
 
 ```
 
-解释48.22%
+### 月度空气质量为优天数泊松回归模型
 
-
-### 泊松回归模型
-
-作为比较的基准，首先建立泊松回归模型，结果如表 \@ref(tab:tab-excel-lm-m) 所示。由
-表 \@ref(tab:tab-excel-lm-m) 可知，在筛选出的变量中，房屋建筑施工面积、废气治理完
-成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、是否临海、纬度这些
-变量在10%的显著性水平下均通过显著性检验，且其系数分别为0.0000、-0.5486、0.031、
-0.0038、0.0309、0.3306、0.1992、0.0826、-0.017，说明平均气温、降水量、平均相对湿度、
-平均风速、供暖、临海对月均空气质量为优天数呈正向影响，而废气治理完成投资额和纬度对
-月均空气质量为优天数呈负向影响。也就是说，在其他变量保持不变的条件下，平均气温越高、
-降水量越多、平均相对湿度越大、平均风速越大、供暖、临海的地区，月均空气质量为优的
-天数越多，空气质量越好；而废弃治理完成投资额越多，纬度越高的地区，月均空气质量为优
-的天数越少，空气质量越差。但根据我们的认知，废气治理完成投资额越多，空气质量应该越
-好，供暖地区比非供暖地区空气质量更差。在这里，对于废气治理完成投资额，我们可以做出
-同样的解释，目前废气治理完成投资额不足，当空气污染严重时，才增加更多投资来缓解空气
-污染。因此，在线性回归模型中，在一定时间内，废气污染治理完成投资额越多，空气污染越
-严重。
+由于月度空气为优天数服从泊松分布，所以首先可以建立泊松回归模型作为比较的基准。泊
+松回归模型估计结果如表 \@ref(tab:tab-excel-lm-m) 所示。
 
 ```{r tab-excel-lm-m, eval=T, results='markup'}
 varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 25, "nonzero")[[1]]]),
@@ -558,7 +575,7 @@ dimnames(lm.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "�
 
 library("kableExtra")
 knitr::kable(lm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性回归模型回归系数表",digits = 4,
+             caption="月度空气质量为优天数泊松回归模型回归系数表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -568,7 +585,19 @@ knitr::kable(lm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-
+由表 \@ref(tab:tab-excel-lm-m) 可知，在筛选出的变量中，房屋建筑施工面积、废气治
+理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、是否临海、纬度
+这些变量在10%的显著性水平下均通过显著性检验，且其系数分别为0.0000、-0.5486、
+0.031、0.0038、0.0309、0.3306、0.1992、0.0826、-0.017，说明平均气温、降水量、平
+均相对湿度、平均风速、供暖、临海对月均空气质量为优天数呈正向影响，而废气治理完成
+投资额和纬度对月均空气质量为优天数呈负向影响。也就是说，在其他变量保持不变的条件
+下，平均气温越高、降水量越多、平均相对湿度越大、平均风速越大、供暖、临海的地区，
+月均空气质量为优的天数越多，空气质量越好；而废弃治理完成投资额越多，纬度越高的地
+区，月均空气质量为优的天数越少，空气质量越差。但根据我们的认知，废气治理完成投资
+额越多，空气质量应该越好，供暖地区比非供暖地区空气质量更差。在这里，对于废气治理
+完成投资额，我们可以做出同样的解释，目前废气治理完成投资额不足，当空气污染严重时，
+才增加更多投资来缓解空气污染。而模型估计结果中供暖地区空气质量为优天数更多，可以
+认为当前估计的模型模型设定有问题，需要进一步改进。
 
 ```{r tab-excel-lm-m-res-spatial, eval=F, results='markup'}
 library(ape)
@@ -589,7 +618,7 @@ dimnames(moran.g.lm)<- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
 
 library("kableExtra")
 knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性回归模型残差空间自相关检验",digits = 4,
+             caption="月度空气质量为优天数泊松回归模型残差空间自相关检验",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -599,23 +628,21 @@ knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
+### 月度空气质量为优天数泊松混合效应模型
 
-### 泊松混合效应模型
-
-之后将城市作为随机效应建立泊松混合模型，对空气质量影响因素进行分析。拟合结果如
-表 \@ref(tab:tab-excel-lme-m) 所示。由表 \@ref(tab:tab-excel-lme-m) 可以看出，
-在10%的显著性水平下，房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、
-平均相对湿度、平均风速、是否供暖、纬度通过显著性检验，且其系数分别为-0.0001、
--0.9775、0.1624、0.0105、0.1129、1.483、2.9745、-0.2114。表明在其他变量保持不变
-的条件下，平均气温越高、降水量越多、平均相对湿度越大、平均风速越大、供暖的地区，
-其月均空气质量为优的天数越多，空气质量越好；而房屋建筑施工面积越大、废气治理完成
-投资额越多、纬度越高的地区，其月均空气质量为优的天数越少，空气质量越差。同样，在
-泊松混合模型中，废气治理完成投资额与月均空气质量为优天数之间关系的符号仍然是正的，
-供暖与月均空气质量为优的天数之间关系的符号也是正的，与泊松回归模型结论一致，可以
-做出类似的解释。
+把城市作为随机效应建立泊松混合模型，对空气质量影响因素进行分析。模型估计结果如表
+\@ref(tab:tab-excel-lme-m) 所示。由表 \@ref(tab:tab-excel-lme-m) 可以看出，在10%
+的显著性水平下，房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对
+湿度、平均风速、是否供暖、纬度通过显著性检验，且其系数分别为-0.0001、-0.9775、
+0.1624、0.0105、0.1129、1.483、2.9745、-0.2114。表明在其他变量保持不变的条件下，
+平均气温越高、降水量越多、平均相对湿度越大、平均风速越大、供暖的地区，其月均空气
+质量为优的天数越多，空气质量越好；而房屋建筑施工面积越大、废气治理完成投资额越多、
+纬度越高的地区，其月均空气质量为优的天数越少，空气质量越差。同样，在泊松混合模型
+中，废气治理完成投资额与月均空气质量为优天数之间关系的符号仍然是正的，供暖与月均
+空气质量为优的天数之间关系的符号也是正的，与泊松回归模型结论一致，可以做出类似的
+解释。
 
 ```{r tab-excel-lme-m, eval=T, results='markup'}
-
 library(mgcv)
 lme.m.excel <- gamm(excellent~con_area+gas_control+mean_temp+rain+humid+wind_speed +heating+coast+lat,
               random=list(city=~1), data=dat.sel.m.excel, method = "REML")
@@ -626,7 +653,7 @@ dimnames(lme.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "�
 
 library("kableExtra")
 knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性混合效应模型回归固定效应表",digits = 4,
+             caption="月度空气质量为优天数泊松混合效应模型回归固定效应表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -636,23 +663,19 @@ knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-### 泊松可加模型
+### 月度空气质量为优天数泊松可加模型
 
-由之前变量筛选的结果可知，纬度与月均空气质量为优天数之间存在非线性相关关系。进一步
-建立泊松可加模型，结果如表 \@ref(tab:tab-excel-gam-m) 所示。由表 \@ref(tab:tab-excel-gam-m) 
-可知，在10%的显著性水平下，房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、
-平均相对湿度、平均风速、是否供暖对月均空气质量为优天数存在显著影响，其系数分别为
-0.0000、-0.1845、0.037、0.0005、0.031、0.2714、0.3783。表明在其他变量保持不变的条件下，
-平均气温越高、降水量越大、平均相对湿度越大、平均风速越大、供暖的地区，月均空气质量为
-优的天数越多，空气质量越好；而废气治理完成投资额越多的地区，月均空气治理为优的天数越
-少，空气质量越差。且图 \@ref(fig:fig-excel-gam-m) 中显示了纬度的拟合曲线，阴影部分表
-示95%的置信区间。由表 \@ref(tab:tab-excel-gam-m-smooth) 可知，纬度通过显著性检验，
-表明纬度对月均空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-m) 可以发现，
-月均空气质量为优天数随纬度呈不规则变动，具体来讲，可以分为以下几个阶段。纬度在25之前，
-月均空气质量为优的天数随纬度的增加呈小幅度增加，纬度在25-35之间，月均空气质量为优的天数
-随纬度的增加显著下降，在35-40之间，月均空气质量为优的天数随纬度的增加显著增加，纬度在
-40-45之间，月均空气质量为优的天数随纬度的增加呈小幅下降，纬度在45之后，月均空气质量为
-优的天数又随纬度的增加而显著增加。
+由之前变量筛选的结果可知，纬度与月均空气质量为优天数之间存在非线性相关关系。因此
+可以建立泊松可加模型。建立的泊松可加模型中参数部分结果显示在表
+\@ref(tab:tab-excel-gam-m) 中，非参数项的曲线显示在图 \@ref(fig:fig-excel-gam-m)
+中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gam-m-smooth) 中。
+
+由表 \@ref(tab:tab-excel-gam-m) 可知，在10%的显著性水平下，房屋建筑施工面积、废
+气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖对月均空气质
+量为优天数存在显著影响，其系数分别为0.0000、-0.1845、0.037、0.0005、0.031、
+0.2714、0.3783。表明在其他变量保持不变的条件下，平均气温越高、降水量越大、平均相
+对湿度越大、平均风速越大、供暖的地区，月均空气质量为优的天数越多，空气质量越好；
+而废气治理完成投资额越多的地区，月均空气治理为优的天数越少，空气质量越差。
 
 
 ```{r tab-excel-gam-m, eval=T, results='markup'}
@@ -669,7 +692,7 @@ dimnames(gam.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计�
 
 library("kableExtra")
 knitr::kable(gam.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="半参数回归模型参数估计结果",digits = 4,
+             caption="月度空气质量为优天数泊松半参数回归模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -679,9 +702,10 @@ knitr::kable(gam.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-m, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
+par(cex.axis = 0.9, cex.lab = 0.9)
 plot.gam(gam.m.excel,
          select=1,
          col="blue",
@@ -699,7 +723,7 @@ dimnames(gam.smooth.tab.m.excel) <- list(varselname[c(9)], c("经验自由度", 
 
 library("kableExtra")
 knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="半参数回归模型非参数项显著性",digits = 4,
+             caption="月度空气质量为优天数泊松半参数回归模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -709,20 +733,22 @@ knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c")
 
 ```
 
-### 泊松可加混合效应模型
+图 \@ref(fig:fig-excel-gam-m) 中显示了纬度的拟合曲线，阴影部分表示95%的置信区间。
+由表 \@ref(tab:tab-excel-gam-m-smooth) 可知，纬度通过显著性检验，表明纬度对月均
+空气质量为优天数存在非线性影响。由图 \@ref(fig:fig-excel-gam-m) 可以发现，月均空
+气质量为优天数随纬度呈不规则变动，具体来讲，可以分为以下几个阶段。在北纬25度之前，
+月均空气质量为优的天数随纬度的增加呈小幅度增加，在北纬25-35度之间，月均空气质量为
+优的天数随纬度的增加显著下降，在北纬35-40度之间，月均空气质量为优的天数随纬度的增加显
+著增加，纬度在北纬40-45度之间，月均空气质量为优的天数随纬度的增加呈小幅下降，在
+北纬45度之后，月均空气质量为优的天数又随纬度的增加而显著增加。
 
-进一步建立泊松可加混合效应模型，同样以城市作为随机效应，其拟合结果如表 \@ref(tab:tab-excel-gamm-m) 
-所示。由表 \@ref(tab:tab-excel-gamm-m) 可知，在10%的显著性水平下，房屋建筑施工面积、
-废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖均通过显著性
-检验，且其系数分别为0.0000、-0.2094、0.0391、0.0005、0.0374、0.3613、0.4102。表明
-在其他条件不变的前提下，平均气温越高、降水量越多、平均相对湿度越大、平均风速越大、
-供暖的地区，月均空气质量为优天数越大，空气质量越好；而废气治理完成投资额越多，月均
-空气质量为优的天数越少，空气质量越差。图 \@ref(fig:fig-excel-gamm-m) 显示了泊松可加
-混合效应模型的非参数曲线，其非参数项为纬度，且由表 \@ref(tab:tab-excel-gamm-m-smooth) 
-的非参数项显著性检验可知，在10%的显著性水平下，纬度通过显著性检验，表明纬度对月均空气
-质量为优天数存在非线性影响。且从图 \@ref(fig:fig-excel-gamm-m) 可以看出，月均空气质量
-为优天数随纬度的增加呈不规则变化，但整体来讲，纬度在35之前，月均空气质量为优天数随纬度
-的增加而下降，纬度在35之后，月均空气质量为优天数随纬度的增加而增加。
+### 月度空气质量为优天数泊松可加混合效应模型
+
+以城市作为随机效应，进一步建立泊松可加混合效应模型。估计的模型中参数部分结果显示
+在表 \@ref(tab:tab-excel-gamm-m) 中，非参数项的曲线显示在图
+\@ref(fig:fig-excel-gamm-m) 中，非参数项显著性检验结果在表
+\@ref(tab:tab-excel-gamm-m-smooth) 中。
+
 
 
 ```{r tab-excel-gamm-m-model, eval=T, results='hide'}
@@ -743,7 +769,7 @@ dimnames(gamm.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计
 
 library("kableExtra")
 knitr::kable(gamm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="可加混合效应模型回归固定效应表",digits = 4,
+             caption="月度空气质量为优天数泊松可加混合效应模型回归固定效应表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -753,9 +779,18 @@ knitr::kable(gamm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gamm-m, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+由表 \@ref(tab:tab-excel-gamm-m) 可知，在10%的显著性水平下，房屋建筑施工面积、
+废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖均通过显著性
+检验，且其系数分别为0.0000、-0.2094、0.0391、0.0005、0.0374、0.3613、0.4102。表明
+在其他条件不变的前提下，平均气温越高、降水量越多、平均相对湿度越大、平均风速越大、
+供暖的地区，月均空气质量为优天数越大，空气质量越好；而废气治理完成投资额越多，月均
+空气质量为优的天数越少，空气质量越差。
+
+```{r fig-excel-gamm-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
+par(cex.axis = 0.9, cex.lab = 0.9)
+
 plot.gam(gamm.m.excel$gam,
          select=1,
          col="blue",
@@ -773,7 +808,7 @@ dimnames(gamm.smooth.tab.m.excel) <- list(varselname[c(9)],c("经验自由度", 
 
 library("kableExtra")
 knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="可加混合模型非参数项显著性",digits = 4,
+             caption="月度空气质量为优天数泊松可加混合模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -783,36 +818,35 @@ knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"
 
 ```
 
+图 \@ref(fig:fig-excel-gamm-m) 显示了泊松可加混合效应模型的非参数曲线，其非参数
+项为纬度，且由表 \@ref(tab:tab-excel-gamm-m-smooth) 的非参数项显著性检验可知，在
+10%的显著性水平下，纬度通过显著性检验，表明纬度对月均空气质量为优天数存在非线性
+影响。且从图 \@ref(fig:fig-excel-gamm-m) 可以看出，月均空气质量为优天数随纬度的
+增加呈不规则变化，但整体来讲，纬度在35之前，月均空气质量为优天数随纬度的增加而下
+降，纬度在35之后，月均空气质量为优天数随纬度的增加而增加。
 
-### 模型比较与选择
+### 月度空气质量为优天数模型比较与最优模型选择
 
-上述分析中，我们选取月均空气质量为优天数作为因变量，基于lasso筛选出的变量为自变量，
-分别建立泊松回归模型、泊松混合效应模型、泊松可加模型和泊松可加混合效应模型对空气
-质量的影响因素进行分析。根据以上分析结果可知，在泊松回归模型中，显著的变量有房屋
-建筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否
-供暖、是否临海、纬度；在泊松混合效应模型中，显著的变量有房屋建筑施工面积、废气治
-理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、纬度；在泊松可加
-模型中，显著的变量有房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、平均
-相对湿度、平均风速、是否供暖、纬度；在泊松可加混合效应模型中，显著的变量有房屋建
-筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、
-纬度。根据以上结果，结合之前的分析及我们的预期，这些模型尚未很好地表明变量与年均
-空气质量为优天数之间的关系。
+上述分析中，我们选取月均空气质量为优天数作为因变量，基于Lasso筛选出的变量为自变
+量，分别建立泊松回归模型、泊松混合效应模型、泊松可加模型和泊松可加混合效应模型对
+空气质量为优天数的影响因素进行分析。根据以上分析结果可知，在泊松回归模型中，显著
+的变量有房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平
+均风速、是否供暖、是否临海、纬度；在泊松混合效应模型中，显著的变量有房屋建筑施工
+面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、纬
+度；在泊松可加模型中，显著的变量有房屋建筑施工面积、废气治理完成投资额、平均气温、
+降水量、平均相对湿度、平均风速、是否供暖、纬度；在泊松可加混合效应模型中，显著的
+变量有房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平均
+风速、是否供暖、纬度。根据以上结果，结合之前的分析及我们的预期，这些模型尚未很好
+地表明变量与年均空气质量为优天数之间的关系。综合考虑模型的拟合优度及模型的实际意
+义，泊松可加模型对于月度空气质量为优天数的拟合最好。但在上面建立的泊松可加模型中，
+自变量是否临海不显著，故剔除之重新建立泊松可加混合模型作为最优模型。也即以月均空
+气质量为优天数为因变量，房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、
+平均相对湿度、平均风速、是否供暖、纬度为自变量建立泊松可加模型。最优模型估计结果
+中参数部分结果显示在表 \@ref(tab:tab-excel-gam-m-best) 中，非参数项的曲线显示在
+图 \@ref(fig:fig-excel-gam-m-best) 中，非参数项显著性检验结果在表
+\@ref(tab:tab-excel-gam-m-smooth-best) 中。
 
-进一步选取上述所有模型中显著的变量，考虑实际情况，以月均空气质量为优天数为因变量，
-房屋建筑施工面积、废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、
-是否供暖、纬度为自变量建立泊松可加模型，结果如表 \@ref(tab:tab-excel-gam-m-best) 所示。
-由表 \@ref(tab:tab-excel-gam-m-best) 可知，在10%的显著性水平下，房屋建筑施工面积、
-废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、纬度均通
-过显著性检验，且参数项系数分别为0.0000、-0.1742、0.0372、0.0005、0.0312、0.2778、
-0.3836。表明在其他条件不变的情况下，平均气温越高、降水量越大、平均相对湿度越大、
-平均风速越大、供暖地区，月均空气质量为优天数越多，空气质量越好；废气治理完成投资
-额越多，月均空气质量为优天数越少，空气质量越差。图 \@ref(fig:fig-excel-gam-m-best) 
-表明了纬度的非参数曲线，且从表 \@ref(tab:tab-excel-gam-m-smooth-best) 中可以看出，
-在10%的显著性水平下，纬度均对空气质量有非线性影响。且从图 \@ref(fig:fig-excel-gam-m-best) 
-中可以看出，整体上月均空气质量为优天数随纬度呈现下降-上升的趋势，具体来讲，纬度以
-35为分界线，在35之前，月均空气质量为优天数随纬度的增加而下降，35之后月均空气质量为
-优天数随纬度增加而增加。进一步对残差进行空间自相关检验，检验结果如表 \@ref(tab:tab-excel-gam-m-res-spatial) 。
-从表 \@ref(tab:tab-excel-gam-m-res-spatial) 中可以看出，残差不存在空间自相关。
+
 
 ```{r tab-excel-gam-m-best, eval=T, results='markup'}
 
@@ -830,7 +864,7 @@ dimnames(gam.m.excel.best.coef) <- list(c("截距项", varselname[-c(8,9)]), c("
 
 library("kableExtra")
 knitr::kable(gam.m.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="半参数回归模型参数估计结果",digits = 4,
+             caption="月度空气质量为优天数最优模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -840,9 +874,18 @@ knitr::kable(gam.m.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-m-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+由表 \@ref(tab:tab-excel-gam-m-best) 可知，在10%的显著性水平下，房屋建筑施工面积、
+废气治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、是否供暖、纬度均通
+过显著性检验，且参数项系数分别为0.0000、-0.1742、0.0372、0.0005、0.0312、0.2778、
+0.3836。表明在其他条件不变的情况下，平均气温越高、降水量越大、平均相对湿度越大、
+平均风速越大、供暖地区，月均空气质量为优天数越多，空气质量越好；废气治理完成投资
+额越多，月均空气质量为优天数越少，空气质量越差。
+
+```{r fig-excel-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
+par(cex.axis = 0.9, cex.lab = 0.9)
+
 plot.gam(gam.m.excel.best,
          select=1,
          col="blue",
@@ -860,7 +903,7 @@ dimnames(gam.smooth.tab.m.excel) <- list(varselname[c(9)], c("经验自由度", 
 
 library("kableExtra")
 knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"),
-             caption="半参数回归模型非参数项显著性",digits = 4,
+             caption="月度空气质量为优天数最优模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -870,6 +913,9 @@ knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c")
 
 ```
 
-
-	
-
+图 \@ref(fig:fig-excel-gam-m-best) 给出了纬度与月度空气质量为优天数之间的非参数
+曲线，且从表 \@ref(tab:tab-excel-gam-m-smooth-best) 中可以看出，在10%的显著性水
+平下，纬度均对月度空气质量为优天数有非线性影响。从图
+\@ref(fig:fig-excel-gam-m-best) 中进一步可以看出，整体上月均空气质量为优天数随纬
+度呈现下降-上升的趋势，具体来讲，纬度以35为分界线，在35之前，月均空气质量为优天
+数随纬度的增加而下降，35之后月均空气质量为优天数随纬度增加而增加。
