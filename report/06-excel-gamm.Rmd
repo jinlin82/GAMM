@@ -42,7 +42,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 ## 年度空气质量为优天数影响因素分析
 
 我们收集了2014年-2017年35城市每一天的AQI值，根据每一天的AQI值和空气质量指数等级
-划分标准，就可以计算得到2014年-2017年35城市的年度空气质量为优天数。根据第
+划分标准，就可以计算得到2014-2017年35城市的年度空气质量为优天数。根据第
 \@ref(sec:dep-dist) 节的分析结果，年度空气质量为优天数取对数后近似服从正态分布。
 下面就以这个变量作为因变量开展分析，首先进行自变量筛选，然后建立正态可加混合模型
 框架下的各种具体模型。
@@ -291,14 +291,6 @@ knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c")
 \@ref(tab:tab-excel-gamm-y) 中，非参数项的曲线显示在图 \@ref(fig:fig-excel-gamm-y)
 中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gamm-y-smooth) 中。
 
-由表 \@ref(tab:tab-excel-gamm-y) 可知，在10%的显著性水平下，全社会用电量、废气治
-理完成投资额、平均相对湿度、平均风速通过显著性检验，且其系数分别为0.0010、-0.0961、
-0.0358、0.4643。表明在其他条件不变的前提下，全社会用电量越多，年均空气质量为优的
-天数越多，空气质量越好；废气治理完成投资额越多，年均空气质量为优天数越少，空气质
-量越差；平均相对湿度越大，年均空气质量为优天数越多，空气质量越好；平均风速越大，
-年均空气质量为优天数越多，空气质量越好。
-
-
 
 ```{r tab-excel-gamm-y, eval=T, results='markup'}
 library(mgcv)
@@ -313,7 +305,7 @@ dimnames(gamm.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估�
 
 library("kableExtra")
 knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="年度空气质量为优天数半参数混合效应模型回归固定效应表",digits = 4,
+             caption="年度空气质量为优天数半参数混合效应模型固定效应表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -322,6 +314,13 @@ knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
     column_spec(1, width = c("4.5cm"))
 
 ```
+
+由表 \@ref(tab:tab-excel-gamm-y) 可知，在10%的显著性水平下，全社会用电量、废气治
+理完成投资额、平均相对湿度、平均风速通过显著性检验，且其系数分别为0.0010、-0.0961、
+0.0358、0.4643。表明在其他条件不变的前提下，全社会用电量越多，年均空气质量为优的
+天数越多，空气质量越好；废气治理完成投资额越多，年均空气质量为优天数越少，空气质
+量越差；平均相对湿度越大，年均空气质量为优天数越多，空气质量越好；平均风速越大，
+年均空气质量为优天数越多，空气质量越好。
 
 ```{r fig-excel-gamm-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数半参数混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
@@ -485,7 +484,7 @@ moran.g.gam.best <- tapply(resid(gam.y.excel.best), as.factor(dat.sel.y.excel$ye
               function(x) Moran.I(x, city.dists.inv))
 
 moran.g.gam.best <- sapply(moran.g.gam.best, function(x) c(x$observed, x$p.v))
-dimnames(moran.g.gam.best) <- list(c("Moran's I", "P值"), paste0(2014:2017, "年"))
+dimnames(moran.g.gam.best) <- list(c("莫兰指数", "P值"), paste0(2014:2017, "年"))
 
 library("kableExtra")
 knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
