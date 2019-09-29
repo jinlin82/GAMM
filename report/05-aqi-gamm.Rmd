@@ -506,9 +506,9 @@ R语言中的gamsel包可以进行基于Lasso的广义可加模型的变量筛�
 资额、平均气温、降水量、平均相对湿度、平均风速、平均气压、纬度。且在剩下的这些变
 量中，可以看出，私人汽车拥有量、废气质量完成投资额、平均气压、纬度与年均AQI呈正
 相关关系，而降水量、平均相对湿度、平均风速与年均AQI呈负相关关系，而固定资产投资
-额、平均气温对年均AQI呈非线性影响。
+额、平均气温对年均AQI呈非线性影响。下面就以筛选出的变量建立模型。
 
-```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI asso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.y <- read.csv("./results/dat.sel.y.csv")
@@ -538,7 +538,7 @@ mapply(function(i, y) {
 \@ref(fig:fig-var-sel-m) 所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变
 量，纵轴表示取对数之后的月均AQI。
 
-```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI asso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.m <- read.csv("./results/dat.sel.m.csv")
@@ -1558,13 +1558,9 @@ knitr::kable(gam.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 其中废气治理完成投资额是正的线性影响，固定资产投资和汽车拥有量与年均AQI之间具有
 非线性关系；气候因素中的平均风速和平均气温也对年均AQI有显著性影响，其中平均风速
 是线性关系，平均气温具有非线性关系。是否临海，是否供暖和纬度三个地理因素对年均
-AQI有线性影响。
-
-对于月均AQI，社会经济方面影响因素有废气治理完成投资额，房屋建筑施工面积和汽车拥
-有量，且这三个因素均为线性影响；平均气温，降水量，平均风速和平均气压这四个气象变
-量都对月均AQI有显著性的线性影响；是否临海，是否供暖和纬度三个地理因素对月均AQI有
-影响其中是否临海和是否供暖是线性影响，纬度与月均AQI直接的关系是非线性的。
-
-
-通过比较年均AQI和月均AQI之间的影响因素，我们发现二者并不完成重合。这可能是因为年
-均AQI具有更多的稳定性，而月均AQI更多受当月具体情况的影响。
+AQI有线性影响。对于月均AQI，社会经济方面影响因素有废气治理完成投资额，房屋建筑施
+工面积和汽车拥有量，且这三个因素均为线性影响；平均气温，降水量，平均风速和平均气
+压这四个气象变量都对月均AQI有显著性的线性影响；是否临海，是否供暖和纬度三个地理
+因素对月均AQI有影响其中是否临海和是否供暖是线性影响，纬度与月均AQI直接的关系是非
+线性的。通过比较年均AQI和月均AQI之间的影响因素，我们发现二者并不完成重合。这可能
+是因为年均AQI具有更多的稳定性，而月均AQI更多受当月具体情况的影响。

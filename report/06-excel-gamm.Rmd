@@ -30,7 +30,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 
 
 
-# 基于广义可加混合模型的空气质量为优天数影响因素分析 {#sec:chap-6}
+# 基于广义可加混合模型空气质量为优天数影响因素分析 {#sec:chap-6}
 
 在第 \@ref(sec:chap-5) 章中，我们分别对35城市年度和月度空气质量指数(AQI)进行了建
 模分析，得出了空气质量指数影响因素。空气质量指数是一个综合指标，反应的是城市空气
@@ -59,9 +59,9 @@ Sys.setlocale("LC_ALL", "Chinese")
 均相对湿度、平均风速与空气质量为优的天数呈正相关关系，而废气治理完成投资与空气质
 量为优的天数呈负相关关系，而地区生产总值、纬度对空气质量为优的天数呈非线性影响。
 下面将使用筛选出的自变量为基础建立正态可加混合模型框架下的各种模型，并选择最优模
-型得出空气质量为优天数的影响因素。
+型得出空气质量为优天数的影响因素。下面就以筛选出的变量建立模型。
 
-```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.y.excel <- read.csv("./results/dat.sel.y.excel.csv")
@@ -513,17 +513,18 @@ knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
 
 以月均空气质量为优天数为因变量进行Lasso变量筛选，变量筛选结果如图
 \@ref(fig:fig-var-sel-m-excel) 所示。在图 \@ref(fig:fig-var-sel-m-excel) 中，横
-轴表示各自变量，纵轴表示标准化后的月均空气质量为优的天数。
-由图 \@ref(fig:fig-var-sel-m-excel) 可知，地区生产总值、地区生产总值增长率、
-固定资产投资额、常住人口、建成区绿化覆盖率、城市公路客运量、私人汽车拥有量、全社
-会用电量、工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成投资额、平均气压、
-日照时数、经度、海拔对月均空气质量为优的天数无影响，这些变量被剔除，而剩下的变量
-有房屋建筑施工面积、废气污染治理完成投资额、平均气温、降水量、平均相对湿度、平均
-风速、纬度。且在剩下的这些变量中，可以看出，平均气温、降水量、平均相对湿度、平均
-风速对月均空气质量为优的天数呈正向影响，而房屋建筑施工面积、废气治理完成投资对月
-均空气质量为优的天数呈负向影响，纬度与月均空气质量为优的天数呈非线性相关关系。
+轴表示各自变量，纵轴表示标准化后的月均空气质量为优的天数。由图
+\@ref(fig:fig-var-sel-m-excel) 可知，地区生产总值、地区生产总值增长率、固定资产
+投资额、常住人口、建成区绿化覆盖率、城市公路客运量、私人汽车拥有量、全社会用电量、
+工业二氧化硫排放量、工业烟粉尘排放量、工业污染治理完成投资额、平均气压、日照时数、
+经度、海拔对月均空气质量为优的天数无影响，这些变量被剔除，而剩下的变量有房屋建筑
+施工面积、废气污染治理完成投资额、平均气温、降水量、平均相对湿度、平均风速、纬度。
+且在剩下的这些变量中，可以看出，平均气温、降水量、平均相对湿度、平均风速对月均空
+气质量为优的天数呈正向影响，而房屋建筑施工面积、废气治理完成投资对月均空气质量为
+优的天数呈负向影响，纬度与月均空气质量为优的天数呈非线性相关关系。下面就以筛选出
+的变量建立模型。
 
-```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度空气质量为优天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度空气质量为优天数Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.m.excel <- read.csv("./results/dat.sel.m.excel.csv")
@@ -928,9 +929,9 @@ knitr::kable(gam.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c")
 额，其中全社会用电量和废气治理完成投资额与年度空气质量为优天数之间具有线性关系，
 GDP具有非线性作用；气候因素中的平均相对湿度和平均风速对年度空气质量为优天数有线
 性影响。地理因素中只有纬度变量对年度空气质量为优天数有显著性影响，并且关系是非线
-性的。对于年度空气质量为优天数，社会经济影响因素有房屋建筑施工面积和废气治理完成
+性的。对于月度空气质量为优天数，社会经济影响因素有房屋建筑施工面积和废气治理完成
 投资额，并且二者与年度空气质量为优天数之间均具有线性关系；气候因素中的平均气温，
-降水量，平均相对湿度和平均风速对年度空气质量为优天数有线性影响。地理因素中是否供
-暖和纬度变量对年度空气质量为优天数有显著性影响，是否供暖是线性关系，纬度是非线性
+降水量，平均相对湿度和平均风速对月度空气质量为优天数有线性影响。地理因素中是否供
+暖和纬度变量对月度空气质量为优天数有显著性影响，是否供暖是线性关系，纬度是非线性
 影响。通过比较年度空气质量为优天数和月度空气质量为优天数之间的影响因素，我们发现
 二者并不完成重合。
