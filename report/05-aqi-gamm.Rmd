@@ -13,6 +13,10 @@ link-citations: true
 ---
 
 ```{r setup, echo=F}
+
+################# 第 5 章 R 程序代码  ####################
+
+
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
@@ -508,7 +512,7 @@ R语言中的gamsel包可以进行基于Lasso的广义可加模型的变量筛�
 相关关系，而降水量、平均相对湿度、平均风速与年均AQI呈负相关关系，而固定资产投资
 额、平均气温对年均AQI呈非线性影响。下面就以筛选出的变量建立模型。
 
-```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI asso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.y <- read.csv("./results/dat.sel.y.csv")
@@ -538,7 +542,7 @@ mapply(function(i, y) {
 \@ref(fig:fig-var-sel-m) 所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变
 量，纵轴表示取对数之后的月均AQI。
 
-```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI asso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 varlist <- read.csv("./data/var_list.csv")
 dat.sel.m <- read.csv("./results/dat.sel.m.csv")

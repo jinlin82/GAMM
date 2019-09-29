@@ -13,6 +13,10 @@ autoEqnLabels: yes
 ---
 
 ```{r setup, echo=F, message=F}
+
+################# 第 4 章 R 程序代码  ####################
+
+
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
@@ -367,7 +371,7 @@ knitr::kable(eco.stat, row.names =F, align = c("l","l",rep("r", 4)),
              caption="2017年35个城市社会经济统计变量描述统计",
              longtable = TRUE, booktabs = TRUE, linesep  = "", escape = F) %>%
     kable_styling(full_width = T) %>%
-    column_spec(1:2, width = c("4.3cm","1.8cm"))%>%
+    column_spec(1:2, width = c("4.3cm","1.9cm"))%>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)",

@@ -6,7 +6,7 @@ $if(listings)$
 \usepackage{listings}
 $endif$
 $if(lhs)$
-\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
+\lstnewenvironment{code}{\lstset{language=R,basicstyle=\small\ttfamily}}{}
 $endif$
 $if(highlighting-macros)$
 $highlighting-macros$
@@ -115,8 +115,15 @@ $if(lof)$
 \cleardoublepage
 \phantomsection %
 \pdfbookmark{图目录}{figtoc}
+
 \listoffigures          % 如果要生成图目录
 $endif$
+
+\cleardoublepage
+\phantomsection %
+\pdfbookmark{\denotationname}{denotation}
+\pagenumbering{arabic}
+\input{denotation} % 如果要生成符号列表
 
 \mainmatter
 \pagestyle{mpage}

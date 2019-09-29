@@ -1,6 +1,6 @@
 --- 
 title: "广义可加混合模型及其应用"
-author: "金林"
+author: ""
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 css: ./style/markdown.css

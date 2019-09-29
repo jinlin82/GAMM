@@ -253,7 +253,7 @@
 \renewcommand\contentsname{目\hspace{1em}录}
 \renewcommand\listfigurename{图\hspace{1em}目\hspace{1em}录}
 \renewcommand\listtablename{表\hspace{1em}目\hspace{1em}录}
-\newcommand\denotationname{符号列表}
+\newcommand\denotationname{缩写列表}
 \newcommand\ackname{致\hspace{1em}谢}
 \newcommand\resumename{攻读博士学位期间科研成果}
 \newcommand\listequationname{公式索引}
@@ -938,7 +938,7 @@
 \lstset{
   language=R,
   basicstyle=\footnotesize\ttfamily,
-  commentstyle=\ttfamily\color{black}, % 评论颜色
+  commentstyle=\ttfamily\color{dkgreen}, % 评论颜色,打印时使用black
   numbers=left,
   numberstyle=\ttfamily\color{gray},  % the style that is used for the line-numbers,
   stepnumber=1,
@@ -954,7 +954,8 @@
   breakatwhitespace=false,
   caption=R 程序代码,
   escapeinside={},
-  keywordstyle=\ttfamily,
+  keywordstyle=\color{blue}\ttfamily,
+  stringstyle=\color{purple}\ttfamily,
   morekeywords={},
   xleftmargin=2em, xrightmargin=0em, aboveskip=1em, belowskip=2em,
 }

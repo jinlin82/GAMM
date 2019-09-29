@@ -15,6 +15,10 @@ link-citations: true
 
 
 ```{r setup, echo=F}
+
+################# 第 6 章 R 程序代码  ####################
+
+
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
@@ -119,7 +123,7 @@ dimnames(lm.y.excel.coef) <- list(c("截距项", varselname), c("估计值", "�
 
 library("kableExtra")
 knitr::kable(lm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
-             caption="线性回归模型回归系数表",digits = 4,
+             caption="年度空气质量为优天数线性回归模型回归系数表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
