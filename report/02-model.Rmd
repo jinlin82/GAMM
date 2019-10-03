@@ -1446,8 +1446,7 @@ $$\begin{array}{c}{\mu_{i}=h\left(\eta_{i}\right)} \\ {\eta_{i}=f_{1}\left(x_{i
 被包含在模型中。如果自变量不足以解释研究单位间的异质性或者研究对象是纵向研究中具有相
 关性的数据，则构建具有形式 [@eq:m-bayes-4] 的模型或许是不合适的。一种常见的处理这个问题的方法
 是在预测子中加入随机效应。即产生具有如下形式预测子的GAMM模型
-$$\eta_{i}=f_{1}\left(x_{i 1}\right) z_{i 1}+\ldots+f_{p}\left(x_{i p}\right) z_{i 
-p}+w_{i}^{T} \beta+b_{g_{i}}$$ {#eq:m-bayes-5}
+$$\eta_{i}=f_{1}\left(x_{i 1}\right) +\ldots+f_{p}\left(x_{i p}\right)+w_{i}^{T} \beta+b_{g_{i}}$$ {#eq:m-bayes-5}
 其中 $b_{g_{i}}$ 表示特定个体或特定组的随机效应，如果在第 $g$ （$g=1,\ldots, G$）
 组中存在第 $i$ 个观测个体，则 $b_{g_{i}}=b_{g}$ 。
 
@@ -1591,7 +1590,7 @@ $a=1,c=0.005$ 。
 态先验。随机效应的先验是 $b_{g}$ 满足独立同分布的正态假定。
 $$b_{g} | v^{2} \sim \mathcal{N}\left(0, v^{2}\right), \quad g=1, \ldots, G$$
 
-并且为 $v^{2}$ 再定义一个高度离散的超先验，即
+并且为 $v^{2}$ 再定义一个高度离散的超先验。接下来分别定义
 $$f=\left(f_{1}, \ldots, f_{p}\right), \qquad \tau^{2}=\left(\tau_{1}^{2}, \ldots, 
 \tau_{p}^{2}\right), \qquad \beta=\left(\beta_{1}, \ldots, \beta_{r}\right), \quad 
 b=\left(b_{1}, \ldots, b_{G}\right)$$ 

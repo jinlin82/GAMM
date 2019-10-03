@@ -647,7 +647,7 @@ knitr::kable(lme.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 由表 \@ref(tab:tab-severe-gam-m) 可知，在10%的显著性水平下，私人汽车拥有量、降水
 量、平均相对湿度、平均风速、日照时数对月度是否出现严重污染存在显著影响，且其系数
 均为负，表明在其他变量保持不变的条件下，私人汽车拥有量越多、降水量越大、平均相对
-湿度越大、平均风速越高、日照时数越长，月度出现严重污染的概率越大。
+湿度越大、平均风速越高、日照时数越长，月度出现严重污染的概率越小。
 
 ```{r tab-severe-gam-m, eval=T, results='markup'}
 
@@ -766,7 +766,7 @@ knitr::kable(gamm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 由表 \@ref(tab:tab-severe-gamm-m) 可知，在10%的显著性水平下，降水量、平均相对湿
 度、平均风速、日照时数均通过显著性检验，且其系数均为负，表明在其他条件不变的前提
 下，降水量越多、平均相对湿度越大、平均风速越大、日照时数越长，月度出现严重污染的
-概率越大。
+概率越小。
 
 
 ```{r fig-severe-gamm-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现空气严重污染Logistic可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
