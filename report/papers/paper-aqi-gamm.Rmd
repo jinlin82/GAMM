@@ -3,17 +3,34 @@ title: "基于半参数混合模型的城市空气质量影响因素分析"
 author: "Jin"
 date: '2019-04-15'
 output:
-  pdf_document: default
-  html_document:
-    df_print: paged
-  word_document: default
-css: ./style/markdown.css
-bibliography: Bibfile.bib
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ../style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+css: ../style/markdown.css
+bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
 notice: '@*'
-csl: ./style/chinese-gb7714-2005-numeric.csl
+csl: ../style/chinese-gb7714-2005-numeric.csl
 autoEqnLabels: yes
 ---
 
@@ -195,7 +212,7 @@ index，AQI）是定量描述空气质量状况的无量纲指数,是反映空�
 
 ```{r tab3, eval=T,results='markup', cache=F}
 library("kableExtra")
-tab3 <- read.csv('./results/variable.csv')
+tab3 <- read.csv('../results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
              longtable = TRUE, booktabs = TRUE, escape = F,
              linesep  = c(rep("", 12), "\\hline", rep("",5), "\\hline")) %>%
@@ -217,10 +234,10 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 和Jarque-Bera正态性检验，结果显示年均AQI服从正态分布，对数化月均AQI服从正态分布。图  \@ref(fig:fig-dep-norm) 给出了年均AQI和月均AQI两个变量的密度曲线。因此，将年均AQI、对数化后的月
 均AQI均当作正态分布进行处理。
 
-```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = " 年度平均AQI，月度平均AQI对数密度图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="100%", fig.pos="h", fig.align="center", fig.cap = "年度平均AQI，月度平均AQI对数密度图", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-dat.y <- read.csv("./data/yearly.csv")
-dat.m <- read.csv("./data/monthly.csv")
+dat.y <- read.csv("../data/yearly.csv")
+dat.m <- read.csv("../data/monthly.csv")
 
 par(mfrow=c(1,2))
 par(mar = c(1.1, 4.5, 2.1, 1.1))
@@ -282,10 +299,10 @@ t检验，结果显示在本文所研究的35所城市中，集中供暖的有17
 市年均AQI为71.21。内陆城市年均AQI为91.89。以上分析表明，城市空气质量与地理因素有关，是
 否集中供暖和是否临海其城市的空气质量差异较大。因此，这两个变量也作为影响因素参与模型构建。
 
-```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI Lasso自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -332,8 +349,8 @@ mapply(function(i, y) {
 
 ```{r tab-lm-y, include=FALSE, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -372,8 +389,8 @@ knitr::kable(lm.y.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-lm-y-res-spatial, eval=T, results='markup'}
 library(ape)
-source("./codes/geodistance.R")
-city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+source("../codes/geodistance.R")
+city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
 df.cities <- city[,c(1, 5, 6)]
 names(df.cities) <- c("name", "lat", "lon")
 city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
@@ -407,8 +424,8 @@ knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-lme-y, eval=FALSE, include=FALSE, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -466,8 +483,8 @@ AQI指数有正向作用。在其他变量保持不变的条件下，平均风�
 
 ```{r tab-gam-y, include=FALSE, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -501,7 +518,7 @@ knitr::kable(gam.y.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI半参数回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,3))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y,
@@ -565,8 +582,8 @@ knitr::kable(gam.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
 
 ```{r tab-gamm-y, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -600,7 +617,7 @@ knitr::kable(gamm.y.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gamm-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI半参数混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gamm-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI半参数混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,3))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.y$gam,
@@ -656,7 +673,7 @@ knitr::kable(gamm.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
 ### 年均AQI模型比较与最优模型选择
 
 ```{r tab-aqi-y-huizong, eval=T, results='markup'}
-yearly=read.csv("./results/yearly-aqi.csv")
+yearly=read.csv("../results/yearly-aqi.csv")
 
 library("kableExtra")
 knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
@@ -693,8 +710,8 @@ AIC、BIC值可以看出半参数混合效应模型最好，但是在半参数�
 
 ```{r tab-gam-y-best, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y <- read.csv("./results/dat.sel.y.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y <- read.csv("../results/dat.sel.y.csv")
 
 varinfo <- varlist[match(names(dat.sel.y), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -737,7 +754,7 @@ knitr::kable(gam.y.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 15.7729，临海地区比不临海地区的年均AQI小12.5379；且纬度越高的地方年均AQI越大，空
 气质量越差。
 
-```{r fig-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年均AQI最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,3))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.best,
@@ -801,8 +818,8 @@ knitr::kable(gam.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
 
 ```{r tab-gam-y-res-spatial, eval=T, results='markup'}
 library(ape)
-source("./codes/geodistance.R")
-city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+source("../codes/geodistance.R")
+city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
 df.cities <- city[,c(1, 5, 6)]
 names(df.cities) <- c("name", "lat", "lon")
 city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
@@ -836,10 +853,10 @@ knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
 \@ref(fig:fig-var-sel-m) 所示。在图 \@ref(fig:fig-var-sel-m) 中，横轴表示各自变
 量，纵轴表示取对数之后的月均AQI。
 
-```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "对数月均AQI Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "对数月均AQI Lasso自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
 
 varinfo <- varlist[match(names(dat.sel.m), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -886,9 +903,9 @@ AQI为因变量采用月度数据建立线性回归模型、线性混合效应�
 
 ```{r tab-lm-m, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
-month<-read.csv("./data/monthly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
+month<-read.csv("../data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
 names(dat.sel.m)<-c("city","year","month","AQI","gdp","gdp_rate","invest","pop","green","passenger","con_area",
@@ -947,9 +964,9 @@ library("kableExtra")
 
 ```{r tab-lme-m, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
-month<-read.csv("./data/monthly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
+month<-read.csv("../data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
 #head(dat.sel.m)
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
@@ -1011,9 +1028,9 @@ library("kableExtra")
 
 ```{r tab-gam-m, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
-month<-read.csv("./data/monthly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
+month<-read.csv("../data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
 #head(dat.sel.m)
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
@@ -1068,7 +1085,7 @@ knitr::kable(gam.m.coef, row.names =T, align = c("r", "r", "r", "r"),
 之前，对数月均AQI随纬度的增加而增加，在北纬37度之后，对数月均AQI随纬度的增加而下
 降。且由表 \@ref(tab:tab-gam-m-smooth) 可知，该非参数项通过显著性检验。
 
-```{r fig-gam-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI半参数回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
@@ -1106,9 +1123,9 @@ knitr::kable(gam.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 
 ```{r tab-gamm-m, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
-month<-read.csv("./data/monthly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
+month<-read.csv("../data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
 #head(dat.sel.m)
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
@@ -1153,7 +1170,7 @@ library("kableExtra")
 
 ```
 
-```{r fig-gamm-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI半参数混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gamm-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI半参数混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
@@ -1205,11 +1222,11 @@ knitr::kable(gamm.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 ### 月均AQI模型比较与最优模型选择
 
 ```{r tab-aqi-m-huizong, eval=T, results='markup'}
-monthly=read.csv("./results/monthly-aqi.csv")
+monthly=read.csv("../results/monthly-aqi.csv")
 
 library("kableExtra")
-knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
-             caption="年度平均空气质量指数模型汇总表",digits = 4,
+knitr::kable(monthly, row.names =T, align = c("r", "r", "r", "r"),
+             caption="月度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -1255,9 +1272,9 @@ knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-gam-m-best, eval=T, results='markup'}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m <- read.csv("./results/dat.sel.m.csv")
-month<-read.csv("./data/monthly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m <- read.csv("../results/dat.sel.m.csv")
+month<-read.csv("../data/monthly.csv")
 dat.sel.m<-merge(dat.sel.m,month,by=c("city","year","month"))
 #head(dat.sel.m)
 dat.sel.m<-dat.sel.m[,c(1:28,67)]
@@ -1302,7 +1319,7 @@ knitr::kable(gam.m.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)

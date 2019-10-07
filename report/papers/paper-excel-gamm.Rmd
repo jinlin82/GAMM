@@ -2,14 +2,36 @@
 title: "基于广义可加混合模型空气质量为优天数影响因素研究"
 author: "Jin"
 date: '2019-04-15'
-output: pdf_document
-css: ./style/markdown.css
-bibliography: Bibfile.bib
+output:
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ../style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+
+css: ../style/markdown.css
+bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
 notice: '@*'
-csl: ./style/chinese-gb7714-2005-numeric.csl
+csl: ../style/chinese-gb7714-2005-numeric.csl
 autoEqnLabels: yes
 ---
 
@@ -193,7 +215,7 @@ AQI在0~50的情况，故本文分别以年度和月度空气质量为优天数�
 
 ```{r tab3, eval=T,results='markup', cache=F}
 library("kableExtra")
-tab3 <- read.csv('./results/variable.csv')
+tab3 <- read.csv('../results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
              longtable = TRUE, booktabs = TRUE, escape = F,
              linesep  = c(rep("", 12), "\\hline", rep("",5), "\\hline")) %>%
@@ -216,10 +238,10 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 给出了年度空气质量为优天数对数化后的密度曲线。显然，可将对数化后的年度空气质量为优天数当作正态分
 布处理，而月度空气质量为优天数根据其数据特征，本文将其定义为泊松分布。
 
-```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="1.0\\textwidth", fig.pos="h", fig.cap = " 年度平均AQI，月度平均AQI对数密度图", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="95%", fig.pos="h", fig.cap = " 年度平均AQI，月度平均AQI对数密度图", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-dat.y <- read.csv("./data/yearly.csv")
-dat.m <- read.csv("./data/monthly.csv")
+dat.y <- read.csv("../data/yearly.csv")
+dat.m <- read.csv("../data/monthly.csv")
 
 par(mar = c(1.1, 4.5, 2.1, 1.1))
 
@@ -257,10 +279,10 @@ legend("topright", legend = c("经验密度", "标准正态密度"),lty=c(1,2), 
 下面将使用筛选出的自变量为基础建立正态可加混合模型框架下的各种模型，并选择最优模
 型得出空气质量为优天数的影响因素。下面就以筛选出的变量建立模型。
 
-```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-var-sel-y, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气质量为优天数Lasso自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y.excel <- read.csv("./results/dat.sel.y.excel.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y.excel <- read.csv("../results/dat.sel.y.excel.csv")
 
 varinfo <- varlist[match(names(dat.sel.y.excel), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -344,8 +366,8 @@ knitr::kable(lm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-excel-lm-y-res-spatial, eval=T, results='markup'}
 library(ape)
-source("./codes/geodistance.R")
-city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+source("../codes/geodistance.R")
+city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
 df.cities <- city[,c(1, 5, 6)]
 names(df.cities) <- c("name", "lat", "lon")
 city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
@@ -446,7 +468,7 @@ knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 均空气质量为优天数越少，空气质量越差；平均相对湿度越大，年均空气质量为优的天数越
 多，空气质量越好；平均风速越大，年均空气质量为优天数越多，空气质量越好。
 
-```{r fig-excel-gam-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数半参数回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数半参数回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.excel,
@@ -529,7 +551,7 @@ knitr::kable(gamm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 由表 \@ref(tab:tab-excel-y-huizong) 可知，在10%的显著性水平下，半参数混合效应的参数部分
 各显著变量及其对年度空气质量为优天数的作用方向与半参数回归模型保持一致。
 
-```{r fig-excel-gamm-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数半参数混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gamm-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数半参数混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.y.excel$gam,
@@ -577,7 +599,7 @@ knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"
 ## 年度空气质量为优天数模型比较与最优模型选择
 
 ```{r tab-excel-y-huizong, eval=T, results='markup'}
-yearly=read.csv("./results/yearly-excel.csv")
+yearly=read.csv("../results/yearly-excel.csv")
 
 library("kableExtra")
 knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
@@ -642,7 +664,7 @@ knitr::kable(gam.y.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-y-best, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-y-best, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为 优天数最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.excel.best,
@@ -695,8 +717,8 @@ knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c")
 
 ```{r tab-excel-gam-y-res-spatial, eval=T, results='markup'}
 library(ape)
-source("./codes/geodistance.R")
-city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+source("../codes/geodistance.R")
+city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
 df.cities <- city[,c(1, 5, 6)]
 names(df.cities) <- c("name", "lat", "lon")
 city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
@@ -747,10 +769,10 @@ knitr::kable(moran.g.gam.best, row.names =T, align = c("r", "r", "r", "r"),
 优的天数呈负向影响，纬度与月均空气质量为优的天数呈非线性相关关系。下面就以筛选出
 的变量建立模型。
 
-```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度空气质量为优天数Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m-excel, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度空气质量为优天数Lasso自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m.excel <- read.csv("./results/dat.sel.m.excel.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m.excel <- read.csv("../results/dat.sel.m.excel.csv")
 
 varinfo <- varlist[match(names(dat.sel.m.excel), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -824,8 +846,8 @@ knitr::kable(lm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-excel-lm-m-res-spatial, eval=F, results='markup'}
 library(ape)
-source("./codes/geodistance.R")
-city <- read.csv("./data/city_geo.csv", stringsAsFactors=FALSE)
+source("../codes/geodistance.R")
+city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
 df.cities <- city[,c(1, 5, 6)]
 names(df.cities) <- c("name", "lat", "lon")
 city.dist.km <- round(GeoDistanceInMetresMatrix(df.cities) / 1000)
@@ -873,7 +895,7 @@ AIC(lme.m.excel$lme);BIC(lme.m.excel$lme)
 lme.m.excel.coef <- summary(lme.m.excel$lme)$tTable[,-3]
 
 dimnames(lme.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-write.csv(lme.m.excel.coef,"C:/Users/Administrator/Desktop/lme.m.excel.coef.csv")
+write.csv(lme.m.excel.coef,"../results/lme.m.excel.coef.csv")
 library("kableExtra")
 knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="月度空气质量为优天数泊松混合效应模型回归固定效应表",digits = 4,
@@ -925,7 +947,7 @@ knitr::kable(gam.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-excel-gam-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
@@ -1007,7 +1029,7 @@ knitr::kable(gamm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 供暖的地区，月均空气质量为优天数越大，空气质量越好；而废气治理完成投资额越多，月均
 空气质量为优的天数越少，空气质量越差。
 
-```{r fig-excel-gamm-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gamm-m, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数泊松可加混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
@@ -1049,7 +1071,7 @@ knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"
 ## 月度空气质量为优天数模型比较与最优模型选择
 
 ```{r tab-excel-m-huizong, eval=T, results='markup'}
-yearly=read.csv("./results/monthly-excel.csv")
+yearly=read.csv("../results/monthly-excel.csv")
 
 library("kableExtra")
 knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
@@ -1117,7 +1139,7 @@ knitr::kable(gam.m.excel.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 平均风速越大、供暖地区，月均空气质量为优天数越多，空气质量越好；废气治理完成投资
 额越多，月均空气质量为优天数越少，空气质量越差。
 
-```{r fig-excel-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-excel-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.7\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月度空气质量为优天数最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)

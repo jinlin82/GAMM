@@ -3,16 +3,35 @@ title: "基于广义可加混合模型空气严重污染影响因素研究"
 author: "Jin"
 date: '2019-04-15'
 output:
-  pdf_document: default
-  html_document:
-    df_print: paged
-css: ./style/markdown.css
-bibliography: Bibfile.bib
+  bookdown::word_document2:
+    fig_caption: true
+    reference_docx: ../style/word-styles-02.docx
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--filter", "pandoc-crossref"]
+  bookdown::html_document2:
+    number_sections: true
+    seq_numbering: true
+    fig_caption: true
+    highlight: haddock
+    theme: null
+    md_extensions: +east_asian_line_breaks
+    keep_md: true
+    toc: false
+    pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
+
+css: ../style/markdown.css
+bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
 notice: '@*'
-csl: ./style/chinese-gb7714-2005-numeric.csl
+csl: ../style/chinese-gb7714-2005-numeric.csl
 autoEqnLabels: yes
 ---
 
@@ -72,14 +91,15 @@ Zheng,2017,李健、靳泽凡、苑清敏，2019），面板回归分析（王�
 [@曲长雨2018]，第二类是气象因素（李琛、刘瑾、王彦民，2017）[@李琛2017]。也有部分学者综
 合考虑了经济和气象因素（李静萍、周景博，2017）[@李静萍2017]。
 
-基于以上分析，可以发现：第一、对于使用的模型和空气质量的研究方法，还未有文章涉及广义可
-加混合模型在空气质量研究中的应用，而且国内大部分学者在进行GAMM估计时基本上都是利用基于
-M-H抽样和Gibbs抽样的MCMC方法，还未有人将基于切片抽样的MCMC估计方法应用于GAMM，本文应用
-H.Pham在2018年最新提出的R包gammSlice对广义可加混合模型进行更加精确的估计。第二、在考虑
-空气质量的影响因素时，鲜有文章引入地理因素。因此，本文选取2014-2017年中国重点监测的35个
-城市的年度数据和月度数据，综合考虑社会经济因素，气象因素和地理因素三方面的影响，分别以
-年度城市空气出现严重污染的天数和月度城市是否会出现严重污染为因变量建立广义可加混合模型
-进行相应研究，为空气质量状况研究提供新的视角和研究方法。
+基于以上分析，可以发现：第一、对于使用的模型和空气质量的研究方法，还未有文章涉及
+广义可加混合模型在空气质量研究中的应用，而且国内大部分学者在进行GAMM估计时基本上
+都是利用基于M-H抽样和Gibbs抽样的MCMC方法，还未有人将基于切片抽样的MCMC估计方法应
+用于GAMM，本文应用H.Pham在2018年最新提出的R包gammSlice对广义可加混合模型进行更加
+精确的估计。第二、在考虑空气质量的影响因素时，鲜有文章引入地理因素。因此，本文选
+取2014-2017年中国重点监测的35个城市的年度数据和月度数据，综合考虑社会经济因素，
+气象因素和地理因素三方面的影响，分别以年度城市空气出现严重污染的天数和月度城市是
+否会出现严重污染为因变量建立广义可加混合模型进行相应研究，为空气质量状况研究提供
+新的视角和研究方法。
 
 ## 贝叶斯广义可加混合模型
 
@@ -187,7 +207,7 @@ $$
 
 ```{r tab3, eval=T,results='markup', cache=F}
 library("kableExtra")
-tab3 <- read.csv('./results/variable.csv')
+tab3 <- read.csv('../results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
              longtable = TRUE, booktabs = TRUE, escape = F,
              linesep  = c(rep("", 12), "\\hline", rep("",5), "\\hline")) %>%
@@ -233,10 +253,10 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 向影响，而降水量、平均相对湿度对年度空气严重污染的天数呈负向影响，常住人口、建成
 区绿化覆盖率、平均风速、日照时数与年度空气严重污染的天数呈非线性相关关系。
 
-```{r fig-var-sel-y-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度严重污染天数自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-y-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度严重污染天数自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y.severe <- read.csv("./results/dat.sel.y.severe.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y.severe <- read.csv("../results/dat.sel.y.severe.csv")
 
 varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -269,8 +289,8 @@ mapply(function(i, y) {
 空气质量差异较大。表 \@ref(tab:tab-geo) 给出了具体的分析结果。
 
 ```{r tab-geo, echo=FALSE, results='markup'}
-varlist <- read.csv("./data/var_list.csv")
-dat.y <- read.csv("./data/yearly.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.y <- read.csv("../data/yearly.csv")
 
 geovar <- names(dat.y)[c(1,3,10,15, 41,42)]
 geo.y17 <- dat.y[dat.y$year==2017, geovar]
@@ -294,7 +314,7 @@ geo.stat <- cbind(geo.factor, geo.factor2, geo.count, geo.stat)
 geo.stat1 <- geo.stat[,c(1,2,3,6)]
 
 names(geo.stat1) <- c("属性", "取值", "城市数量", "严重污染平均天数")
-#write.csv(geo.stat, "./results/geo.stat.csv", row.names=F)
+#write.csv(geo.stat, "../results/geo.stat.csv", row.names=F)
 
 library("kableExtra")
 knitr::kable(geo.stat1, row.names =F, align = c("l","l","c", "r"),
@@ -332,8 +352,8 @@ knitr::kable(geo.stat1, row.names =F, align = c("l","l","c", "r"),
 率越多，空气质量应该越好，临海地区比非临海地区的空气质量好。
 
 ```{r tab-severe-lm-y, include=FALSE, results='markup'}
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.y.severe <- read.csv("./results/dat.sel.y.severe.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.y.severe <- read.csv("../results/dat.sel.y.severe.csv")
 
 varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -431,7 +451,7 @@ knitr::kable(gam.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```
 
 
-```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加回归模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.y.severe,
@@ -541,7 +561,7 @@ knitr::kable(gamm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 加，随平均风速、日照时数的增加而减少，随建成区绿化覆盖率的增加呈先增加后下降的趋
 势。
 
-```{r fig-severe-gamm-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gamm-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.y.severe$gam,
@@ -603,7 +623,7 @@ knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c
 应模型对年度空气严重污染天数的影响因素进行分析。表 \@ref(tab:tab-severe-y-huizong) 给出了以上四个模型的汇总结果。
 
 ```{r tab-severe-y-huizong, eval=T, results='markup'}
-yearly=read.csv("./results/yearly.csv")
+yearly=read.csv("../results/yearly.csv")
 
 library("kableExtra")
 knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
@@ -672,7 +692,7 @@ knitr::kable(gam.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r")
 \@ref(fig:fig-severe-gam-y-best) 中可以看出，年度空气严重污染天数随常住人口和日
 照时数的增加均呈先上升后下降的趋势。
 
-```{r fig-severe-gam-y-best, eval=T, fig.height=3.0, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气严重污 染天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gam-y-best, eval=T, fig.height=3.0, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污 染天数最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
 par(cex.lab = 0.9)
@@ -728,11 +748,11 @@ knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"
 \@ref(fig:fig-var-sel-m-severe) 所示。在图 \@ref(fig:fig-var-sel-m-severe) 中，
 横轴表示各自变量。
 
-```{r fig-var-sel-m-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现严重污染Lasso自变量筛选结果", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-var-sel-m-severe, eval=T, fig.height=8.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现严重污染Lasso自变量筛选结果", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 rm(list=ls())
 
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m.severe <- read.csv("./results/dat.sel.m.severe.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m.severe <- read.csv("../results/dat.sel.m.severe.csv")
 
 varinfo <- varlist[match(names(dat.sel.m.severe), as.character(varlist$var_code)), c(1:3,7)]
 varinfo <- varinfo[order(varinfo$var_no), ]
@@ -786,8 +806,8 @@ mapply(function(i, y) {
 
 
 ```{r tab-severe-lm-m, include=FALSE, results='markup'}
-varlist <- read.csv("./data/var_list.csv")
-dat.sel.m.severe <- read.csv("./results/dat.sel.m.severe.csv")
+varlist <- read.csv("../data/var_list.csv")
+dat.sel.m.severe <- read.csv("../results/dat.sel.m.severe.csv")
 severe=ifelse(dat.sel.m.severe$severe>0,1,0)
 dat.sel.m.severe$severe=severe
 varinfo <- varlist[match(names(dat.sel.m.severe), as.character(varlist$var_code)), c(1:3,7)]
@@ -896,7 +916,7 @@ knitr::kable(gam.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-severe-gam-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现空 气严重污染Logistic可加模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gam-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现空 气严重污染Logistic可加模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.m.severe,
@@ -992,7 +1012,7 @@ knitr::kable(gamm.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```
 
 
-```{r fig-severe-gamm-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现空气严重污染Logistic可加混合模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gamm-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现空气严重污染Logistic可加混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
 plot.gam(gamm.m.severe$gam,
@@ -1050,8 +1070,8 @@ knitr::kable(gamm.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c
 
 
 
-```{r tab-severe-gamm-m-smooth, eval=T, results='markup'}
-month=read.csv("./results/month.csv")
+```{r tab-severe-gamm-m-smooth-stat, eval=T, results='markup'}
+month=read.csv("../results/month.csv")
 
 library("kableExtra")
 knitr::kable(month, row.names =T, align = c("r", "r", "r", "r"),
@@ -1130,7 +1150,7 @@ knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r")
 而模型结果中私人汽车拥有量未对月度严重污染的概率造成影响很有可能是限号等相关交通
 政策实施和近年来清洁能源发展的结果，致使私人汽车拥有量的增加没有导致严重污染天数增加。
 
-```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现空气严重污染最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现空气严重污染最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
 plot.gam(gam.m.severe.best,
