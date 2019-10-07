@@ -24,7 +24,6 @@ output:
     latex_engine: xelatex
     md_extensions: +east_asian_line_breaks
     pandoc_args: ["--listing", "--filter", "pandoc-crossref"]
-
 css: ../style/markdown.css
 bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
@@ -32,7 +31,7 @@ link-citations: yes
 linkReferences: yes
 notice: '@*'
 csl: ../style/chinese-gb7714-2005-numeric.csl
-autoEqnLabels: yes
+autoEqnLabels: true
 ---
 
 
@@ -1195,3 +1194,6 @@ GDP具有非线性作用；气候因素中的平均相对湿度和平均风速�
 暖和纬度变量对月度空气质量为优天数有显著性影响，是否供暖是线性关系，纬度是非线性
 影响。通过比较年度空气质量为优天数和月度空气质量为优天数之间的影响因素，我们发现
 二者并不完成重合。
+
+# 参考文献 {-}
+[//]: # (\bibliography{Bibfile})

@@ -32,7 +32,7 @@ link-citations: yes
 linkReferences: yes
 notice: '@*'
 csl: ../style/chinese-gb7714-2005-numeric.csl
-autoEqnLabels: yes
+autoEqnLabels: true
 ---
 
 
@@ -1227,3 +1227,6 @@ knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"
 响。地理因素中只有纬度变量对月度是否出现空气严重污染有显著性影响，并且这个影响是
 非线性的。通过比较年度空气严重污染天数和月度是否出现空气严重污染之间的影响因素，
 我们发现二者并不完成重合。
+
+# 参考文献 {-}
+[//]: # (\bibliography{Bibfile})

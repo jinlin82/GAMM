@@ -9,7 +9,7 @@ eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
 notice: '@*'
-autoEqnLabels: yes
+autoEqnLabels: true
 ---
 
 ```{r setup, echo=F, message=F}
