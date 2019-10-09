@@ -3,13 +3,6 @@ title: "基于广义可加混合模型空气质量为优天数影响因素研究
 author: "Jin"
 date: '2019-04-15'
 output:
-  bookdown::pdf_document2:
-    keep_tex: yes
-    toc: false
-    latex_engine: xelatex
-    md_extensions: +east_asian_line_breaks
-    citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -20,6 +13,13 @@ output:
     keep_md: true
     toc: false
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    citation_package: natbib
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::word_document2:
     fig_caption: true
     reference_docx: ../style/word-styles-02.docx
@@ -332,7 +332,7 @@ t检验，结果显示在本文所研究的35所城市中，集中供暖的有17
 足，当空气污染严重时，才增加更多投资来缓解空气污染。因此，在线性回归模型中，在一
 定时间内，废气污染治理完成投资额越多，空气污染越严重。
 
-```{r tab-excel-lm-y, eval=T, results='markup'}
+```{r tab-excel-lm-y, include=FALSE, results='markup'}
 varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 21, "nonzero")[[1]]]),
             "heating", "coast")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
@@ -364,7 +364,7 @@ knitr::kable(lm.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 \@ref(tab:tab-excel-lm-y-res-spatial) 可知，在5%的显著性水平下，2014、2016、2017
 年的莫兰指数均未通过显著性检验，说明残差不存在空间自相关。
 
-```{r tab-excel-lm-y-res-spatial, eval=T, results='markup'}
+```{r tab-excel-lm-y-res-spatial, results='markup'}
 library(ape)
 source("../codes/geodistance.R")
 city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
@@ -404,7 +404,7 @@ knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
 投资额与年均空气质量为优天数之间关系的符号仍然是正的，与线性回归模型结论一致，可以做出类似
 的解释。
 
-```{r tab-excel-lme-y, eval=T, results='markup'}
+```{r tab-excel-lme-y, include=FALSE, results='markup'}
 
 library(mgcv)
 lme.y.excel <- gamm(excellent~gdp+power+gas_control
@@ -437,7 +437,7 @@ knitr::kable(lme.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gam-y-smooth) 中。
 
 
-```{r tab-excel-gam-y, eval=T, results='markup'}
+```{r tab-excel-gam-y, include=FALSE, results='markup'}
 library(mgcv)
 gam.y.excel <- gam(excellent~s(gdp)+power+gas_control
                    +rain+humid+wind_speed
@@ -524,7 +524,7 @@ knitr::kable(gam.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c")
 中，非参数项显著性检验结果在表\@ref(tab:tab-excel-gamm-y-smooth) 中。
 
 
-```{r tab-excel-gamm-y, eval=T, results='markup'}
+```{r tab-excel-gamm-y, include=FALSE, results='markup'}
 library(mgcv)
 gamm.y.excel <- gamm(excellent~s(gdp)+power+gas_control
                    +rain+humid+wind_speed
@@ -602,14 +602,14 @@ knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"
 yearly=read.csv("../results/yearly-excel.csv")
 
 library("kableExtra")
-knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
              caption="年度平均空气质量为优天数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1, width = c("2cm"))
+    column_spec(1, width = c("4.5cm"))
 
 ```
 
@@ -802,7 +802,7 @@ mapply(function(i, y) {
 由于月度空气为优天数服从泊松分布，所以首先可以建立泊松回归模型作为比较的基准。泊
 松回归模型估计结果如表 \@ref(tab:tab-excel-m-huizong) 所示。
 
-```{r tab-excel-lm-m, eval=T, results='markup'}
+```{r tab-excel-lm-m, include=FALSE, results='markup'}
 varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 25, "nonzero")[[1]]]),
             "heating", "coast")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
@@ -844,7 +844,7 @@ knitr::kable(lm.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 才增加更多投资来缓解空气污染。而模型估计结果中供暖地区空气质量为优天数更多，可以
 认为当前估计的模型模型设定有问题，需要进一步改进。
 
-```{r tab-excel-lm-m-res-spatial, eval=F, results='markup'}
+```{r tab-excel-lm-m-res-spatial, eval=FALSE, include=FALSE, results='markup'}
 library(ape)
 source("../codes/geodistance.R")
 city <- read.csv("../data/city_geo.csv", stringsAsFactors=FALSE)
@@ -887,7 +887,7 @@ knitr::kable(moran.g.lm, row.names =T, align = c("r", "r", "r", "r"),
 空气质量为优的天数之间关系的符号也是正的，与泊松回归模型结论一致，可以做出类似的
 解释。
 
-```{r tab-excel-lme-m, eval=T, results='markup'}
+```{r tab-excel-lme-m, include=FALSE, results='markup'}
 library(mgcv)
 lme.m.excel <- gamm(excellent~con_area+gas_control+mean_temp+rain+humid+wind_speed +heating+coast+lat,
               random=list(city=~1), data=dat.sel.m.excel, method = "REML")
@@ -923,7 +923,7 @@ knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 而废气治理完成投资额越多的地区，月均空气治理为优的天数越少，空气质量越差。
 
 
-```{r tab-excel-gam-m, eval=T, results='markup'}
+```{r tab-excel-gam-m, include=FALSE, results='markup'}
 
 library(mgcv)
 gam.m.excel <- gam(excellent~con_area+gas_control
@@ -1005,7 +1005,7 @@ gamm.m.excel <- gamm(excellent~con_area+gas_control
 
 ```
 
-```{r tab-excel-gamm-m, eval=T, results='markup'}
+```{r tab-excel-gamm-m, include=FALSE, results='markup'}
 gamm.m.excel.coef <- summary(gamm.m.excel$lme)$tTable[-(10),-3]
 AIC(gamm.m.excel$lme);BIC(gamm.m.excel$lme)
 dimnames(gamm.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计值", "标准误", "t值", "P值"))
@@ -1074,14 +1074,14 @@ knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"
 yearly=read.csv("../results/monthly-excel.csv")
 
 library("kableExtra")
-knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
              caption="月度空气质量为优天数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1, width = c("2cm"))
+    column_spec(1, width = c("4.5cm"))
 
 ```
 

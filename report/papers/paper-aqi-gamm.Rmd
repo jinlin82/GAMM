@@ -3,13 +3,6 @@ title: "基于半参数混合模型的城市空气质量影响因素分析"
 author: "Jin"
 date: '2019-04-15'
 output:
-  bookdown::pdf_document2:
-    keep_tex: true
-    toc: false
-    latex_engine: xelatex
-    md_extensions: +east_asian_line_breaks
-    citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -20,6 +13,13 @@ output:
     keep_md: true
     toc: false
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
+  bookdown::pdf_document2:
+    keep_tex: true
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    citation_package: natbib
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::word_document2:
     fig_caption: true
     reference_docx: ../style/word-styles-02.docx
@@ -292,8 +292,9 @@ varselname <- as.character(varselname[order(varselname$var_no), 2])
 lm.y <- lm(dat.sel.y[, c("AQI", varsel)])
 lm.y.coef <- summary(lm.y)$coef
 AIC(lm.y)#1089.159
+BIC(lm.y)
 dimnames(lm.y.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-#write.csv(lm.y.coef,"C:/Users/Administrator/Desktop/lm.y.coef5.csv")
+#write.csv(lm.y.coef,"../results/lm.y.coef5.csv")
 library("kableExtra")
 knitr::kable(lm.y.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年均AQI线性回归模型回归系数表",digits = 4,
@@ -371,7 +372,7 @@ AIC(lme.y$lme)#1064.311
 lme.y.coef <- summary(lme.y$lme)$tTable[,-3]
 
 dimnames(lme.y.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-#write.csv(lme.y.coef,"C:/Users/Administrator/Desktop/lme.y.coef5.csv")
+#write.csv(lme.y.coef,"../results/lme.y.coef5.csv")
 library("kableExtra")
 knitr::kable(lme.y.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年均AQI线性混合效应模型回归固定效应表",digits = 4,
@@ -430,7 +431,7 @@ gam.y$aic#1047.365
 gam.y.coef <- summary(gam.y)$p.table
 
 dimnames(gam.y.coef) <- list(c("截距项", varselname[-c(1,2,4)]), c("估计值", "标准误", "t值", "P值"))
-#write.csv(gam.y.coef,"C:/Users/Administrator/Desktop/gam.y.coef5.csv")
+#write.csv(gam.y.coef,"../results/gam.y.coef5.csv")
 library("kableExtra")
 knitr::kable(gam.y.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年均AQI半参数回归模型参数估计结果",digits = 4,
@@ -598,17 +599,16 @@ knitr::kable(gamm.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
 ### 年均AQI模型比较与最优模型选择
 
 ```{r tab-aqi-y-huizong, eval=T, results='markup'}
-yearly=read.csv("../results/yearly-aqi.csv")
-
+yearly=read.csv("../results/yearly-aqi.csv",na.strings = "NA")
 library("kableExtra")
-knitr::kable(yearly, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
              caption="年度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1, width = c("2cm"))
+    column_spec(1, width = c("4.5cm"))
 
 ```
 
@@ -858,7 +858,7 @@ lm.m.coef <- summary(lm.m)$coef
 #AIC(lm.m)
 #BIC(lm.m)
 dimnames(lm.m.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-#write.csv(lm.m.coef,"C:/Users/Administrator/Desktop/lm.y.coef5.csv")
+#write.csv(lm.m.coef,"../results/lm.m.coef5.csv")
 library("kableExtra")
 #knitr::kable(lm.m.coef, row.names =T, align = c("r", "r", "r", "r"),
              #caption="月均AQI线性回归模型回归系数表",digits = 4,
@@ -923,7 +923,7 @@ lme.m <- gamm(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+su
 lme.m.coef <- summary(lme.m$lme)$tTable[,-3]
 
 dimnames(lme.m.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-#write.csv(lme.m.coef,"C:/Users/Administrator/Desktop/lme.y.coef5.csv")
+#write.csv(lme.m.coef,"../results/lme.m.coef5.csv")
 library("kableExtra")
 #knitr::kable(lme.m.coef, row.names =T, align = c("r", "r", "r", "r"),
              #caption="月均AQI线性混合效应模型回归固定效应表",digits = 4,
@@ -1150,7 +1150,7 @@ knitr::kable(gamm.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 monthly=read.csv("../results/monthly-aqi.csv")
 
 library("kableExtra")
-knitr::kable(monthly, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(monthly, row.names =F, align = c("r", "r", "r", "r"),
              caption="月度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
