@@ -3,6 +3,13 @@ title: "基于半参数混合模型的城市空气质量影响因素分析"
 author: "Jin"
 date: '2019-04-15'
 output:
+  bookdown::pdf_document2:
+    keep_tex: true
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    citation_package: natbib
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -13,13 +20,6 @@ output:
     keep_md: true
     toc: false
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
-  bookdown::pdf_document2:
-    keep_tex: true
-    toc: false
-    latex_engine: xelatex
-    md_extensions: +east_asian_line_breaks
-    citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::word_document2:
     fig_caption: true
     reference_docx: ../style/word-styles-02.docx
@@ -425,10 +425,10 @@ varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gam.y <- gam(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+heating+coast+lat,
+gam.y <- gamm(AQI~te(invest)+te(car)+gas_control+te(mean_temp)+rain+humid+wind_speed+pressure+heating+coast+lat,
              data=dat.sel.y, method = "REML")
 gam.y$aic#1047.365
-gam.y.coef <- summary(gam.y)$p.table
+gam.y.coef <- summary(gam.y$lme)$tTable[-(10:12),-3]
 
 dimnames(gam.y.coef) <- list(c("截距项", varselname[-c(1,2,4)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.y.coef,"../results/gam.y.coef5.csv")
@@ -447,7 +447,7 @@ knitr::kable(gam.y.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r fig-gam-y, eval=T, fig.height=2.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI半参数回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,3))
 par(mar=c(5,4,2,1))
-plot.gam(gam.y,
+plot.gam(gam.y$gam,
          select=1,
          col="blue",
          shade=T,
@@ -455,7 +455,7 @@ plot.gam(gam.y,
          ylab="AQI",xlab = "固定资产投资额"
          )
 par(mar=c(5,3,2,1))
-plot.gam(gam.y,
+plot.gam(gam.y$gam,
          select=2,
          col="blue",
          shade=T,
@@ -463,7 +463,7 @@ plot.gam(gam.y,
          ylab="",xlab = "汽车拥有量"
          )
 par(mar=c(5,3,2,1))
-plot.gam(gam.y,
+plot.gam(gam.y$gam,
          select=3,
          col="blue",
          shade=T,
@@ -474,7 +474,7 @@ plot.gam(gam.y,
 ```
 
 ```{r tab-gam-y-smooth, eval=T, results='markup'}
-gam.smooth.tab.y <- summary(gam.y)$s.table[,-2]
+gam.smooth.tab.y <- summary(gam.y$gam)$s.table[,-2]
 
 dimnames(gam.smooth.tab.y) <- list(varselname[c(1,2,4)], c("经验自由度", "F统计量值", "P值"))
 
@@ -600,8 +600,12 @@ knitr::kable(gamm.smooth.tab.y, row.names =T, align = c("c", "c", "c", "c"),
 
 ```{r tab-aqi-y-huizong, eval=T, results='markup'}
 yearly=read.csv("../results/yearly-aqi.csv",na.strings = "NA")
+yearly..=apply(yearly,2,function(x) as.character(x))
+yearly..[seq(2,35,3),(2:5)]=t(apply(yearly..[seq(2,35,3),(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+yearly=yearly..
+yearly=yearly[-seq(3,36,3),]
 library("kableExtra")
-knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
+knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
              caption="年度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -980,14 +984,14 @@ varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gam.m <- gam(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+sun+heating+coast+te(lat),
+gam.m <- gamm(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+sun+heating+coast+te(lat),
              data=dat.sel.m, method = "REML")
-gam.m.coef <- summary(gam.m)$p.table
+gam.m.coef <- summary(gam.m$lme)$tTable[-12,-3]
 
 dimnames(gam.m.coef) <- list(c("截距项", varselname[-11]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.m.coef,"C:/Users/Administrator/Desktop/gam.m.coef5.csv")
 library("kableExtra")
-knitr::kable(gam.m.coef, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(gam.m.coef, row.names =T, align = c("l", "c", "c", "c"),
              caption="月均AQI半参数回归模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -1014,7 +1018,7 @@ knitr::kable(gam.m.coef, row.names =T, align = c("r", "r", "r", "r"),
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
-plot.gam(gam.m,
+plot.gam(gam.m$gam,
          select=1,
          col="blue",
          shade=T,
@@ -1024,7 +1028,7 @@ plot.gam(gam.m,
 ```
 
 ```{r tab-gam-m-smooth, eval=T, results='markup'}
-gam.smooth.tab.m <- t(as.matrix(summary(gam.m)$s.table[,-2]))
+gam.smooth.tab.m <- t(as.matrix(summary(gam.m$gam)$s.table[,-2]))
 
 colnames(gam.smooth.tab.m) <-  c("经验自由度", "F统计量值", "P值")
 rownames(gam.smooth.tab.m)<-varselname[11]
@@ -1148,16 +1152,19 @@ knitr::kable(gamm.smooth.tab.m, row.names =T, align = c("c", "c", "c", "c"),
 
 ```{r tab-aqi-m-huizong, eval=T, results='markup'}
 monthly=read.csv("../results/monthly-aqi.csv")
-
+monthly..=apply(monthly,2,function(x) as.character(x))
+monthly..[seq(2,35,3),(2:5)]=t(apply(monthly..[seq(2,35,3),(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+monthly=monthly..
+monthly=monthly[-seq(3,36,3),]
 library("kableExtra")
-knitr::kable(monthly, row.names =F, align = c("r", "r", "r", "r"),
+knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
              caption="月度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1, width = c("2cm"))
+    column_spec(1, width = c("4.5cm"))
 
 ```
 

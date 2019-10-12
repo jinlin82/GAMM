@@ -3,6 +3,13 @@ title: "基于广义可加混合模型空气严重污染影响因素研究"
 author: "Jin"
 date: '2019-04-15'
 output:
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    citation_package: natbib
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -13,13 +20,6 @@ output:
     keep_md: true
     toc: false
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
-  bookdown::pdf_document2:
-    keep_tex: yes
-    toc: false
-    latex_engine: xelatex
-    md_extensions: +east_asian_line_breaks
-    citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::word_document2:
     fig_caption: true
     reference_docx: ../style/word-styles-02.docx
@@ -206,6 +206,7 @@ $$
 素24个，具体列举在表 \@ref(tab:tab3) 中。
 
 ```{r tab3, eval=T,results='markup', cache=F}
+rm(list=ls())
 library("kableExtra")
 tab3 <- read.csv('../results/variable.csv')
 knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素指标体系",
@@ -429,13 +430,14 @@ knitr::kable(lme.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r tab-severe-gam-y, include=FALSE, results='markup'}
 
 library(mgcv)
-gam.y.severe <- gam(severe~s(pop)+s(green)+car
+gam.y.severe <- gamm(severe~s(pop)+s(green)+car
                     +rain+humid+s(wind_speed)+s(sun)
                    +heating+coast+lat,
                    data=dat.sel.y.severe,
                    family = "poisson", method = "REML")
 #gam.y.severe$aic;BIC(gam.y.severe)
-gam.y.severe.coef <- summary(gam.y.severe)$p.table
+#summary(gam.y.severe)
+gam.y.severe.coef <- summary(gam.y.severe$lme)$tTable[-(8:11),-3]
 
 dimnames(gam.y.severe.coef) <- list(c("截距项", varselname[c(3:5,8:10)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.y.severe.coef,"C:/Users/Administrator/Desktop/gam.y.severe.coef.csv")
@@ -455,7 +457,7 @@ knitr::kable(gam.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
-plot.gam(gam.y.severe,
+plot.gam(gam.y.severe$gam,
          select=1,
          col="blue",
          shade=T,
@@ -463,7 +465,7 @@ plot.gam(gam.y.severe,
          ylab="severe",xlab = "人口数"
          )
 par(mar=c(5,4,2,1))
-plot.gam(gam.y.severe,
+plot.gam(gam.y.severe$gam,
          select=2,
          col="blue",
          shade=T,
@@ -471,7 +473,7 @@ plot.gam(gam.y.severe,
          ylab="severe",xlab = "绿化率"
          )
 par(mar=c(5,4,2,1))
-plot.gam(gam.y.severe,
+plot.gam(gam.y.severe$gam,
          select=3,
          col="blue",
          shade=T,
@@ -479,7 +481,7 @@ plot.gam(gam.y.severe,
          ylab="severe",xlab = "平均风速"
          )
 par(mar=c(5,4,2,1))
-plot.gam(gam.y.severe,
+plot.gam(gam.y.severe$gam,
          select=4,
          col="blue",
          shade=T,
@@ -490,7 +492,7 @@ plot.gam(gam.y.severe,
 ```
 
 ```{r tab-severe-gam-y-smooth, eval=T, results='markup'}
-gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe)$s.table[,-2])
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe$gam)$s.table[,-2])
 
 dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)], c("经验自由度", "卡方统计量值", "P值"))
 
@@ -537,7 +539,7 @@ gamm.y.severe <- gamm(severe~s(green)+s(pop)+car
 ```
 
 ```{r tab-severe-gamm-y, include=FALSE, results='markup'}
-gamm.y.severe.coef <- summary(gamm.y.severe$lme)$tTable[-(6:9),-3]
+gamm.y.severe.coef <- summary(gamm.y.severe$lme)$tTable[-(8:11),-3]
 
 dimnames(gamm.y.severe.coef) <- list(c("截距项", varselname[c(3:5, 8:10)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gamm.y.severe.coef,"C:/Users/Administrator/Desktop/gamm.y.severe.coef.csv")
@@ -625,9 +627,11 @@ knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c
 
 ```{r tab-severe-y-huizong, eval=T, results='markup'}
 yearly=read.csv("../results/yearly.csv")
-
+yearly..=apply(yearly,2,function(x) as.character(x))
+yearly..[seq(1,41,4)+1,(2:5)]=t(apply(yearly..[seq(1,41,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+yearly=yearly..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
 library("kableExtra")
-knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
+knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
              caption="年度空气严重污染天数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -895,13 +899,14 @@ knitr::kable(lme.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r tab-severe-gam-m, include=FALSE, results='markup'}
 
 library(mgcv)
-gam.m.severe <- gam(severe~s(pop)+car
+gam.m.severe <- gamm(severe~s(pop)+car
                    +s(mean_temp)+rain+humid+wind_speed+sun
                    +heating+coast+s(lat),
                    data=dat.sel.m.severe,
                    family = binomial, method = "REML")
+summary(gam.m.severe)
 #gam.m.severe$aic;BIC(gam.m.severe)
-gam.m.severe.coef <- summary(gam.m.severe)$p.table
+gam.m.severe.coef <- summary(gam.m.severe$lme)$tTable[-(9:11),-3]
 
 dimnames(gam.m.severe.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.m.severe.coef,"C:/Users/Administrator/Desktop/gam.m.severe.coef.csv")
@@ -920,21 +925,21 @@ knitr::kable(gam.m.severe.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r fig-severe-gam-m, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现空 气严重污染Logistic可加模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
-plot.gam(gam.m.severe,
+plot.gam(gam.m.severe$gam,
          select=1,
          col="blue",
          shade=T,
          shade.col="grey",
          ylab="severe",xlab = "常住人口数"
          )
-plot.gam(gam.m.severe,
+plot.gam(gam.m.severe$gam,
          select=2,
          col="blue",
          shade=T,
          shade.col="grey",
          ylab="severe",xlab = "平均温度"
          )
-plot.gam(gam.m.severe,
+plot.gam(gam.m.severe$gam,
          select=3,
          col="blue",
          shade=T,
@@ -944,7 +949,7 @@ plot.gam(gam.m.severe,
 ```
 
 ```{r tab-severe-gam-m-smooth, eval=T, results='markup'}
-gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe)$s.table[,-2])
+gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe$gam)$s.table[,-2])
 
 dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "卡方统计量值", "P值"))
 
@@ -1079,7 +1084,9 @@ knitr::kable(gamm.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c
 
 ```{r tab-severe-m-huizong, eval=T, results='markup'}
 month=read.csv("../results/month.csv")
-
+month..=apply(month,2,function(x) as.character(x))
+month..[seq(1,41,4)+1,(2:5)]=apply(month..[seq(1,41,4)+1,(2:5)],2,function(x) {substr(x,2,9)})
+month=month..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
 library("kableExtra")
 knitr::kable(month, row.names =F, align = c("c", "c", "c", "c"),
              caption="月度空气严重污染天数模型汇总表",digits = 4,

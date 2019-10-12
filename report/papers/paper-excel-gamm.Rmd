@@ -3,6 +3,13 @@ title: "基于广义可加混合模型空气质量为优天数影响因素研究
 author: "Jin"
 date: '2019-04-15'
 output:
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: false
+    latex_engine: xelatex
+    md_extensions: +east_asian_line_breaks
+    citation_package: natbib
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -13,13 +20,6 @@ output:
     keep_md: true
     toc: false
     pandoc_args: ["--filter", "pandoc-crossref", "-M", "eqnPrefix="]
-  bookdown::pdf_document2:
-    keep_tex: yes
-    toc: false
-    latex_engine: xelatex
-    md_extensions: +east_asian_line_breaks
-    citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::word_document2:
     fig_caption: true
     reference_docx: ../style/word-styles-02.docx
@@ -439,16 +439,16 @@ knitr::kable(lme.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```{r tab-excel-gam-y, include=FALSE, results='markup'}
 library(mgcv)
-gam.y.excel <- gam(excellent~s(gdp)+power+gas_control
+gam.y.excel <- gamm(excellent~s(gdp)+power+gas_control
                    +rain+humid+wind_speed
                    +heating+coast+s(lat),
                    data=dat.sel.y.excel, method = "REML")
-gam.y.excel.coef <- summary(gam.y.excel)$p.table
+gam.y.excel.coef <- summary(gam.y.excel$lme)$tTable[-(9:10),-3]
 
 dimnames(gam.y.excel.coef) <- list(c("截距项", varselname[-c(1,9)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.y.excel.coef,"C:/Users/Administrator/Desktop/gam.y.excel.coef5.csv")
-gam.y.excel$aic#306.42
-BIC(gam.y.excel)#364.4073
+#gam.y.excel$aic#306.42
+#BIC(gam.y.excel$lme)#364.4073
 library("kableExtra")
 knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年度空气质量为优天数半参数回归模型参数估计结果",digits = 4,
@@ -471,7 +471,7 @@ knitr::kable(gam.y.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r fig-excel-gam-y, eval=T, fig.height=3.5, fig.width=6.5,out.width="0.9\\textwidth", fig.pos="H", fig.cap = "年度空气质量为优天数半参数回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
-plot.gam(gam.y.excel,
+plot.gam(gam.y.excel$gam,
          select=1,
          col="blue",
          shade=T,
@@ -479,7 +479,7 @@ plot.gam(gam.y.excel,
          ylab="excellent",xlab = "GDP"
          )
 par(mar=c(5,3,2,1))
-plot.gam(gam.y.excel,
+plot.gam(gam.y.excel$gam,
          select=2,
          col="blue",
          shade=T,
@@ -490,7 +490,7 @@ plot.gam(gam.y.excel,
 ```
 
 ```{r tab-excel-gam-y-smooth, eval=T, results='markup'}
-gam.smooth.tab.y.excel <- summary(gam.y.excel)$s.table[,-2]
+gam.smooth.tab.y.excel <- summary(gam.y.excel$gam)$s.table[,-2]
 
 dimnames(gam.smooth.tab.y.excel) <- list(varselname[c(1,9)], c("经验自由度", "F统计量值", "P值"))
 
@@ -599,10 +599,14 @@ knitr::kable(gamm.smooth.tab.y.excel, row.names =T, align = c("c", "c", "c", "c"
 ## 年度空气质量为优天数模型比较与最优模型选择
 
 ```{r tab-excel-y-huizong, eval=T, results='markup'}
+#rm(list=ls())
 yearly=read.csv("../results/yearly-excel.csv")
+yearly..=apply(yearly,2,function(x) as.character(x))
+yearly..[seq(1,37,4)+1,(2:5)]=t(apply(yearly..[seq(1,37,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+yearly=yearly..[-c(seq(1,37,4)+2,seq(1,37,4)+3),]
 
 library("kableExtra")
-knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
+knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
              caption="年度平均空气质量为优天数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -926,13 +930,13 @@ knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 ```{r tab-excel-gam-m, include=FALSE, results='markup'}
 
 library(mgcv)
-gam.m.excel <- gam(excellent~con_area+gas_control
+gam.m.excel <- gamm(excellent~con_area+gas_control
                    +mean_temp+rain+humid+wind_speed+heating+coast
                    +s(lat),
                    data=dat.sel.m.excel,
                    family = "poisson", method = "REML")
-gam.m.excel.coef <- summary(gam.m.excel)$p.table
-AIC(gam.m.excel);BIC(gam.m.excel)
+gam.m.excel.coef <- summary(gam.m.excel$lme)$tTable[-(10),-3]
+#AIC(gam.m.excel);BIC(gam.m.excel)
 dimnames(gam.m.excel.coef) <- list(c("截距项", varselname[-c(9)]), c("估计值", "标准误", "t值", "P值"))
 #write.csv(gam.m.excel.coef,"C:/Users/Administrator/Desktop/gam.m.excel.coef.csv")
 library("kableExtra")
@@ -951,7 +955,7 @@ knitr::kable(gam.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
-plot.gam(gam.m.excel,
+plot.gam(gam.m.excel$gam,
          select=1,
          col="blue",
          shade=T,
@@ -962,7 +966,7 @@ plot.gam(gam.m.excel,
 ```
 
 ```{r tab-excel-gam-m-smooth, eval=T, results='markup'}
-gam.smooth.tab.m.excel <- t(as.data.frame(summary(gam.m.excel)$s.table[,-2]))
+gam.smooth.tab.m.excel <- t(as.data.frame(summary(gam.m.excel$gam)$s.table[,-2]))
 
 dimnames(gam.smooth.tab.m.excel) <- list(varselname[c(9)], c("经验自由度", "卡方统计量值", "P值"))
 
@@ -1071,10 +1075,14 @@ knitr::kable(gamm.smooth.tab.m.excel, row.names =T, align = c("c", "c", "c", "c"
 ## 月度空气质量为优天数模型比较与最优模型选择
 
 ```{r tab-excel-m-huizong, eval=T, results='markup'}
-yearly=read.csv("../results/monthly-excel.csv")
+monthly=read.csv("../results/monthly-excel.csv")
+#rm(list=ls())
 
+monthly..=apply(monthly,2,function(x) as.character(x))
+monthly..[seq(1,37,4)+1,(2:5)]=t(apply(monthly..[seq(1,37,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+monthly=monthly..[-c(seq(1,37,4)+2,seq(1,37,4)+3),]
 library("kableExtra")
-knitr::kable(yearly, row.names =F, align = c("c", "c", "c", "c"),
+knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
              caption="月度空气质量为优天数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
