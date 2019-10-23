@@ -1129,5 +1129,7 @@ knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r")
 非线性的。通过比较年度空气严重污染天数和月度是否出现空气严重污染之间的影响因素，
 我们发现二者并不完成重合。
 
+# 最优模型的确定待定
+
 # 参考文献 {-}
 [//]: # (\bibliography{Bibfile})
