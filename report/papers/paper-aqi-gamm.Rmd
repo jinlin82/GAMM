@@ -929,14 +929,14 @@ lme.m.coef <- summary(lme.m$lme)$tTable[,-3]
 dimnames(lme.m.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
 #write.csv(lme.m.coef,"../results/lme.m.coef5.csv")
 library("kableExtra")
-#knitr::kable(lme.m.coef, row.names =T, align = c("r", "r", "r", "r"),
-             #caption="月均AQI线性混合效应模型回归固定效应表",digits = 4,
-             #longtable = TRUE, booktabs = TRUE, escape = F) %>%
-    #kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  #repeat_header_text = "(续)")%>%
-    #kable_styling(full_width = T) %>%
-    #column_spec(1, width = c("4.5cm"))
+knitr::kable(lme.m.coef, row.names =T, align = c("r", "r", "r", "r"),
+             caption="月均AQI线性混合效应模型回归固定效应表",digits = 4,
+             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
+                  # stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
+                  repeat_header_text = "(续)")%>%
+    kable_styling(full_width = T) %>%
+    column_spec(1, width = c("4.5cm"))
 
 ```
 

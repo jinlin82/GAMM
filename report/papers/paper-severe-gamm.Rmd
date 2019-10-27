@@ -1037,6 +1037,7 @@ knitr::kable(gamm.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c
 month=read.csv("../results/month.csv")
 month..=apply(month,2,function(x) as.character(x))
 month..[seq(1,41,4)+1,(2:5)]=apply(month..[seq(1,41,4)+1,(2:5)],2,function(x) {substr(x,2,9)})
+month..[seq(1,41,4)+1,(2:5)]=apply(month..[seq(1,41,4)+1,(2:5)],2,function(x) {paste('(',x,')',sep='')})
 month=month..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
 library("kableExtra")
 knitr::kable(month, row.names =F, align = c("c", "c", "c", "c"),

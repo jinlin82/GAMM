@@ -899,7 +899,7 @@ AIC(lme.m.excel$lme);BIC(lme.m.excel$lme)
 lme.m.excel.coef <- summary(lme.m.excel$lme)$tTable[,-3]
 
 dimnames(lme.m.excel.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值"))
-write.csv(lme.m.excel.coef,"../results/lme.m.excel.coef.csv")
+#write.csv(lme.m.excel.coef,"../results/lme.m.excel.coef.csv")
 library("kableExtra")
 knitr::kable(lme.m.excel.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="月度空气质量为优天数泊松混合效应模型回归固定效应表",digits = 4,
