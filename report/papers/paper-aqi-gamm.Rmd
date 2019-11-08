@@ -124,6 +124,11 @@ $$y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
 在模型中，线性预测子和非参数函数共同来拟合自变量的固定效应，允许自变量与因变量的关系
 存在多种形式，而随机效应用来拟合观测值之间的相关关系和数据的异质性。
 
+文章以下部分的结构为：第二部分说明了变量选择和数据来源，给出了数据处理过程；第三
+部分在使用Lasso方法选择自变量的基础上，以年度平均AQI为因变量建立了半参数混合模型
+的几种具体模型，通过模型比较给出了最优模型并进行解释分析得到影响因素。第四部分对
+月度平均AQI作了类似的分析得到月度空气质量因素因素。最后部分是结论。
+
 # 变量选择和数据来源
 
 环境保护部2012年颁布的《环境空气质量指数（AQI）技术规定（试行）》对空气质量指数
@@ -276,7 +281,9 @@ mapply(function(i, y) {
 的原则，对服从正态分布的年均AQI建立普通线性回归模型，进一步分别考虑空气质量城市
 之间的相关性及自变量对空气质量的非线性影响，分别建立线性混合模型及半参数模型；
 最后综合考虑城市之间的相关性及自变量的非线性影响，建立半参数混合效应模型。并在这
-些可选模型中通过综合比较模型拟合优度，模型实际意义等确定最优模型。
+些可选模型中通过综合比较模型拟合优度，模型实际意义等确定最优模型。具体的模型结果
+显示在表  \@ref(tab:tab-aqi-y-huizong) 中。
+
 
 <!-- ### 年均AQI线性回归模型 -->
 
@@ -619,9 +626,6 @@ mapply(function(i, y) {
 
 <!-- ### 年均AQI模型比较与最优模型选择 -->
 
-我们选取年均AQI作为因变量，基于Lasso筛选出的变量为自变量，分别建立线
-性回归模型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空气质量指数的
-影响因素进行分析，模型结果显示在表  \@ref(tab:tab-aqi-y-huizong) 中。
 
 ```{r tab-aqi-y-huizong, eval=T, results='markup'}
 yearly=read.csv("../results/yearly-aqi.csv",na.strings = "NA")
@@ -708,6 +712,12 @@ knitr::kable(gam.y.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 风速越大，年均AQI越小，空气质量越好；平均来讲，供暖地区比不供暖的年均AQI大
 15.7729，临海地区比不临海地区的年均AQI小12.5379；且纬度越高的地方年均AQI越大，空
 气质量越差。
+
+以上显著的变量中，废弃治理完成投资额的回归系数与一般认知相反,结果显示废弃治理完成
+投资额越多，空气质量越差，为此，本文尝试做出以下解释。目前废弃治理投资额不足，当空气
+污染严重时，才增加更多投资来缓解空气污染，或者说目前的废气治理完成投资额更多是被动
+投资，而不是从预防的角度提前投资。因此，在一定时间内，废弃治理完成投资额越多，表明
+空气污染越严重，废气污染治理滞后且力度不足，不足以扭转城市空气污染的局面。
 
 ```{r fig-gam-y-best, eval=T, fig.height=2.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年均AQI最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,3))
@@ -849,7 +859,7 @@ mapply(function(i, y) {
 
 根据因变量分布的分析结果，月均AQI取对数后近似服从正态分布。因此，下面以对数月均
 AQI为因变量采用月度数据建立线性回归模型、线性混合效应模型、半参数回归模型和半参
-数混合效应模型，从这些模型中选择最优模型并做相应分析。
+数混合效应模型，从这些模型中选择最优模型并做相应分析。具体的模型结果在表 \@ref(tab:tab-aqi-m-huizong) 中。
 
 <!-- ### 月均AQI线性回归模型 -->
 
@@ -1176,18 +1186,14 @@ AQI为因变量采用月度数据建立线性回归模型、线性混合效应�
 
 <!-- ### 月均AQI模型比较与最优模型选择 -->
 
-我们选取对数月均AQI作为因变量，基于Lasso筛选出的变量为自变量，分别建立线性回归模
-型、线性混合效应模型、半参数回归模型和半参数混合效应模型对空气质量的影响因素进行
-分析。模型结果在表 \@ref(tab:tab-aqi-m-huizong) 中。
-
 ```{r tab-aqi-m-huizong, eval=T, results='markup'}
 monthly=read.csv("../results/monthly-aqi.csv")
 monthly..=apply(monthly,2,function(x) as.character(x))
-monthly..[seq(2,35,3),(2:5)]=t(apply(monthly..[seq(2,35,3),(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
+monthly..[seq(2,35,3),(2:5)]=t(apply(monthly..[seq(2,35,3),(2:5)],1,function(x) {paste('(',as.character(-as.numeric(x)),')',sep = "")}))
 monthly=monthly..
 monthly=monthly[-seq(3,36,3),]
 library("kableExtra")
-knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
+knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c",'c'),
              caption="月度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -1225,11 +1231,14 @@ knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
 
 由表 \@ref(tab:tab-gam-m-best) 可知，在10%的显著性水平下，房屋建筑施工面积、私人
 汽车拥有量、废气治理完成投资额、平均气温、降水量、平均风速、平均气压、是否供暖、
-是否临海均通过显著性检验，且其系数分别为0.0000、0.0003、0.0959、-0.0140、-0.0677、
+是否临海均通过显著性检验，且其系数分别为0.0002、0.0003、0.0959、-0.0140、-0.0677、
 0.0014、0.0003、0.0358、-0.1733。表明在其他条件不变的情况下，私人汽车拥有量越多，
 空气质量越差；废气治理完成投资额越多，空气质量越差；平均气压越高，空气质量越差；
 平均风速越大，空气质量越差；而平均气温越高，空气质量越好；降水量越多，空气质量越
 好；且平均来讲，供暖地区比不供暖的空气质量差，临海地区比不临海地区的空气质量好。
+
+以上结果中，废气治理完成投资额与月均AQI之间关系的符号仍然是正的，与年均AQI分析结果
+一致，可以做出类似的解释。
 
 ```{r tab-gam-m-best, eval=T, results='markup'}
 rm(list=ls())
@@ -1260,11 +1269,11 @@ varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 
 library(mgcv)
-gam.m.best <- gam(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+heating+coast+te(lat),
+gam.m.best <- gamm(AQI~con_area+car+gas_control+mean_temp+rain+wind_speed+pressure+heating+coast+te(lat),
                   data=dat.sel.m, method = "REML")
 
 
-gam.m.best.coef <- summary(gam.m.best)$p.table
+gam.m.best.coef <- summary(gam.m.best$lme)$tTable[-11,-3]
 
 dimnames(gam.m.best.coef) <- list(c("截距项", varselname[c(1:7,9:10)]), c("估计值", "标准误", "t值", "P值"))
 
@@ -1285,7 +1294,7 @@ par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)
 
-plot.gam(gam.m.best,
+plot.gam(gam.m.best$gam,
          select=1,
          col="blue",
          shade=T,
@@ -1296,7 +1305,7 @@ plot.gam(gam.m.best,
 ```
 
 ```{r tab-gam-m-smooth-best, eval=T, results='markup'}
-gam.smooth.tab.m <- t(as.matrix(summary(gam.m.best)$s.table[,-2]))
+gam.smooth.tab.m <- t(as.matrix(summary(gam.m.best$gam)$s.table[,-2]))
 
 #dimnames(gam.smooth.tab.m) <- list(varselname[c(1,2,4)], c("经验自由度", "F统计量值", "P值"))
 colnames(gam.smooth.tab.m)<-c("经验自由度", "F统计量值", "P值")
