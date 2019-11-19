@@ -6,8 +6,8 @@ csl: ./style/chinese-gb7714-2005-numeric.csl
 css: ./style/markdown.css
 bibliography: Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
-link-citations: yes
-linkReferences: yes
+link-citations: true
+linkReferences: true
 notice: '@*'
 autoEqnLabels: true
 ---
