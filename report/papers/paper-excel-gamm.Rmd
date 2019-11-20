@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
     md_extensions: +east_asian_line_breaks
     citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
+    pandoc_args: ["--listing", "--bibliography=Bibfile_e", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -181,7 +181,7 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 将对数化后的年度空气质量为优天数当作正态分布处理，而月度空气质量为优天数根据其数据特征，本文将其
 定义为泊松分布。
 
-```{r fig-dep-norm, eval=T, fig.height=2.5,fig.width=6.5,out.width="95%", fig.pos="h", fig.cap = " 空气质量为优天数Q-Q图", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-dep-norm, echo=FALSE, fig.cap=" 空气质量为优天数Q-Q图", fig.height=2.5, fig.pos="h", fig.width=6.5, dev=c("png","cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light"), list(family="Microsoft, out.width="95%")}
 rm(list=ls())
 library(car)
 dat.y <- read.csv("../data/yearly.csv")
@@ -189,8 +189,8 @@ dat.m <- read.csv("../data/monthly.csv")
 par(mfrow=c(1,2))
 par(mar = c(1.1, 4.5, 2.1, 1.1))
 
-qqPlot(dat.y$excellent, id=F, grid = F, xlab = "",ylab='', main ="年度质量为优天数", lwd=1)
-qqPlot(dat.m$excellent, id=F, grid = F, xlab = "",ylab='',main ="月度质量为优天数", lwd=1)
+qqPlot(dat.y$excellent, id=F, grid = F, xlab = '正态分布分位点',ylab ="年度质量为优天数", lwd=1)
+qqPlot(dat.m$excellent, id=F, grid = F, xlab = "正态分布分位点",ylab ="月度质量为优天数", lwd=1)
 ```
 
 
