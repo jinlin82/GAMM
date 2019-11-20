@@ -4,7 +4,7 @@ author: "Jin"
 date: '2019-04-15'
 output:
   bookdown::pdf_document2:
-    keep_tex: yes
+    keep_tex: true
     toc: false
     latex_engine: xelatex
     md_extensions: +east_asian_line_breaks
@@ -28,8 +28,8 @@ output:
 css: ../style/markdown.css
 bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
-link-citations: yes
-linkReferences: yes
+link-citations: true
+linkReferences: true
 notice: '@*'
 csl: ../style/chinese-gb7714-2005-numeric.csl
 autoEqnLabels: true
