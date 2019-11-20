@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
     md_extensions: +east_asian_line_breaks
     citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile_e", "--filter", "pandoc-crossref"]
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -26,7 +26,7 @@ output:
     md_extensions: +east_asian_line_breaks
     pandoc_args: ["--filter", "pandoc-crossref"]
 css: ../style/markdown.css
-bibliography: ../Bibfile_e.bib
+bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
@@ -76,14 +76,15 @@ Sys.setlocale("LC_ALL", "Chinese")
 部门的空气污染治理和城市化发展提供重要参考价值。
 
 对空气质量进行研究，已有文献主要集中在以下三类。第一类直接以空气质量指数为研究对象，运用
-时间序列研究方法以及支持向量机、BP神经网络等算法对未来的空气质量指数进行预测[@刘威2013;闫
-妍2013;胡世前2016]。第二类注重从时空演变角度出发注重探究空气质量的时空演变特征[@黄小刚2019;@柏玲2018]。第三类是空气质量影响因素分析。在进行影响因素分析时，因变量设置也有所不同，一类是以SO2等空
+时间序列研究方法以及支持向量机、BP神经网络等算法对未来的空气质量指数进行预测[@刘威2013;@闫妍2013;@胡世前2016]。
+第二类注重从时空演变角度出发注重探究空气质量的时空演变特征[@黄小刚2019;@柏玲2018]。第三类
+是空气质量影响因素分析。在进行影响因素分析时，因变量设置也有所不同，一类是以SO2等空
 气污染物为研究对象，以空气污染物排放量表征空气质量，进而进行影响因素分析[@李陈2016]，另一
 类是以空气质量指数AQI作为因变量。并且选取的影响因素侧重点不同，一部分研究侧重社会经济因素
-的影响[@柏玲2018;王超2019;郭一鸣2019；吴雪萍2018],也有研究单独从气候或气象等自然因素出发进行影响因素
-研究[@周文博2019;Rafael2019]，还有部分学者综合考虑社会经济因素、自然因素，并将空气主要污
+的影响[@柏玲2018;@王超2019;@郭一鸣2019;@吴雪萍2018],也有研究单独从气候或气象等自然因素出发进行影响因素
+研究[@周文博2019;@Rafael2019]，还有部分学者综合考虑社会经济因素、自然因素，并将空气主要污
 染物作为自变量进行分析而不是因变量[@李桂兰2019]。所用方法主要为多元回归、灰色关联度分析、
-空间分析方法[@柏玲2018；王超2019;王乐2019；郭一鸣2019；吴雪萍2018]
+空间分析方法[@柏玲2018;@王超2019;@王乐2019;@郭一鸣2019;@吴雪萍2018]
 
 基于以上文献分析，可以发现：第一、在考虑空气质量的影响因素时，鲜有研究引入地理因
 素。第二，在分析空气质量影响因素时，当前使用的方法很少有考虑影响因素对空气质量的
@@ -181,7 +182,7 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 将对数化后的年度空气质量为优天数当作正态分布处理，而月度空气质量为优天数根据其数据特征，本文将其
 定义为泊松分布。
 
-```{r fig-dep-norm, echo=FALSE, fig.cap=" 空气质量为优天数Q-Q图", fig.height=2.5, fig.pos="h", fig.width=6.5, dev=c("png","cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light"), list(family="Microsoft, out.width="95%")}
+```{r fig-dep-norm, echo=FALSE, fig.cap=" 空气质量为优天数Q-Q图", out.width="95%",fig.height=2.5, fig.pos="h", fig.width=6.5, dev=c("png","cairo_pdf"), dev.args=list(family="Microsoft YaHei UI Light"),}
 rm(list=ls())
 library(car)
 dat.y <- read.csv("../data/yearly.csv")
@@ -628,4 +629,4 @@ GDP具有非线性作用；气候因素中的平均相对湿度和平均风速�
 量为优天数更多受当月具体情况的影响。
 
 # 参考文献 {-}
-[//]: # (\bibliography{Bibfile_e})
+[//]: # (\bibliography{Bibfile})

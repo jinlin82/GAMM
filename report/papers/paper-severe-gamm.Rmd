@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
     md_extensions: +east_asian_line_breaks
     citation_package: natbib
-    pandoc_args: ["--listing", "--bibliography=Bibfile_s", "--filter", "pandoc-crossref"]
+    pandoc_args: ["--listing", "--bibliography=Bibfile", "--filter", "pandoc-crossref"]
   bookdown::html_document2:
     number_sections: true
     seq_numbering: true
@@ -26,7 +26,7 @@ output:
     md_extensions: +east_asian_line_breaks
     pandoc_args: ["--filter", "pandoc-crossref"]
 css: ../style/markdown.css
-bibliography: ../Bibfile_s.bib
+bibliography: ../Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
@@ -1165,4 +1165,4 @@ knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r")
 我们发现二者并不完成重合。
 
 # 参考文献 {-}
-[//]: # (\bibliography{Bibfile_s})
+[//]: # (\bibliography{Bibfile})
