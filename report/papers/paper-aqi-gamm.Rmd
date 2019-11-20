@@ -1,7 +1,7 @@
 ---
 title: "基于半参数混合模型的城市空气质量影响因素分析"
-author: "Jin"
-date: '2019-04-15'
+author: '金林&nbsp; 李研&nbsp; 王红红'
+date: '（中南财经政法大学&nbsp; 统计与数学学院，湖北&nbsp; 武汉 430073）'
 output:
   bookdown::pdf_document2:
     keep_tex: true
@@ -51,14 +51,38 @@ graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
 
-**摘要:** 本文以2014-2017年中国重点监测的35个城市的年度和月度空气质量指数为研究
-对象，利用半参数混合效应模型对城市空气质量的影响因素进行研究。研究结果显示，对于
-年均AQI，社会经济因素中的废气治理完成投资额是正的线性影响，固定资产投资和汽车拥
-有量是非线性关系；气候因素中的平均风速是线性关系，平均气温具有非线性关系;是否临
-海，是否供暖和纬度三个地理因素对年均AQI有线性影响。对于月均AQI，社会经济方面的三
-个影响因素废气治理完成投资额，房屋建筑施工面积和汽车拥有量均为线性影响；平均气温，
-降水量，平均风速和平均气压这四个气象变量对月均AQI均有显著的线性影响；地理因素中
-的是否临海，是否供暖是线性影响，纬度对月均AQI有显著的非线性影响。
+**摘要:** 本文以2014-2017年中国重点监测的35个城市的年度和月度空气质量指数（AQI）
+为研究对象，利用半参数混合效应模型对城市空气质量的影响因素进行研究。结果显示，对
+于年均AQI，社会经济因素中的废气治理完成投资额是正的线性影响，固定资产投资和汽车
+拥有量具有非线性关系；气候因素中的平均风速是线性关系，平均气温具有非线性关系;是
+否临海，是否供暖和纬度三个地理因素对年均AQI均有线性影响。对于月均AQI，社会经济方
+面的三个影响因素废气治理完成投资额，房屋建筑施工面积和汽车拥有量均为线性影响；平
+均气温，降水量，平均风速和平均气压这四个气象变量对月均AQI均有显著的线性影响；地
+理因素中的是否临海，是否供暖是线性影响，纬度对月均AQI有显著的非线性影响。
+
+**关键词：** 空气质量指数； 半参数混合模型； 影响因素
+
+**中图分类号：** C811 	**文献标识码：**A
+
+**Analysis of influencing factors of Urban Air Quality Based on Semiparametric Mixed Model**
+
+**Abstract：**This paper takes the annual and monthly air quality index (AQI) of
+35 cities monitored in China from 2014 to 2017 as the research object, and uses
+the semiparametric mixed effect models to study the influencing factors of urban
+air quality. The results show that for the annual average AQI, the investment of
+waste gas treatment in the socio-economic factors has a positive linear effect,
+and the fixed asset investment and number of cars have a nonlinear relationship;
+the average wind speed in the climate factor is linear, and the average
+temperature is nonlinear relationship; The three geographical factors: whether
+near the sea, whether heating and latitude have linear effect on the annual
+average AQI. For the monthly average AQI, the three influencing factors of the
+socio-economic aspects: the investment of waste gas treatment, the building
+construction area and number of cars are linear effects; the average
+temperature, precipitation, average wind speed and average pressure have
+significant linear effects; whether near the sea and whether heating are linear,
+and latitude has a significant nonlinear effect on monthly average AQI.
+
+**Key Words:** Air Quality Index (AQI); Semiparametric Mixed Model; Influencing Factors
 
 # 简介
 
@@ -79,7 +103,7 @@ Sys.setlocale("LC_ALL", "Chinese")
 [@曲长雨2018]，第二类是气象因素（李琛、刘瑾、王彦民，2017）[@李琛2017]。也有部分学者综
 合考虑了经济和气象因素（李静萍、周景博，2017）[@李静萍2017]。关于空气质量影响因
 素的研究方法，研究者大多采用环境库兹涅茨曲线（Zanin、Marra,2012,
-Zheng,2017,李健、靳泽凡、苑清敏，2019）[@zanin2012assessing;@zheng2017a;@李健2019]，
+Zheng,2017,李健、靳泽凡、苑清敏，2019）[@Zanin2012;@Zheng2017;@李健2019]，
 面板回归分析（王斌会、王术，2015）[@王斌会2015]，空间分析（蔺雪芹、王岱，2016）[@蔺雪芹2016]，
 灰色关联分析（湛社霞、匡耀求、阮柱，2018）和主成分分析（李经路、曾天，2017）等
 方法[@湛社霞2018;@李经路2017]。
@@ -95,7 +119,7 @@ Zheng,2017,李健、靳泽凡、苑清敏，2019）[@zanin2012assessing;@zheng20
 质量状况研究提供新的研究方法，并完善空气质量状况的研究体系。
 
 半参数回归模型是 Engle 等(1986)在研究英国电力需求预测时提出了一种回归模型
-[@engle1986semiparametric]。半参数混合模型是在半参数回归模型中增加随机效应项。
+[@Engle1986]。半参数混合模型是在半参数回归模型中增加随机效应项。
 一般地，半参数混合模型具有以下形式
 $$y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i}) + \cdots + \boldsymbol{Z_{i}b} + \varepsilon_{i}$${#eq:additive-mixed}
 
@@ -108,7 +132,7 @@ $$y_{i}=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i}) + \cdots + \bold
  中，线性预测子和非参数函数共同来拟合自变量的固定效应，允许自变量与因变量的关系
  存在多种形式，而随机效应用来拟合观测值之间的相关关系和数据的异质性。Zhang 等
  (1998)对基于纵向数据的半参数混合模型进行了研究[@Zhang1998]。Zhang 和 Lin (2003) 对半参数混
- 合模型的推断问题进行了研究[@zhang2003hypothesis]。Ni等(2010)研究了半
+ 合模型的推断问题进行了研究[@Zhang2003]。Ni等(2010)研究了半
  参数混合模型的变量选择问题[@Ni2010]。本文使用 Wood(2017) 的著作中给出的R语言包
  mgcv 来估计各种具体半参数混合模型[@Wood2017]。
 
@@ -155,7 +179,7 @@ knitr::kable(tab3, row.names =F, align = "l", caption="空气质量影响因素�
 			     kable_styling(latex_options = c("scale_down", "repeat_header", "hold_position"),
                  repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
-    column_spec(1:4, width = c("3cm", "3cm", "5cm", "2cm"))
+    column_spec(1:4, width = c("3cm", "2.7cm", "5cm", "2.3cm"))
 			 
 ```
 
@@ -262,7 +286,7 @@ mapply(function(i, y) {
 
 ```
 
-## 年均AQI模型建立与最优模型确定
+## 年均AQI模型建立与最优模型选择
 
 使用Lasso方法得到的模型参数估计值是有偏，下面对基于Lasso方法筛选出的变量重新进行
 模型拟合。根据年度空气质量指数AQI服从正态分布的数据特征，且遵循模型由简单到复杂
@@ -282,15 +306,15 @@ yearly=yearly[-seq(3,36,3),]
 library("kableExtra")
 knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
              caption="年度平均空气质量指数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F, linesep = "") %>%
     kable_styling(full_width = T) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="注:数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
-             general_title = "注:",
-             threeparttable = T)
+    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
+             general_title = "注:",footnote_as_chunk = T
+             )
 
 ```
 
@@ -342,7 +366,7 @@ dimnames(gam.y.best.coef) <- list(c("截距项", varselname[c(3,7,9:11)]), c("�
 library("kableExtra")
 knitr::kable(gam.y.best.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年均AQI半参数回归模型参数估计结果",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F, linesep = "") %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
@@ -517,14 +541,14 @@ monthly=monthly[-seq(3,36,3),]
 library("kableExtra")
 knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c",'c'),
              caption="月度平均空气质量指数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F, linesep = "") %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm")) %>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
-             general_title = "注:",
+    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05, .表示p<0.1",
+             general_title = "注:",footnote_as_chunk = T, escape=F
             )
 
 ```
@@ -602,7 +626,7 @@ dimnames(gam.m.best.coef) <- list(c("截距项", varselname[c(1:7,9:10)]), c("�
 library("kableExtra")
 knitr::kable(gam.m.best.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="月均AQI最优模型参数估计结果",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F, linesep = "") %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
@@ -611,7 +635,7 @@ knitr::kable(gam.m.best.coef, row.names =T, align = c("r", "r", "r", "r"),
 
 ```
 
-```{r fig-gam-m-best, eval=T, fig.height=3.5, fig.width=5,out.width="0.75\\textwidth", fig.align='center', fig.pos="H", fig.cap = "月均AQI最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+```{r fig-gam-m-best, eval=T, fig.height=3.5, fig.width=5, out.width="95%", fig.align='center', fig.pos="H", fig.cap = "月均AQI最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(1,1))
 par(mar=c(5,4,2,1))
 par(cex.axis = 0.9, cex.lab = 0.9)

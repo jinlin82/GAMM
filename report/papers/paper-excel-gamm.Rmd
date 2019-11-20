@@ -296,8 +296,8 @@ knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm")) %>%
     footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
-             general_title = "注:",
-             threeparttable = T)
+             general_title = "注:",footnote_as_chunk = T
+             )
 
 ```
 
@@ -511,7 +511,7 @@ knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
     column_spec(1, width = c("4.5cm"))%>%
     footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
              general_title = "注:",
-             threeparttable = T)
+             footnote_as_chunk = T)
 
 ```
 
