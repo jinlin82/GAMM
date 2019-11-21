@@ -1,7 +1,7 @@
 ---
 title: "基于广义可加混合模型空气严重污染影响因素研究"
-author: "Jin"
-date: '2019-04-15'
+author: '金林&nbsp; 李研&nbsp; 王红红'
+date: '（中南财经政法大学&nbsp; 统计与数学学院，湖北&nbsp; 武汉 430073）'
 output:
   bookdown::pdf_document2:
     keep_tex: yes
@@ -36,12 +36,11 @@ autoEqnLabels: true
 ---
 
 
-
 ```{r setup, echo=F}
-
 knitr::opts_knit$set(root.dir = getwd())
 knitr::opts_chunk$set(echo = FALSE, results = 'hide')
 knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+options(kableExtra.auto_format = F)
 ```
 
 ```{r prepare}
@@ -51,6 +50,18 @@ options(scipen=100)
 graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
+
+**摘要:**
+
+**关键词：** 空气质量严重污染天数； 广义可加混合模型； 影响因素
+
+**中图分类号：** C811 	**文献标识码：**A
+
+**Analysis of influencing factors of Urban Air Quality Based on Semiparametric Mixed Model**
+
+**Abstract：**
+
+**Key Words:** Air Quality Index (AQI); Semiparametric Mixed Model; Influencing Factors
 
 # 简介
 
@@ -590,15 +601,14 @@ yearly=yearly..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
 library("kableExtra")
 knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
              caption="年度空气严重污染天数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm"))%>%
     footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
-             general_title = "注:",
-             threeparttable = T)
+             general_title = "注:",footnote_as_chunk = T)
 
 ```
 
@@ -1063,9 +1073,9 @@ month..[seq(1,41,4)+1,(2:5)]=apply(month..[seq(1,41,4)+1,(2:5)],2,function(x) {s
 month..[seq(1,41,4)+1,(2:5)]=apply(month..[seq(1,41,4)+1,(2:5)],2,function(x) {paste('(',x,')',sep='')})
 month=month..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
 library("kableExtra")
-knitr::kable(month, row.names =F, align = c("c", "c", "c", "c"),
+knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"),
              caption="月度空气严重污染天数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F) %>%
+             longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
@@ -1073,8 +1083,7 @@ knitr::kable(month, row.names =F, align = c("c", "c", "c", "c"),
     column_spec(1, width = c("4.5cm"))%>%
     footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
              general_title = "注:",
-             threeparttable = T)
-
+             footnote_as_chunk = T)
 
 ```
 
