@@ -531,7 +531,6 @@ mapply(function(i, y) {
 AQI为因变量采用月度数据建立线性回归模型、线性混合效应模型、半参数回归模型和半参
 数混合效应模型，从这些模型中选择最优模型并做相应分析。具体的模型结果在表 \@ref(tab:tab-aqi-m-huizong) 中。
 
-
 ```{r tab-aqi-m-huizong, eval=T, results='markup'}
 monthly=read.csv("../results/monthly-aqi.csv")
 monthly..=apply(monthly,2,function(x) as.character(x))
@@ -548,8 +547,7 @@ knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c",'c'),
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm")) %>%
     footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05, .表示p<0.1",
-             general_title = "注:",footnote_as_chunk = T, escape=F
-            )
+             general_title = "注:",footnote_as_chunk = T, escape=F)
 
 ```
 

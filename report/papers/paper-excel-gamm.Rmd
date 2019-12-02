@@ -26,7 +26,7 @@ output:
     md_extensions: +east_asian_line_breaks
     pandoc_args: ["--filter", "pandoc-crossref"]
 css: ../style/markdown.css
-bibliography: ../Bibfile.bib
+bibliography: ./Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: true
 linkReferences: true
@@ -50,51 +50,53 @@ graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
 
-**摘要**本文以2014-2017年中国重点监测的35个城市的年度空气质量为优天数和月度空气
-质量为优天数为研究对象，利用广义可加混合模型对城市空气质量的影响因素进行研究。研
-究结果显示，对于年度空气质量为优天数，社会经济影响因素中的全社会用电量和废气治理
-完成投资额与年度空气质量为优天数之间具有线性关系，GDP具有非线性作用；气候因素中
-的平均相对湿度和平均风速对年度空气质量为优天数有线性影响。地理因素中只有纬度变量
-对年度空气质量为优天数有显著性影响，并且关系是非线性的。对于月度空气质量为优天数，
-社会经济影响因素有房屋建筑施工面积和废气治理完成投资额，并且二者与年度空气质量为
-优天数之间均具有线性关系；气候因素中的平均气温，降水量，平均相对湿度和平均风速对
-月度空气质量为优天数有线性影响。地理因素中是否供暖和纬度变量对月度空气质量为优天
-数有显著性影响，是否供暖是线性关系，纬度是非线性影响。
+**摘要：**本文以2014-2017年中国重点监测的35个城市的年度空气质量为优天数和月度空气
+质量为优天数为研究对象，利用广义可加混合模型对城市空气质量的影响因素进行研究。结
+果显示，对于年度空气质量为优天数，社会经济影响因素中的全社会用电量和废气治理完成
+投资额与年度空气质量为优天数之间具有线性关系，GDP具有非线性作用；气候因素中的平
+均相对湿度和平均风速对年度空气质量为优天数有线性影响。地理因素中只有纬度变量对年
+度空气质量为优天数有显著性影响，并且关系是非线性的。对于月度空气质量为优天数，社
+会经济影响因素有房屋建筑施工面积和废气治理完成投资额，并且二者与年度空气质量为优
+天数之间均具有线性关系；气候因素中的平均气温，降水量，平均相对湿度和平均风速对月
+度空气质量为优天数有线性影响。地理因素中是否供暖和纬度变量对月度空气质量为优天数
+有显著性影响，是否供暖是线性关系，纬度是非线性影响。
 
 **关键词：** 空气质量为优天数； 广义可加混合模型； 影响因素
 
 **中图分类号：** C811 	**文献标识码：**A
 
-**Analysis of influencing factors of the number of yearly and monthly excellent-grade air quality days Based on Generalized Additive Mixed Model**
+**Analysis of Influencing Factors of Number of Excellent-grade Air Quality Days Based on Generalized Additive Mixed Models**
 
-**Abstract：**This paper takes the number of yearly and monthly excellent-grade 
-air quality days in 35 cities monitored in China from 2014 to 2017 as the research 
-object, and uses the generalized additive model to study the influencing factors of 
-urban air quality. The research results show that for the yearly excellent-grade air
-quality days, the total social electricity consumption and the investment of waste gas 
-treatment in the socio-economic factors have a has a positive linear effect, GDP has 
-a nonlinear effect; the average humidity and average wind speed in the
-climate factors have a linear effect. Among the geographical factors, only the latitude 
-has a significant influence on the annual excellent-grade air quality days, and the 
-relationship is nonlinear. For the monthly excellent-grade air quality days, the two 
-influencing factors of the socio-economic aspects: the building construction area and
-the investment of waste gas treatment are linear effects; the average temperature, 
-precipitation, average humidity and average wind speed in the climate factors have
-significant linear effects; whether heating are linear and latitude has a significant 
-nonlinear effect on monthly excellent-grade air quality days.
+**Abstract:** This paper takes the number of yearly and monthly excellent-grade
+air quality days in 35 cities monitored in China from 2014 to 2017 as the
+research object, and uses the generalized additive mixed model to study the
+influencing factors of urban air quality. The results show that for the yearly
+excellent-grade air quality days, the total social electricity consumption and
+the investment of waste gas treatment in the socio-economic factors have
+positive linear effects, GDP has a nonlinear effect; the average humidity and
+average wind speed in the climate factors have linear effects. Among the
+geographical factors, only the latitude has a significant influence on the
+annual excellent-grade air quality days, and the relationship is nonlinear. For
+the monthly excellent-grade air quality days, the two influencing factors of the
+socio-economic aspects: the building construction area and the investment of
+waste gas treatment; the average temperature, precipitation, average humidity
+and average wind speed in the climate factors have significant linear effects;
+whether heating are linear and latitude has a significant nonlinear effect on
+monthly excellent-grade air quality days.
 
-**Key Words:** the Number of Excellent-grade Air Quality Days; Generalized Additive Mixed Model; Influencing Factors
+**Key Words:** Number of Excellent-grade Air Quality Days; Generalized Additive Mixed Model; Influencing Factors
 
 # 简介
-随着我国城市化的不断发展，大气污染等环境问题越来越严重，已对我国可持续发展构成严重威胁。
-大气污染治理刻不容缓，为此，我国出台一系列相关政策。2018年，国务院印发《打赢蓝天保卫
-战三年行动计划》的通知，其中指出经过3年努力，要大幅减少主要大气污染物排放总量，明显减少
-严重污染天数，明显改善环境空气质量，明显增强人民的蓝天幸福感。到2020年，地级及以上城市，空
-气质量为优良天数要达到全年比率80%以上。而2017年，全国城市平均优良天数比例仅为78.0%。为顺利
-完成这一目标，需要严格把控，空气质量影响因素研究必不可少。只
-有在把握影响机制的前提下，才能针对性做出大气污染治理及防治措施。故本文重点以全国35个城市空
-气质量为优天数为研究对象，在筛选影响因素的基础上利用广义可加模型进行影响因素分析，可为有关
-部门的空气污染治理和城市化发展提供重要参考价值。
+随着我国城市化的不断发展，大气污染等环境问题越来越严重，已对我国可持续发展构成严
+重威胁。大气污染治理刻不容缓，为此，我国出台一系列相关政策。2018年，国务院印发
+《打赢蓝天保卫战三年行动计划》的通知，其中指出经过3年努力，要大幅减少主要大气污
+染物排放总量，明显减少严重污染天数，明显改善环境空气质量，明显增强人民的蓝天幸福
+感。到2020年，地级及以上城市，空气质量为优良天数要达到全年比率80%以上。而2017年，
+全国城市平均优良天数比例仅为78.0%。为顺利完成这一目标，需要严格把控，空气质量影
+响因素研究必不可少。只有在把握影响机制的前提下，才能针对性做出大气污染治理及防治
+措施。故本文重点以全国35个城市空气质量为优天数为研究对象，在筛选影响因素的基础上
+利用广义可加模型进行影响因素分析，可为有关部门的空气污染治理和城市化发展提供重要
+参考价值。
 
 对空气质量进行研究，已有文献主要集中在以下三类。第一类直接以空气质量指数为研究对象，运用
 时间序列研究方法以及支持向量机、BP神经网络等算法对未来的空气质量指数进行预测[@刘威2013;@闫妍2013;@胡世前2016]。
@@ -117,7 +119,7 @@ nonlinear effect on monthly excellent-grade air quality days.
 为空气质量状况研究提供新的研究方法，并完善空气质量状况的研究体系。
 
 广义加性混合模型（GAMM）是根据 Hastie and Tibshirani (1990) 的思想对 GLMM 
-的可加模型进行推广[@hastie1990]。这种新类型模型使用可加非参数函数
+的可加模型进行推广[@Hastie1990]。这种新类型模型使用可加非参数函数
 来拟合自变量的效应，并通过对可加预测子增加随机效应来应对数据中的过离散化和相
 关性。
 
@@ -140,7 +142,7 @@ $$g(\mu_{i}^{\boldsymbol{b}})=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_
 GAMM可以用于不同的相关数据类型，如纵向数据，分层数据、空间数据等。对于不同的数据
 类型，需要对随机效应$\boldsymbol{b}$设定不同的方差协方差矩阵结构。GAMM 的非参数函数、
 光滑参数和方差成分的估计可以通过已有的统计软件拟合一个 GLMM来得到。关于广义可加
-混合模型的估计和推断更详细的讨论可以参考 Lin，Zhang(1999) 和 Wood(2006)[@Lin1999;@wood2006]。
+混合模型的估计和推断更详细的讨论可以参考 Lin，Zhang(1999) 和 Wood(2006)[@Lin1999;@Wood2006]。
 本文使用R包mgcv进行模型计算。
 
 文章以下部分的结构为：第二部分说明了变量选择和数据来源，给出了数据处理过程；第三
