@@ -1,8 +1,9 @@
 #prepare
 rm(list=ls())
-path=getwd()
+path="c:/Works/Funds/2014年02月19日--2014年社科申请/2019-03-GAMM/";
 setwd(path)
 library(mgcv)
+library(gamm4)
 library("kableExtra")
 tab3 <- read.csv(paste(path,'/report/results/variable.csv',sep=''))
 dat.m <- read.csv(paste(path,"/report/data/monthly.csv",sep=''))
@@ -42,12 +43,12 @@ varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzer
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)] 
 varselname <- as.character(varselname[order(varselname$var_no), 2]) 
 
-glm.m.severe1 <- glm(severe~pop+car 
+glm.m.severe1 <- gam(severe~pop+car 
                    +mean_temp+rain+humid+wind_speed+sun 
                    +heating+coast+lat, 
                    data=dat.sel.m.severe, 
-                   family = binomial) 
-#AIC(glm.m.severe1);BIC(glm.m.severe1) 
+                   family = binomial, method = "REML") 
+AIC(glm.m.severe1);BIC(glm.m.severe1) 
 lm.m.severe.coef <- summary(glm.m.severe1)$coef 
 
 
@@ -56,13 +57,23 @@ dimnames(lm.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "�
 
 ## ----Logistic 混合效应模型 (模型 II),tab-severe-lme-m-model, include=FALSE, results='hide'---------------
 library(mgcv) 
-lme.m.severe <- gamm(severe~pop+car 
+
+
+## lme.m.severe <- gamm(severe~pop+car 
+##                    +mean_temp+rain+humid+wind_speed+sun 
+##                    +heating+coast+lat, 
+##                    data=dat.sel.m.severe, 
+##                    family = binomial,  
+##                    random=list(city=~1), method = "REML")
+
+lme.m.severe <- gamm4(severe~pop+car 
                    +mean_temp+rain+humid+wind_speed+sun 
                    +heating+coast+lat, 
                    data=dat.sel.m.severe, 
                    family = binomial,  
-                   random=list(city=~1), method = "REML") 
-#AIC(lme.m.severe$lme);BIC(lme.m.severe$lme) 
+                   random=~(1|city))
+
+AIC(lme.m.severe$mer);BIC(lme.m.severe$mer) 
 
 lme.m.severe.coef <- summary(lme.m.severe$lme)$tTable[,-3] 
 
@@ -76,10 +87,26 @@ gam.m.severe <- gamm(severe~s(pop)+car
                    +s(mean_temp)+rain+humid+wind_speed+sun 
                    +heating+coast+s(lat), 
                    data=dat.sel.m.severe, 
-                   family = binomial, method = "REML") 
+                   family = binomial, method = "REML")
+
+gam.m.severe2 <- gam(severe~s(pop)+car 
+                   +s(mean_temp)+rain+humid+wind_speed+sun 
+                   +heating+coast+s(lat), 
+                   data=dat.sel.m.severe, 
+                   family = binomial, method = "REML")
+
+
+gam.m.severe <- gamm4(severe~s(pop)+car 
+                   +s(mean_temp)+rain+humid+wind_speed+sun 
+                   +heating+coast+s(lat), 
+                   data=dat.sel.m.severe, 
+                   family = binomial, method = "REML")
 
 gam.m.severe.coef <- summary(gam.m.severe$lme)$tTable[c(1,9,2,10,3:8,11),-3]
-#AIC(gam.m.severe$lme);BIC(gam.m.severe$lme) 
+AIC(gam.m.severe$lme);BIC(gam.m.severe$lme)
+AIC(gam.m.severe2$mer);BIC(gam.m.severe2$mer)
+
+
 dimnames(gam.m.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值")) 
 
 
@@ -113,8 +140,6 @@ plot.gam(gam.m.severe$gam,
 gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe$gam)$s.table[,-2]) 
 
 dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "卡方统计量值", "P值")) 
-
-
 
 ## ---- Logistic 可加混合效应模型 (模型 IV),tab-severe-gamm-m-model, include=FALSE, results='hide'--------------
 
@@ -180,4 +205,4 @@ abic=matrix(c(AIC(glm.m.severe1),BIC(glm.m.severe1),c(rep('',6)),
             dimnames=list(c('AIC','BIC'),colnames(month)))
 month=as.data.frame(rbind(month,abic))
 month[c('常住人口','平均气温','纬度'),c(9,13)] = 'NA'
-#write.csv(month,"./report/results/new_severe_month.csv")
+write.csv(month,"./report/results/new_severe_month.csv")
