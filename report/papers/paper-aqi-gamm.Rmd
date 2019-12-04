@@ -541,13 +541,14 @@ library("kableExtra")
 knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c",'c'),
              caption="月度平均空气质量指数模型汇总表",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F, linesep = "") %>%
+    kable_styling(full_width = T) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
-    kable_styling(full_width = T) %>%
-    column_spec(1, width = c("4.5cm")) %>%
+    column_spec(1, width = c("4.5cm"))%>%
     footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
-             general_title = "注:",footnote_as_chunk = T, escape=F)
+             general_title = "注:",footnote_as_chunk = T
+             )
 
 ```
 
