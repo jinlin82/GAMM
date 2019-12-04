@@ -1,6 +1,6 @@
 ---
 title: "基于广义可加混合模型空气严重污染影响因素研究"
-author: '金林&nbsp; 李研&nbsp; 王红红'
+author: '金林&nbsp; 王红红&nbsp; 李研'
 date: '（中南财经政法大学&nbsp; 统计与数学学院，湖北&nbsp; 武汉 430073）'
 output:
   bookdown::pdf_document2:
@@ -26,7 +26,7 @@ output:
     md_extensions: +east_asian_line_breaks
     pandoc_args: ["--filter", "pandoc-crossref"]
 css: ../style/markdown.css
-bibliography: ../Bibfile.bib
+bibliography: ./Bibfile.bib
 eqnPrefixTemplate: ($$i$$)
 link-citations: yes
 linkReferences: yes
@@ -120,7 +120,7 @@ pollution days.
 空气质量状况研究提供新的视角和研究方法。
 
 广义加性混合模型（GAMM）可以用于不同的相关数据类型，如纵向数据，分层数据、空间数据等，
-为涉及横截面，纵向和空间数据现实复杂情况下的回归分析提供了广泛而灵活的框架[@zeger1994;@Zhang1998;@lin1996;@cressie1993;@Breslow1993]。
+为涉及横截面，纵向和空间数据现实复杂情况下的回归分析提供了广泛而灵活的框架[@Zeger1994;@Zhang1998;@Lin1996;@Cressie1993;@Breslow1993]。
 此类模型将未知的度量自变量，时间尺度和空间自变量的光滑函数以及随机效应添加到预测
 子的一般线性固定效应部分，是 GLMM 可加模型的推广[@Hastie1990]。
 
@@ -291,280 +291,6 @@ mapply(function(i, y) {
 模型，最后综合考虑城市之间的相关性及自变量的非线性影响，建立泊松可加混合模型进行相应分析。
 最后在这些可选模型中通过综合比较模型拟合优度，模型实际意义等确定年度空气污染天数最优模型。
 表 \@ref(tab:tab-severe-y-huizong) 给出了以上四个模型的汇总结果。
-
-<!-- ### 年度空气严重污染天数泊松回归模型 -->
-
-<!-- 作为比较的基准，利用筛选出的10个变量首先建立泊松回归模型,结果见表 \@ref(tab:tab-severe-y-huizong)。在10%的显著性水平下，虽然只有降水 -->
-<!-- 量和纬度两个变量未通过显著性检验，但建成区绿化覆盖率和临海地区两个变量的符号与实际意义不符， -->
-<!-- 其对应系数为0.0312和1.5828。也就是说，在其他变量保持不变的条件下，建成区绿化覆盖率越高，空 -->
-<!-- 气质量越差；临海地区的空气严重污染天数平均比内陆地区多1.5828天。但实际情况是建成区绿化覆盖 -->
-<!-- 率越多，空气质量应该越好，临海地区比非临海地区的空气质量好。 -->
-
-<!-- ```{r tab-severe-lm-y, include=FALSE, results='markup'} -->
-<!-- varlist <- read.csv("../data/var_list.csv") -->
-<!-- dat.sel.y.severe <- read.csv("../results/dat.sel.y.severe.csv") -->
-
-<!-- varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)] -->
-<!-- varinfo <- varinfo[order(varinfo$var_no), ] -->
-<!-- varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 18, "nonzero")[[1]]]), -->
-<!--             "heating", "coast") -->
-<!-- varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)] -->
-<!-- varselname <- as.character(varselname[order(varselname$var_no), 2]) -->
-
-<!-- glm.y.severe1 <- glm(dat.sel.y.severe[, c("severe", varsel)], family = "poisson") -->
-<!-- lm.y.severe.coef <- summary(glm.y.severe1)$coef -->
-<!-- #glm.y.severe1$aic -->
-<!-- #BIC(glm.y.severe1) -->
-
-<!-- dimnames(lm.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值")) -->
-<!-- #write.csv(lm.y.severe.coef,"C:/Users/Administrator/Desktop/lm.y.severe.coef.csv") -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(lm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"), -->
-<!--              caption="年度空气严重污染天数泊松回归模型回归系数表",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm")) -->
-<!-- ``` -->
-
-
-<!-- ### 年度空气严重污染天数泊松混合效应模型 -->
-
-<!-- 将城市作为随机效应建立泊松混合效应模型，对年度空气质量严重污染天数影响因素进行分 -->
-<!-- 析。结果显示在10%的显著性水平下，常住人口、降水量、平均风速、日照时数、纬度通过显著性检 -->
-<!-- 验，且其系数分别为0.0606、-0.0009、-0.7571、-0.0013、0.1575。表明在其他变量保持不变的条件 -->
-<!-- 下，常住人口越多、纬度越高，年度严重污染的天数越多，空气质量越差；而降水量越多、平均风速 -->
-<!-- 越大、日照时数越多，年度空气严重污染的天数越少，空气质量越好。 -->
-
-<!-- ```{r tab-severe-lme-y-model, include=FALSE, results='hide'} -->
-
-<!-- library(mgcv) -->
-<!-- lme.y.severe <- gamm(severe~green+pop+car -->
-<!--                     +rain+humid+wind_speed+sun -->
-<!--                    +heating+coast+lat, -->
-<!--                    random=list(city=~1), data=dat.sel.y.severe, -->
-<!--                    family="poisson", method = "REML") -->
-<!-- ``` -->
-
-<!-- ```{r tab-severe-lme-y, include=FALSE, results='markup'} -->
-<!-- lme.y.severe.coef <- summary(lme.y.severe$lme)$tTable[,-3] -->
-<!-- #lme.y.severe$lme$logLik -->
-<!-- #AIC(lme.y.severe$lme);BIC(lme.y.severe$lme) -->
-<!-- dimnames(lme.y.severe.coef) <- list(c("截距项", varselname), c("估计值", "标准误", "t值", "P值")) -->
-<!-- #write.csv(lme.y.severe.coef,"C:/Users/Administrator/Desktop/lme.y.severe.coef.csv") -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(lme.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"), -->
-<!--              caption="年度空气严重污染天数泊松混合效应模型回归固定效应表",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm")) -->
-
-<!-- ``` -->
-
-<!-- ### 年度空气严重污染天数泊松可加模型 -->
-
-<!-- 由之前变量筛选的结果可知，常住人口、建成区绿化覆盖率、平均风速、日照时数与年度空气严重污 -->
-<!-- 染天数之间存在非线性相关关系。进一步建立泊松可加模型，模型参数部分显示降水量和是否临海，纬度 -->
-<!-- 三个变量通过了10%的显著性检验，其中纬度对空气质量出现严重污染有正向作用，纬度越高，空气质量 -->
-<!-- 越差；而降水量越多、临海的地区，年度空气严重污染天数越少，空气质量越好，详细结果见表 \@ref(tab:tab-severe-y-huizong)。非参数项的曲线显示在 -->
-<!-- 图\@ref(fig:fig-severe-gam-y)中，非参数项显著性检验结果在表\@ref(tab:tab-severe-gam-y-smooth -->
-<!-- ) 中。 -->
-
-<!-- ```{r tab-severe-gam-y, include=FALSE, results='markup'} -->
-
-<!-- library(mgcv) -->
-<!-- gam.y.severe <- gamm(severe~s(pop)+s(green)+car -->
-<!--                     +rain+humid+s(wind_speed)+s(sun) -->
-<!--                    +heating+coast+lat, -->
-<!--                    data=dat.sel.y.severe, -->
-<!--                    family = "poisson", method = "REML") -->
-<!-- AIC(gam.y.severe$lme);BIC(gam.y.severe$lme) -->
-<!-- #summary(gam.y.severe) -->
-<!-- #gam与gamm的运算结果系数略有差异，最终结果以gamm为主 -->
-<!-- gam.y.severe.coef <- summary(gam.y.severe$lme)$tTable[-(8:11),-3] -->
-
-<!-- dimnames(gam.y.severe.coef) <- list(c("截距项", varselname[c(3:5,8:10)]), c("估计值", "标准误", "t值", "P值")) -->
-<!-- #write.csv(gam.y.severe.coef,"C:/Users/Administrator/Desktop/gam.y.severe.coef.csv") -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(gam.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"), -->
-<!--              caption="年度空气严重污染天数泊松可加回归模型参数估计结果",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm")) -->
-
-<!-- ``` -->
-
-
-<!-- ```{r fig-severe-gam-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加回归模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")} -->
-<!-- par(mfrow = c(2,2)) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gam.y.severe$gam, -->
-<!--          select=1, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "人口数" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gam.y.severe$gam, -->
-<!--          select=2, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "绿化率" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gam.y.severe$gam, -->
-<!--          select=3, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "平均风速" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gam.y.severe$gam, -->
-<!--          select=4, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "日照时数" -->
-<!--          ) -->
-
-<!-- ``` -->
-
-<!-- ```{r tab-severe-gam-y-smooth, eval=T, results='markup'} -->
-<!-- gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe$gam)$s.table[,-2]) -->
-
-<!-- dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)], c("经验自由度", "卡方统计量值", "P值")) -->
-
-<!-- library("kableExtra") -->
-<!-- knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"), -->
-<!--              caption="年度空气严重污染天数泊松可加模型非参数项显著性",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm")) -->
-
-<!-- ``` -->
-
-<!-- 图 \@ref(fig:fig-severe-gam-y) 中显示了常住人口、建成区绿化覆盖率、平均风速、日 -->
-<!-- 照时数的拟合曲线，阴影部分表示95%的置信区间。同时由表 -->
-<!-- \@ref(tab:tab-severe-gam-y-smooth) 可知，在10%的显著性水平下，常住人口、建成区绿 -->
-<!-- 化覆盖率、平均风速、日照时数均通过显著性检验，表明常住人口、建成区绿化覆盖率、平 -->
-<!-- 均风速、日照时数对年度空气严重污染天数存在非线性影响。由图 -->
-<!-- \@ref(fig:fig-severe-gam-y) 可以发现，年度空气严重污染的天数随常住人口的增加呈现 -->
-<!-- 先上升后下降的趋势，具体来讲，在常住人口在2000万人之后，年度空气严重污染的天数会 -->
-<!-- 下降；同时，年度空气严重污染天数随建成区绿化覆盖率的增加而有所增加，随平均风速的 -->
-<!-- 增加而有所减小，随日照时数的增加呈先增加后下降的平缓趋势。 -->
-
-<!-- ### 年度空气严重污染天数泊松可加混合效应模型 -->
-
-<!-- 同样以城市作为随机效应，进一步建立泊松可加混合效应模型，模型估计结果中的参数部分与泊松可加 -->
-<!-- 模型中的结果相似，具体见表 \@ref(tab:tab-severe-y-huizong)。只是纬度对空气出现严重污染的影响由正向作用变为负向作用。在泊松可加混合效 -->
-<!-- 应模型中，结果表明，纬度越高，空气质量越好。非参数项的曲线显示在图 -->
-<!-- \@ref(fig:fig-severe-gamm-y)中，非参数项显著性检验结果在表 -->
-<!-- \@ref(tab:tab-severe-gamm-y-smooth) 中。 -->
-
-<!-- ```{r tab-severe-gamm-y-model, include=FALSE, results='hide'} -->
-
-<!-- library(mgcv) -->
-<!-- gamm.y.severe <- gamm(severe~s(green)+s(pop)+car -->
-<!--                     +rain+humid+s(wind_speed)+s(sun) -->
-<!--                   +heating+coast+lat, -->
-<!--                    random=list(city=~1), data=dat.sel.y.severe, -->
-<!--                    family = "poisson", method = "REML") -->
-<!-- #AIC(gamm.y.severe$lme);BIC(gamm.y.severe$lme) -->
-
-<!-- ``` -->
-
-<!-- ```{r tab-severe-gamm-y, include=FALSE, results='markup'} -->
-<!-- gamm.y.severe.coef <- summary(gamm.y.severe$lme)$tTable[-(8:11),-3] -->
-
-<!-- dimnames(gamm.y.severe.coef) <- list(c("截距项", varselname[c(3:5, 8:10)]), c("估计值", "标准误", "t值", "P值")) -->
-<!-- #write.csv(gamm.y.severe.coef,"C:/Users/Administrator/Desktop/gamm.y.severe.coef.csv") -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(gamm.y.severe.coef, row.names =T, align = c("r", "r", "r", "r"), -->
-<!--              caption="年度空气严重污染天数泊松可加混合效应模型回归固定效应表",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm")) -->
-
-<!-- ``` -->
-
-<!-- 图 \@ref(fig:fig-severe-gamm-y) 显示了泊松可加混合效应模型的非参数曲线，其非参数 -->
-<!-- 项为常住人口、建成区绿化覆盖率、平均风速、日照时数，且由表 -->
-<!-- \@ref(tab:tab-severe-gamm-y-smooth) 的非参数项显著性检验可知，在10%的显著性水平 -->
-<!-- 下，常住人口、建成区绿化覆盖率、平均风速、日照时数均通过显著性检验，表明常住人口、 -->
-<!-- 建成区绿化覆盖率、平均风速、日照时数对年度空气严重污染天数存在非线性影响。且从图 -->
-<!-- \@ref(fig:fig-severe-gamm-y) 可以看出，年度空气严重污染天数随常住人口的增加而增 -->
-<!-- 加，随平均风速、日照时数的增加而减少，随建成区绿化覆盖率的增加呈先增加后下降的趋 -->
-<!-- 势。 -->
-
-<!-- ```{r fig-severe-gamm-y, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")} -->
-<!-- par(mfrow = c(2,2)) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gamm.y.severe$gam, -->
-<!--          select=1, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "人口数" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gamm.y.severe$gam, -->
-<!--          select=2, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "绿化率" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gamm.y.severe$gam, -->
-<!--          select=3, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "平均风速" -->
-<!--          ) -->
-<!-- par(mar=c(5,4,2,1)) -->
-<!-- plot.gam(gamm.y.severe$gam, -->
-<!--          select=4, -->
-<!--          col="blue", -->
-<!--          shade=T, -->
-<!--          shade.col="grey", -->
-<!--          ylab="severe",xlab = "日照时数" -->
-<!--          ) -->
-
-<!-- ``` -->
-
-<!-- ```{r tab-severe-gamm-y-smooth, eval=T, results='markup'}  -->
-<!-- gamm.smooth.tab.y.severe <- as.data.frame(summary(gamm.y.severe$gam)$s.table[,-2])  -->
-
-<!-- dimnames(gamm.smooth.tab.y.severe) <- list(varselname[c(1,2,6,7)],c("经验自由度", "F统计量值", "P值"))  -->
-
-<!-- library("kableExtra")  -->
-<!-- knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),  -->
-<!--              caption="年度空气严重污染天数泊松可加混合模型非参数项显著性",digits = 4,  -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F) %>%  -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),  -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),  -->
-<!--                   repeat_header_text = "(续)")%>%  -->
-<!--     kable_styling(full_width = T) %>%  -->
-<!--     column_spec(1, width = c("4.5cm"))  -->
-<!-- ```  -->
 
 ```{r tab-severe-y-huizong, eval=T, results='markup'}
 yearly=read.csv("../results/yearly.csv")
@@ -847,6 +573,7 @@ varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzer
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
 #library(mgcv)
+library(gamm4)
 gam.m.severe.best <- gamm4(severe~s(pop)
                    +s(mean_temp)+rain+humid+wind_speed+sun
                    +s(lat),
@@ -912,10 +639,10 @@ knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"
     column_spec(1, width = c("4.5cm"))
 ```
 
-由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，参数部分的降水量、平均相对湿度、
-平均风速、日照时数、均通过显著性检验，表明在
-其他条件不变的情况下，降水量越大、平均相对湿度越大、平均风速
-越大、日照时数越长，月度出现严重污染的概率越小。
+由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，参数部分的降水
+量、平均相对湿度、平均风速、日照时数、均通过显著性检验，表明在其他条件不变的情况
+下，降水量越大、平均相对湿度越大、平均风速越大、日照时数越长，月度出现严重污染的
+概率越小。
 
 图 \@ref(fig:fig-severe-gam-m-best) 展示了常住人口数、平均气温、纬度与月度是否出
 现空气严重污染的非参数关系曲线，且从表 \@ref(tab:tab-severe-gam-m-smooth-best)
@@ -935,26 +662,27 @@ knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"
 
 # 结论
 
-本文从空气污染可能出现的最坏情况，也是空气质量的最低等级：空气严重污染的角度，
-对35个城市年度空气严重污染天数建立泊松可加混合模型框架下的各种模型，对月度是否出现
+本文从空气污染可能出现的最坏情况，也是空气质量的最低等级：空气严重污染的角度，对
+35个城市年度空气严重污染天数建立泊松可加混合模型框架下的各种模型，对月度是否出现
 空气严重污染建立Logistic可加混合模型框架下的各种模型，并通过模型拟合优度指标及模
-型实际意义等方面综合选取了最优模型。在建立模型过程中，使用了Lasso方法进行自
-变量筛选及以决定其进入模型的形式。
+型实际意义等方面综合选取了最优模型。在建立模型过程中，使用了Lasso方法进行自变量
+筛选及以决定其进入模型的形式。
 
-对于年度空气严重污染天数，社会经济影响因素中的建成区绿化覆盖率是影响天数多少的主要因素，
-并且这个影响是非线性的，总体而言，年度空气严重污染天数是随着建成区绿化覆盖率的增加而逐
-渐增加，这很可能是是因为先污染后治理模式的存在。人们预先意识不到污染的严重性，只是在空
-气质量变差以后才加强环境治理，于是造成空气质量污染越严重，绿化率越高的情况。气候因素中
-的降水量、平均风速、日照时数对年度空气严重污染天数有显著影响，并且降水量是负的线性影响，
-平均风速和日照时数是非线性影响。地理因素中仅有纬度对年度空气严重污染天数有显著性线性影响。
+对于年度空气严重污染天数，社会经济影响因素中的建成区绿化覆盖率是影响天数多少的主
+要因素，并且这个影响是非线性的，总体而言，年度空气严重污染天数是随着建成区绿化覆
+盖率的增加而逐渐增加，这很可能是是因为先污染后治理模式的存在。人们预先意识不到污
+染的严重性，只是在空气质量变差以后才加强环境治理，于是造成空气质量污染越严重，绿
+化率越高的情况。气候因素中的降水量、平均风速、日照时数对年度空气严重污染天数有显
+著影响，并且降水量是负的线性影响，平均风速和日照时数是非线性影响。地理因素中仅有
+纬度对年度空气严重污染天数有显著性线性影响。
 
-对于月度是否出现空气严重污染，社会经济影响因素主要有常住人口数，其与月度是否出现空气严重
-污染概率之间具有非线性关系；气候因素中的平均气温，降水量，平均相对湿度，平均风速和日照时
-数对月度是否出现空气严重污染的概率局有显著性影响，这5个气候因素中，除平均温度是负的非线
-性影响外，其余是负向线性影响。地理因素中只有纬度变量对月度是否出现空气严重污染有显著性影
-响，并且这个影响是线性的。通过比较年度空气严重污染天数和月度是否出现空气严重污染之间的影
-响因素，我们发现二者并不完成重合。这可能是由于年度空气质量严重污染天数相比月度空气质量严
-重污染天数更具稳定性。
+对于月度是否出现空气严重污染，社会经济影响因素主要有常住人口数，其与月度是否出现
+空气严重污染概率之间具有非线性关系；气候因素中的平均气温，降水量，平均相对湿度，
+平均风速和日照时数对月度是否出现空气严重污染的概率局有显著性影响，这5个气候因素
+中，除平均温度是负的非线性影响外，其余是负向线性影响。地理因素中只有纬度变量对月
+度是否出现空气严重污染有显著性影响，并且这个影响是线性的。通过比较年度空气严重污
+染天数和月度是否出现空气严重污染之间的影响因素，我们发现二者并不完成重合。这可能
+是由于年度空气质量严重污染天数相比月度空气质量严重污染天数更具稳定性。
 
 # 参考文献 {-}
 [//]: # (\bibliography{Bibfile})
