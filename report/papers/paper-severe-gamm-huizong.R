@@ -192,7 +192,6 @@ gamm.smooth.tab.m.severe <- as.data.frame(summary(gamm.m.severe$gam)$s.table[,-2
 dimnames(gamm.smooth.tab.m.severe) <- list(varselname[c(1,3,10)],c("经验自由度", "F统计量值", "P值")) 
 
 
-
 ## ----四个模型汇总，tab-severe-m-huizong, eval=T, results='markup'----------------------
 
 month=as.data.frame(cbind(lm.m.severe.coef,lme.m.severe.coef,gam.m.severe.coef,gamm.m.severe.coef))
@@ -205,4 +204,4 @@ abic=matrix(c(AIC(glm.m.severe1),BIC(glm.m.severe1),c(rep('',6)),
             dimnames=list(c('AIC','BIC'),colnames(month)))
 month=as.data.frame(rbind(month,abic))
 month[c('常住人口','平均气温','纬度'),c(9,13)] = 'NA'
-write.csv(month,"./report/results/new_severe_month.csv")
+#write.csv(month,"./report/results/new_severe_month.csv")

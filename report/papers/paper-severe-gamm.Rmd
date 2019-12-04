@@ -85,7 +85,7 @@ the geographical factors, only the latitude has a significant influence on the m
 pollution days.
 
 
-**Key Words:** Number of Severe Air Pollution Days; Generalized Additive Mixed Model; Influencing Factors
+**Key Words:** the Number of Severe Air Pollution Days; Generalized Additive Mixed Model; Influencing Factors
 
 # 简介
 
@@ -306,7 +306,7 @@ knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
              general_title = "注:",footnote_as_chunk = T)
 
 ```
@@ -423,11 +423,12 @@ knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c
 日照时数对年度空气严重污染天数有非线性影响。且从图
 \@ref(fig:fig-severe-gamm-y-best) 中可以看出，年度空气严重污染天数随日
 照时数和平均风速的增加呈下降的趋势。
+
 # 月度是否出现空气严重污染影响因素研究
 
 利用2014年-2017年35城市每一天的AQI值，根据每一天的AQI值和空气质量指数等级划分标
 准，可以计算得到2014年-2017年35城市的月度是否出现空气严重污染，把出现空气严重污
-染记为1，否则记为0。根据第\@ref(sec:dep-dist)节中对因变量分布的分析，这个变量服
+染记为1，否则记为0。根据前面部分对因变量分布的分析，这个变量服
 从两点分布。下面就以这个服从两点分布的变量作为因变量开展分析，首先利用Lasso方法
 进行自变量筛选，然后建立Logistic可加混合模型框架下的各种具体模型并进行模型比较和
 最优模型选择。
@@ -508,14 +509,12 @@ four[c(seq(3,33,3))]=month[2:12,13]
 
 sign=function(x){
   for(i in c(seq(3,33,3))) {
-    if(x[i]<0.001){
-      x[i-2]=paste(x[i-2],'***',sep = '')
-   }else if(x[i]<0.01){
-     x[i-2]=paste(x[i-2],'**',sep = '')
+   if(x[i]<0.01){
+     x[i-2]=paste(x[i-2],'***',sep = '')
    }else if(0.01<x[i]&x[i]<0.05){
-      x[i-2]=paste(x[i-2],'*',sep = '')
+      x[i-2]=paste(x[i-2],'**',sep = '')
    }else if(0.05<x[i]&x[i]<0.1){
-       x[i-2]=paste(x[i-2],'.',sep = '')
+       x[i-2]=paste(x[i-2],'*',sep = '')
    }
   }
   return(x)
@@ -526,7 +525,7 @@ month..[c(4,10,31),3:4]='-'
 month..[1:33,]=apply(month..[1:33,],2,sign)
 month..[c(seq(2,32,3)),]=apply(month..[c(seq(2,32,3)),],2,function(x) {paste('(',x,')',sep='')})
 rowname=vector();rowname[c(seq(1,21,2),23,24)]=as.character(month[2:14,1]);rowname[seq(2,22,2)]=''
-month=as.data.frame(cbind(rowname,month..))
+month=as.data.frame(cbind(rowname,month..[-c(seq(3,33,3)),]))
 colnames(month)=c('变量','模型I','模型II','模型III','模型IV')
 library("kableExtra")
 knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"),
@@ -537,7 +536,7 @@ knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
              general_title = "注:",
              footnote_as_chunk = T)
 

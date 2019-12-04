@@ -84,7 +84,7 @@ and average wind speed in the climate factors have significant linear effects;
 whether heating are linear and latitude has a significant nonlinear effect on
 monthly excellent-grade air quality days.
 
-**Key Words:** Number of Excellent-grade Air Quality Days; Generalized Additive Mixed Model; Influencing Factors
+**Key Words:** the Number of Excellent-grade Air Quality Days; Generalized Additive Mixed Model; Influencing Factors
 
 # 简介
 随着我国城市化的不断发展，大气污染等环境问题越来越严重，已对我国可持续发展构成严
@@ -315,9 +315,8 @@ knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm")) %>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
-             general_title = "注:",footnote_as_chunk = T
-             )
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
+             general_title = "注:",footnote_as_chunk = T)
 ```
 
 根据表 \@ref(tab:tab-excel-y-huizong) 可知，在线性回归模型(模型I)中，显著的变量有废气
@@ -527,7 +526,7 @@ knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c"),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
              general_title = "注:",
              footnote_as_chunk = T)
 

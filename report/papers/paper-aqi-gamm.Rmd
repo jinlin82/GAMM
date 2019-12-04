@@ -312,7 +312,7 @@ knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
                   repeat_header_text = "(续)")%>%
     column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05,.表示p<0.1",
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
              general_title = "注:",footnote_as_chunk = T
              )
 
@@ -546,7 +546,7 @@ knitr::kable(monthly, row.names =F, align = c("l", "c", "c", "c",'c'),
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm")) %>%
-    footnote(general ="数字后面的***表示p<0.001,**表示p<0.01,*表示p<0.05, .表示p<0.1",
+    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
              general_title = "注:",footnote_as_chunk = T, escape=F)
 
 ```
