@@ -52,32 +52,34 @@ Sys.setlocale("LC_ALL", "Chinese")
 ```
 
 **摘要：**本文以2014-2017年中国重点监测的35个城市的年度空气质量严重污染天数和月
-度空气质量严重污染天数为研究对象，利用广义可加混合模型对城市空气质量的影响因素进
-行研究。结果显示，对于年度空气严重污染天数，社会经济影响因素中的建成区绿化覆盖率
-是影响天数多少的主要因素，并且这个影响是非线性的，气候因素中的降水量、平均风速、
-日照时数对年度空气严重污染天数有显著影响，并且降水量是负的线性影响，平均风速和日
-照时数是非线性影响。地理因素中仅有纬度对年度空气严重污染天数有显著性线性影响。对
-于月度是否出现空气严重污染，社会经济影响因素主要有常住人口数，其与因变量之间具有
-非线性关系；气候因素中的平均气温，降水量，平均相对湿度，平均风速和日照时数对月度
-是否出现空气严重污染的概率局有显著性影响，这5个气候因素中，除平均温度是负的非线
-性影响外，其余是负向线性影响。地理因素中只有纬度变量对月度是否出现空气严重污染有
-显著的线性影响。
+度空气质量严重污染天数为研究对象，分别构建泊松和Logistic可加模型对城市空气质量的
+影响因素进行研究。结果显示，对于年度空气严重污染天数，社会经济影响因素中的常住人
+口数是影响天数多少的主要因素，并且这个影响是非线性的。气候因素中的降水量和平均风
+速对年度空气严重污染天数有负向线性影响，而日照时数有非线性影响。地理因素中的是否
+供暖，是否临海和纬度均对年度空气严重污染天数有显著性线性影响。对于月度是否出现空
+气严重污染，社会经济影响因素主要有常住人口数，其与月度是否出现空气严重污染概率之
+间具有非线性关系；气候因素中的平均气温，降水量，平均相对湿度，平均风速和日照时数
+对月度是否出现空气严重污染的概率有显著性影响，这5个气候因素中，除平均温度是负的非
+线性影响外，其余是负向线性影响。地理因素中只有纬度变量对月度是否出现空气严重污染
+有显著性影响，并且这个影响是非线性的。
 
-**关键词：** 空气质量严重污染天数； 广义可加混合模型； 影响因素
+
+
+**关键词：** 空气质量严重污染天数； 泊松可加模型； logistic可加模型； 影响因素
 
 **中图分类号：** C811 	**文献标识码：**A
 
-**Analysis of Influencing Factors of Severe Air Pollution Based on Generalized Additive Mixing Model**
+**Analysis of Influencing Factors of Severe Air Pollution Based on Poisson and Logistic Additive Mixing Model**
 
 **Abstract:**This paper takes the number of severe air pollution days in 35
-cities monitored in China from 2014 to 2017 as the research object, and uses the
-generalized additive mixed model to study the influencing factors of urban air
-quality. The results show that for the yearly severe air pollution days, the
-greening rate in the socio-economic factors has a nonlinear effect;
+cities monitored in China from 2014 to 2017 as the research object, and 
+constructs Poisson and Logistic additive models to study the influencing 
+factors of urban air quality.The results show that for the yearly severe air pollution days, the
+population in the socio-economic factors has a nonlinear effect;
 precipitation,average wind speed and sunshine hours in the climate factors have
-significant effects. Among the geographical factors, only the latitude has a
-significant influence on the annual severe air pollution days, and the
-relationship is nonlinear. For the monthly severe air pollution days, the factor
+significant effects. Among the geographical factors, whether near the sea, whether 
+heating the latitude has a significant influence on the annual severe air pollution 
+days. For the monthly severe air pollution days, the factor
 of the socio-economic aspects is population; the average temperature,
 precipitation, average humidity and average wind speed and sunshine hours in the
 climate factors have significant effects;Among the geographical factors, only
@@ -85,7 +87,7 @@ the latitude has a significant influence on the monthly severe air pollution
 days.
 
 
-**Key Words:** the Number of Severe Air Pollution Days; Generalized Additive Mixed Model; Influencing Factors
+**Key Words:** the Number of Severe Air Pollution Days; Poisson Additive Mixing Modeld; Logistic Additive Mixed Model; Influencing Factors
 
 # 简介
 
@@ -101,54 +103,50 @@ days.
 加混合模型对空气严重污染天数进行影响因素探究，既可完善相关科学理论，也可为有关环
 境治理措施的制定及实施提供借鉴意义。
 
-在进行空气质量污染研究时，学者们根据使用的方法得出不同的结论。部分学者利用空间分
-析方法得出不同时空特征下，空气质量污染的影响因素存在地理和季节上的差异[@陈卫卫2019;@李惠娟2018],
-影响因素的影响方向和影响程度也随时间变化[@郭一鸣2019]。部分学者以大气污染物代表空
-气污染作为研究对象，利用灰色关联分析法探讨空气污染影响因素[@王超2019;@王乐2019]。
-罗静利用负二项回归的方法得出人口因素、气象因素以及季节效应的发生等因素对空气质量污
-染程度有显著影响[@罗静2017]。另外，学者们利用环境库兹涅茨曲线模型、面板分析方法、结
-构方程模型等方法研究城市化进程、产业结构、人口因素等社会经济因素对空气质量污染的影
-响[@李健2019;@李斌2014;@王立平2016;@李静萍2017;@吴雪萍2018]。
+对空气质量污染情况及其影响因素的研究一直是众多学者的关注重点。根据研究内容所使用
+方法主要可分为三类。第一类：长久以来，人们普遍认为经济的快速增长是环境空气污染的
+重要原因。故有很多文献基于环境经济学的理论，通过环境库兹涅茨曲线集中研究经济因素
+对空气污染的影响[@李健2019;@李斌2014;@王立平2016；@吴雪萍2018]。虽然结论略有差异，
+但可能是由于所构建模型不同、数据的随机性或者指标选取不同的原因造成的，并且学者们一致
+认为经济增长与空气污染这两方面存在显著的相关关系。第二类：有学者立足于空气污染的时
+空分布特征，研究不同时间段不同地区引起空气污染的主要因素[@陈卫卫2019;@郭一鸣2019]。
+所使用方法多为统计学中的相关分析、线性回归等参数方法，但考虑的影响因素不再局限于
+经济因素，加入了社会因素和气象因素以及季节效应[@王乐2019;@李惠娟2018]。第三类：由
+于线性回归的局限性，部分学者利用灰色关联的方法，对空气污染排放物与社会经济因素之
+间的相关关系进行探究[@王超2019;@王乐2019]。
+
 
 基于以上文献分析，可以发现：第一、在考虑空气质量的影响因素时，很少有研究综合考虑地理
-因素、社会经济因素、气象因素三方面的内容。第二，在分析空气质量影响因素时，影响因素对
-空气质量的影响存在时空上的变化，但当前使用的方法很少有同时考虑影响因素对空气质量的线
-性效应和非线性效应,且未将不同城市间影响因素对于空气质量的影响设置为随机效应,也即城市
-间可能存在随机效应。因此，本文选取2014-2017年中国重点监测的35个城市的年度数据和月度
-数据，综合考虑社会经济因素，气象因素和地理因素三方面的影响，分别以年度城市空气出现严
-重污染的天数和月度城市是否会出现严重污染为因变量建立广义可加混合模型进行相应研究，为
-空气质量状况研究提供新的视角和研究方法。
+因素、社会经济因素、气象因素三方面的内容。第二，在分析影响因素与空气质量的关系时，大
+多都是采用提前设定的参数模型，很少有同时考虑影响因素对空气质量的线性效应和非线性效应。
+这很可能造成模型的设定错误从而带来设计误差。而广义可加模型能够有效的拟合变量间的非线
+性关系，因此，本文选取2014-2017年中国重点监测的35个城市的年度数据和月度数据，综合考虑
+社会经济因素，气象因素和地理因素三方面的影响，分别以年度城市空气出现严重污染的天数和
+月度城市是否会出现严重污染为因变量建立广义可加模型进行相应研究，为空气质量状况研究提
+供新的视角和研究方法。
 
-广义加性混合模型（GAMM）可以用于不同的相关数据类型，如纵向数据，分层数据、空间数据等，
-为涉及横截面，纵向和空间数据现实复杂情况下的回归分析提供了广泛而灵活的框架[@Zeger1994;@Zhang1998;@Lin1996;@Cressie1993;@Breslow1993]。
-此类模型将未知的度量自变量，时间尺度和空间自变量的光滑函数以及随机效应添加到预测
-子的一般线性固定效应部分，是 GLMM 可加模型的推广[@Hastie1990]。
+尽管广义线性模型(GLM)的连接函数可以使模型具有非线性，但其基本函数形式仍然是线性的。如
+果真实模型是变量的非线性形式，则这个非线性必须在基本函数部分建模，连接函数对于自变量的
+非线性无能为力。这时，使用广义可加模型（GAM），通过引入自变量的光滑函数可以有效处理自
+变量的非线性。下面给出广义可加模型的具体形式：
 
-假设$n$个个体的第$i$个观测值的因变量$y_{i}$条件独立，并且期望
-为$\mathbb{E}(y_{i}|\boldsymbol{b})=\mu_{i}^{\boldsymbol{b}}$，方差为
-$\text{var}(y_{i}|\boldsymbol{b})=\phi m_{i}^{-1}v(\mu_{i}^{\boldsymbol{b}})$，其中
-$v(\cdot)$是设定的方差函数，$m_{i}$是权重，$\phi$是尺度参数。那么广义
-可加混合模型为 
-$$g(\mu_{i}^{\boldsymbol{b}})=\boldsymbol{X_{i}\beta} + f_{1}(x_{1i}) + f_{2}(x_{2i})
-  + \cdots + \boldsymbol{Z_{i}b},$${#eq:121-1-1}
+$$g(\mu_{i})=\bm{X\beta}+f_{1}(x_{1i}) + f_{2}(x_{2i}) + \cdots $${#eq:semipara-gam} 
+其中
+$$\mu_{i} = \mathbb{E}(Y_{i}),\text{并且~} Y_{i}
+  \overset{\text{i.i.d}}{\sim} \text{~指数分布簇中某一分布.}$$
+  
+其中$g(\mu_{i})$ 是联接函数，为任意单调可微函数，$Y_{i}$是因变量，$\bm X$是设计矩阵，
+$\bm \beta$是对应的参数向量，$f_{j}(\cdot)$是自变量$x_{k}$的光滑函数。
 
-其中 $g(\cdot)$ 是联接函数， $\mu_{i}^{\boldsymbol{b}}$ 是 $y$ 的条件期望，
-$\boldsymbol{\beta}$ 是固定效应参数向量， $\boldsymbol{X_{i}}$ 是固定效应设计矩
-阵，$f_{j}$ 是自变量 $x_{k}$ 的光滑函数， $\boldsymbol{Z_{i}}$ 是随机效应的设计
-矩阵，$\boldsymbol{b \sim \mathcal{N} (0, \Psi)}$ 是随机效应变量，其中方差协方差
-阵$\boldsymbol{\Psi}$ 一般未知而需要估计。
-
-在模型中，线性预测子和非参数函数共同来拟合自变量的固定效应，而随机效应用来拟合观
-测值之间的相关关系。随机效应 $\boldsymbol{b}$ 的方差协方差矩阵结构需根据数据类型
-提前设定。当光滑函数 $f(\cdot)$ 都为线性函数时，那么此时GAMM就变化为GLMM。GAMM的
-计算强度较大，Lin，Zhang(1999)使用光滑样条来估计非参数函数，使用边际拟似然同时给
-出光滑参数和方差成分的估计[@Lin1999]。本文使用R包mgcv和gamm4进行模型计算。
+GAM模型的估计可使用迭代再加权最小二乘法IRLS[@hardin2007;@wood2006],可使用backfitting
+算法或Newton-Raphson方法来估计GAM中系统部分的光滑函数,具体可参考[@ruppert2003]。本文
+使用R包mgcv进行模型计算。
 
 文章以下部分的结构为：第二部分说明了变量选择和数据来源，给出了数据处理过程；第三
-部分在使用Lasso方法选择自变量的基础上，以年度城市空气出现严重污染的天数为因变量
-建立了广义可加混合模型的几种具体模型，通过模型比较给出了最优模型并进行解释分析得
-到影响因素。第四部分以月度城市是否会出现严重污染为因变量作了类似的分析得到月度空
-气质量因素因素。最后部分是结论。
+部分和第四部分首先使用Lasso方法进行自变量选择，然后对因变量年度城市空气出现严重
+污染的天数和月度城市出现严重污染天数的分布形态进行检验，最后在因变量分布形态的判断
+基础上，利用所选的自变量分别构建年度城市空气严重污染天数泊松可加模型和月度城市空
+气严重污染logistic可加模型，得出有显著关系的影响因素。最后部分是结论。
 
 # 变量选择和数据来源
 
@@ -287,78 +285,77 @@ mapply(function(i, y) {
 ## 年度空气严重污染天数的泊松可加模型
 
 使用Lasso方法得到的模型参数估计值是有偏，下面对基于Lasso方法筛选出的变量重新进行
-模型拟合。根据年度空气严重污染天数近似服从泊松分布的数据特征，
-且遵循模型由简单到复杂的原则，对于服从泊松分布的年度严重污染的天数建立泊松回归
-模型，进一步分别考虑城市之间的相关性及自变量的非线性影响，分别建立泊松混合模型及泊松可加
-模型，最后综合考虑城市之间的相关性及自变量的非线性影响，建立泊松可加混合模型进行相应分析。
-最后在这些可选模型中通过综合比较模型拟合优度，模型实际意义等确定年度空气污染天数最优模型。
-表 \@ref(tab:tab-severe-y-huizong) 给出了以上四个模型的汇总结果。
+模型拟合。根据年度空气严重污染天数近似服从泊松分布的数据特征，且存在常住人口、建成
+区绿化覆盖率、平均风速、日照时数这4个因素与因变量呈非线性相关关系，而其他因素呈线性
+相关关系，故接下来对服从泊松分布的年度城市空气严重污染天数建立泊松可加模型。
 
-```{r tab-severe-y-huizong, eval=T, results='markup'}
-yearly=read.csv("../results/yearly.csv")
-yearly..=apply(yearly,2,function(x) as.character(x))
-yearly..[seq(1,41,4)+1,(2:5)]=t(apply(yearly..[seq(1,41,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))}))
-yearly=yearly..[-c(seq(1,41,4)+2,seq(1,41,4)+3),]
-library("kableExtra")
-knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"),
-             caption="年度空气严重污染天数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)")%>%
-    kable_styling(full_width = T) %>%
-    column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
-             general_title = "注:",footnote_as_chunk = T)
+<!-- ```{r tab-severe-y-huizong, eval=FALSE, include=FALSE, results='markup'} -->
+<!-- yearly=read.csv("../results/yearly.csv") -->
+<!-- yearly..=apply(yearly,2,function(x) as.character(x)) -->
+<!-- yearly..[seq(1,41,4)+1,(2:5)]=t(apply(yearly..[seq(1,41,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))})) -->
+<!-- yearly=yearly..[-c(seq(1,41,4)+2,seq(1,41,4)+3),] -->
+<!-- library("kableExtra") -->
+<!-- knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"), -->
+<!--              caption="年度空气严重污染天数模型汇总表",digits = 4, -->
+<!--              longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>% -->
+<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
+<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
+<!--                   repeat_header_text = "(续)")%>% -->
+<!--     kable_styling(full_width = T) %>% -->
+<!--     column_spec(1, width = c("4.5cm"))%>% -->
+<!--     footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%", -->
+<!--              general_title = "注:",footnote_as_chunk = T) -->
 
-```
+<!-- ``` -->
 
 
-根据表 \@ref(tab:tab-severe-y-huizong) 结果可知，在泊松回归模型(模型I)中，显著的
-变量有常住人口、建成区绿化覆盖率、私人汽车拥有量、平均相对湿度、平均风速、日照时
-数、供暖、临海；在泊松混合效应模型(模型II)中，显著的变量有常住人口、降水量、平均
-风速、日照时数、纬度；在泊松可加模型(模型III)中，显著的变量有降水量、供暖、临海、
-纬度、建成区绿化覆盖率、平均风速、日照时数；在泊松可加混合效应模型(模型IV)中，显
-著的变量有降水量、临海、纬度、建成区绿化覆盖率、平均风速、日照时数。从模型拟合优
-度来看，泊松混合效应模型(模型II)效果最好，其AIC值最小，为534.3405；泊松可加混合
-效应模型(模型IV)次之，其AIC为540.6188。但泊松混合效应模型(模型II)中是否临海这个
-地理因素不显著，而根据第二部分的t检验可知，临海和不临海的城市的空气质量之间存在
-显著差异。故综合考虑模型拟合优度和之前的变量筛选结果，将泊松可加混合效应模型(模
-型IV)确定为年度空气严重污染天数的最优模型。接下来去掉泊松可加混合效应模型(模型
-IV)中不显著的变量，重新构建新的模型。
+<!-- 根据表 \@ref(tab:tab-severe-y-huizong) 结果可知，在泊松回归模型(模型I)中，显著的 -->
+<!-- 变量有常住人口、建成区绿化覆盖率、私人汽车拥有量、平均相对湿度、平均风速、日照时 -->
+<!-- 数、供暖、临海；在泊松混合效应模型(模型II)中，显著的变量有常住人口、降水量、平均 -->
+<!-- 风速、日照时数、纬度；在泊松可加模型(模型III)中，显著的变量有降水量、供暖、临海、 -->
+<!-- 纬度、建成区绿化覆盖率、平均风速、日照时数；在泊松可加混合效应模型(模型IV)中，显 -->
+<!-- 著的变量有降水量、临海、纬度、建成区绿化覆盖率、平均风速、日照时数。从模型拟合优 -->
+<!-- 度来看，泊松混合效应模型(模型II)效果最好，其AIC值最小，为534.3405；泊松可加混合 -->
+<!-- 效应模型(模型IV)次之，其AIC为540.6188。但泊松混合效应模型(模型II)中是否临海这个 -->
+<!-- 地理因素不显著，而根据第二部分的t检验可知，临海和不临海的城市的空气质量之间存在 -->
+<!-- 显著差异。故综合考虑模型拟合优度和之前的变量筛选结果，将泊松可加混合效应模型(模 -->
+<!-- 型IV)确定为年度空气严重污染天数的最优模型。接下来去掉泊松可加混合效应模型(模型 -->
+<!-- IV)中不显著的变量，重新构建新的模型。 -->
 
-以年度空气严重污染天数为因变量，降水量、临海、纬度、建成区绿化覆盖率、平均风速、
-日照时数为自变量建立泊松可加混合效应模型，模型估计的参数部分结果显示在表
-\@ref(tab:tab-severe-gam-y-best) 中,非参数项的曲线显示在图
-\@ref(fig:fig-severe-gamm-y-best) 中,非参数项显著性检验结果在表
-\@ref(tab:tab-severe-gamm-y-smooth-best) 中。
+根据lasso分析的自变量选择结果，以年度空气严重污染天数为因变量，私人汽车拥有
+量、降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、是否供暖、
+是否临海、纬度10个因素为自变量构建泊松可加模型，但部分线性自变量未通过显著性
+检验，可以将其删除，重新建立年度空气严重污染天数泊松可加模型。
 
+以年度空气严重污染天数为因变量，降水量、平均风速、是否供暖、是否临海、纬度、
+常住人口、日照时数为自变量建立泊松可加模型，模型估计的参数部分结果显示在表 \@ref(tab:tab-severe-gam-y-best) 
+中，非参数项的曲线显示在图 \@ref(fig:fig-severe-gam-y-best) 中，非参数项显
+著性检验结果在表 \@ref(tab:tab-severe-gam-y-smooth-best) 中。
 
-```{r include=FALSE, results='markup'}
-varlist <- read.csv("../data/var_list.csv") 
-dat.sel.y.severe <- read.csv("../results/dat.sel.y.severe.csv") 
-
-varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)] 
-varinfo <- varinfo[order(varinfo$var_no), ] 
-varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 18, "nonzero")[[1]]]), 
- "heating", "coast") 
-varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
-varselname <- as.character(varselname[order(varselname$var_no), 2])
+```{r tab-severe-gam-y-best, eval=T, results='markup'} 
+varlist <- read.csv("../data/var_list.csv")  
+dat.sel.y.severe <- read.csv("../results/dat.sel.y.severe.csv")  
+ 
+varinfo <- varlist[match(names(dat.sel.y.severe), as.character(varlist$var_code)), c(1:3,7)]  
+varinfo <- varinfo[order(varinfo$var_no), ]  
+varsel <- c(as.character(varinfo[,3][-c(1:3, 23:24)][getActive(gam1, 18, "nonzero")[[1]]]),  
+           "heating", "coast")  
+varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)] 
+varselname <- as.character(varselname[order(varselname$var_no), 2]) 
 library(mgcv)
-gamm.y.severe.best <- gamm4(severe~green
+gam.y.severe.best <- gam(severe~s(pop)
                     +rain+wind_speed+s(sun)
                    +heating+coast+lat,
-                   random = ~(1|city), data=dat.sel.y.severe,
-                   family="poisson", method = "REML")
-```
+                   data=dat.sel.y.severe,
+                   family = "poisson", method = "REML")
 
-```{r tab-severe-gam-y-best, eval=T, results='markup'}
-gamm.y.severe.best.coef <- summary(gamm.y.severe.best$mer)$tTable[1:4,-3]
 
-dimnames(gamm.y.severe.best.coef) <- list(c("截距项", varselname[c(4,9,10)]), c("估计值", "标准误", "t值", "P值"))
+gam.y.severe.best.coef <- summary(gam.y.severe.best)$p.table
+
+dimnames(gam.y.severe.best.coef) <- list(c("截距项", varselname[c(4,6,8:10)]), c("估计值", "标准误", "t值", "P值"))
 
 library("kableExtra")
-knitr::kable(gamm.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
+knitr::kable(gam.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
              caption="年度空气严重污染天数最优模型参数估计结果",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
@@ -369,29 +366,34 @@ knitr::kable(gamm.y.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"
 
 ```
 
-```{r fig-severe-gamm-y-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "年度空气严重污染天数泊松可加混合模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
-par(mfrow = c(2,2))
-par(mar=c(5,4,2,1))
+由表 \@ref(tab:tab-severe-gam-y-best) 可知，在10%的显著性水平下，降水量、平均风
+速、是否供暖、是否临海、纬度均通过显著性检验，且参数项系数分别为-0.0011、-0.8767、
+1.3932、-1.2146、0.0794。表明在其他条件不变的情况下，纬度越高的地区，年度空气严
+重污染天数越多，空气质量越差；且供暖区域比非供暖区域空气质量差。而降水量越多、平
+均风速越大、临海地区，年度空气严重污染天数越少，空气质量越好。
 
+图 \@ref(fig:fig-severe-gam-y-best) 表明了常住人口、日照时数的非参数曲线，阴影部
+分表示95%的置信区间。且从表 \@ref(tab:tab-severe-gam-y-smooth-best) 中可以看出，
+在10%的显著性水平下，常住人口、日照时数对年度空气严重污染天数有非线性影响。且从图
+\@ref(fig:fig-severe-gam-y-best) 中可以发现，年度空气严重污染的天数随常住人口的增
+加呈现先上升后下降的趋势，具体来讲，在常住人口在2000万人之后，年度空气严重污染的
+天数会下降；同时，年度空气严重污染天数随建成区绿化覆盖率的增加而有所增加。
+
+```{r fig-severe-gam-y-best, eval=T, fig.height=3.0, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "年度空气严重污 染天数最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+par(mfrow = c(1,2))
 par(mar=c(5,4,2,1))
-plot.gam(gamm.y.severe.best$gam,
+par(cex.lab = 0.9)
+plot.gam(gam.y.severe.best,
          select=1,
          col="blue",
          shade=T,
          shade.col="grey",
-         ylab="severe",xlab = "绿化率"
+         ylab="severe",xlab = "常住人口数"
          )
+
 par(mar=c(5,4,2,1))
-plot.gam(gamm.y.severe.best$gam,
+plot.gam(gam.y.severe.best,
          select=2,
-         col="blue",
-         shade=T,
-         shade.col="grey",
-         ylab="severe",xlab = "平均风速"
-         )
-par(mar=c(5,4,2,1))
-plot.gam(gamm.y.severe.best$gam,
-         select=3,
          col="blue",
          shade=T,
          shade.col="grey",
@@ -400,14 +402,14 @@ plot.gam(gamm.y.severe.best$gam,
 
 ```
 
-```{r tab-severe-gamm-y-smooth-best, eval=T, results='markup'}
-gamm.smooth.tab.y.severe <- as.data.frame(summary(gamm.y.severe.best$gam)$s.table[,-2])
+```{r tab-severe-gam-y-smooth-best, eval=T, results='markup'}
+gam.smooth.tab.y.severe <- as.data.frame(summary(gam.y.severe.best)$s.table[,-2])
 
-dimnames(gamm.smooth.tab.y.severe) <- list(varselname[c(2,6,7)],c("经验自由度", "F统计量值", "P值"))
+dimnames(gam.smooth.tab.y.severe) <- list(varselname[c(1,7)], c("经验自由度", "F统计量值", "P值"))
 
 library("kableExtra")
-knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
-             caption="年度空气严重污染天数泊松可加混合模型非参数项显著性",digits = 4,
+knitr::kable(gam.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c"),
+             caption="年度空气严重污染天数最优模型非参数项显著性",digits = 4,
              longtable = TRUE, booktabs = TRUE, escape = F) %>%
     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
@@ -418,25 +420,13 @@ knitr::kable(gamm.smooth.tab.y.severe, row.names =T, align = c("c", "c", "c", "c
 ```
 
 
-由表 \@ref(tab:tab-severe-gam-y-best) 可知，在10%的显著性水平下，建成区绿化覆盖率、降
-水量、纬度、平均风速、日照时数均通过显著性检验，且参数项系数分别为-0.0014、
-0.2080。表明在其他条件不变的情况下，纬度越高的地区，年度空气严
-重污染天数越多，空气质量越差。而降水量越多，年度空气严重污染天数越少，空气质量越好。
-
-图 \@ref(fig:fig-severe-gamm-y-best) 表明了建成区绿化覆盖率、平均风速、日照时数的非参数曲线，且从表
-\@ref(tab:tab-severe-gamm-y-smooth-best)中可以看出，在10%的显著性水平下，建成区绿化覆盖率、平均风速、
-日照时数对年度空气严重污染天数有非线性影响。且从图
-\@ref(fig:fig-severe-gamm-y-best) 中可以看出，年度空气严重污染天数随日
-照时数和平均风速的增加呈下降的趋势。
-
 # 月度是否出现空气严重污染影响因素研究
 
 利用2014年-2017年35城市每一天的AQI值，根据每一天的AQI值和空气质量指数等级划分标
 准，可以计算得到2014年-2017年35城市的月度是否出现空气严重污染，把出现空气严重污
 染记为1，否则记为0。根据前面部分对因变量分布的分析，这个变量服
 从两点分布。下面就以这个服从两点分布的变量作为因变量开展分析，首先利用Lasso方法
-进行自变量筛选，然后建立Logistic可加混合模型框架下的各种具体模型并进行模型比较和
-最优模型选择。
+进行自变量筛选，然后建立Logistic可加模型进行影响因素分析并作出解释。
 
 ## 月度是否出现空气严重污染Lasso自变量筛选
 
@@ -486,107 +476,98 @@ mapply(function(i, y) {
 
 ## 月度是否出现空气严重污染的Logistic可加模型
 
-类似于以上关于年度空气严重污染天数的模型构建过程，首先对于服从二点分布的月度是否发生严
-重污染建立logistic回归模型、然后考虑城市之间的相关性及自变量的非线性影响，分别建立Logistic
-混合模型和Logistic可加模型，最后综合考虑城市之间的相关性及自变量的非线性影响，建立Logistic
-可加混合模型进行相应分析。最后在这些可选模型中通过综合比较模型拟合优度，模型实际意义等确定
-月度空气污染天数最优模型。模型具体结果见表 \@ref(tab:tab-severe-m-huizong)。
+<!-- 类似于以上关于年度空气严重污染天数的模型构建过程，首先对于服从二点分布的月度是否发生严 -->
+<!-- 重污染建立logistic回归模型、然后考虑城市之间的相关性及自变量的非线性影响，分别建立Logistic -->
+<!-- 混合模型和Logistic可加模型，最后综合考虑城市之间的相关性及自变量的非线性影响，建立Logistic -->
+<!-- 可加混合模型进行相应分析。最后在这些可选模型中通过综合比较模型拟合优度，模型实际意义等确定 -->
+<!-- 月度空气污染天数最优模型。模型具体结果见表 \@ref(tab:tab-severe-m-huizong)。 -->
+
+<!-- ```{r tab-severe-m-huizong, eval=T, results='markup'} -->
+
+<!-- month=read.csv("../results/new_severe_month_gamm4.csv") -->
+<!-- one=two=three=four=vector() -->
+<!-- one[c(seq(1,31,3),34,35)]=as.character(month[2:14,2]) -->
+<!-- one[c(seq(2,32,3))]=month[2:12,3] -->
+<!-- one[c(seq(3,33,3))]=month[2:12,4] -->
+<!-- two[c(seq(1,31,3),34,35)]=as.character(month[2:14,5]) -->
+<!-- two[c(seq(2,32,3))]=month[2:12,6] -->
+<!-- two[c(seq(3,33,3))]=month[2:12,7] -->
+<!-- three[c(seq(1,31,3),34,35)]=as.character(month[2:14,8]) -->
+<!-- three[c(seq(2,32,3))]=month[2:12,9] -->
+<!-- three[c(seq(3,33,3))]=month[2:12,10] -->
+<!-- four[c(seq(1,31,3),34,35)]=as.character(month[2:14,11]) -->
+<!-- four[c(seq(2,32,3))]=month[2:12,12] -->
+<!-- four[c(seq(3,33,3))]=month[2:12,13] -->
 
 
+<!-- sign=function(x){ -->
+<!--   for(i in c(seq(3,33,3))) { -->
+<!--    if(x[i]<0.01){ -->
+<!--      x[i-2]=paste(x[i-2],'***',sep = '') -->
+<!--    }else if(0.01<x[i]&x[i]<0.05){ -->
+<!--       x[i-2]=paste(x[i-2],'**',sep = '') -->
+<!--    }else if(0.05<x[i]&x[i]<0.1){ -->
+<!--        x[i-2]=paste(x[i-2],'*',sep = '') -->
+<!--    } -->
+<!--   } -->
+<!--   return(x) -->
+<!-- } -->
 
-```{r tab-severe-m-huizong, eval=T, results='markup'}
+<!-- month..=apply(cbind(one,two,three,four),2,function(x) as.character(x)) -->
+<!-- month..[c(4,10,31),3:4]='-' -->
+<!-- month..[1:33,]=apply(month..[1:33,],2,sign) -->
+<!-- month..[c(seq(2,32,3)),]=apply(month..[c(seq(2,32,3)),],2,function(x) {paste('(',x,')',sep='')}) -->
+<!-- rowname=vector();rowname[c(seq(1,21,2),23,24)]=as.character(month[2:14,1]);rowname[seq(2,22,2)]='' -->
+<!-- month=as.data.frame(cbind(rowname,month..[-c(seq(3,33,3)),])) -->
+<!-- colnames(month)=c('变量','模型I','模型II','模型III','模型IV') -->
+<!-- library("kableExtra") -->
+<!-- knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"), -->
+<!--              caption="月度空气严重污染天数模型汇总表",digits = 4, -->
+<!--              longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>% -->
+<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
+<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
+<!--                   repeat_header_text = "(续)")%>% -->
+<!--     kable_styling(full_width = T) %>% -->
+<!--     column_spec(1, width = c("4.5cm"))%>% -->
+<!--     footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%", -->
+<!--              general_title = "注:", -->
+<!--              footnote_as_chunk = T) -->
 
-month=read.csv("../results/new_severe_month_gamm4.csv")
-one=two=three=four=vector()
-one[c(seq(1,31,3),34,35)]=as.character(month[2:14,2])
-one[c(seq(2,32,3))]=month[2:12,3]
-one[c(seq(3,33,3))]=month[2:12,4]
-two[c(seq(1,31,3),34,35)]=as.character(month[2:14,5])
-two[c(seq(2,32,3))]=month[2:12,6]
-two[c(seq(3,33,3))]=month[2:12,7]
-three[c(seq(1,31,3),34,35)]=as.character(month[2:14,8])
-three[c(seq(2,32,3))]=month[2:12,9]
-three[c(seq(3,33,3))]=month[2:12,10]
-four[c(seq(1,31,3),34,35)]=as.character(month[2:14,11])
-four[c(seq(2,32,3))]=month[2:12,12]
-four[c(seq(3,33,3))]=month[2:12,13]
+<!-- ``` -->
 
+<!-- 根据表 \@ref(tab:tab-severe-m-huizong) 可知，在Logistic回归模型(模型I)中，显著的 -->
+<!-- 变量有常住人口、私人汽车拥有量、平均气温、降水量、平均相对湿度、平均风速、日照时 -->
+<!-- 数、纬度；在Logistic混合效应模型(模型II)中，显著的变量有私人汽车拥有量、平均气温、 -->
+<!-- 降水量、平均相对湿度、平均风速、日照时数、纬度；在Logistic可加模型(模型III)中， -->
+<!-- 显著的变量有降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、纬度； -->
+<!-- 在Logistic可加混合效应模型(模型IV)中，显著的变量有降水量、平均相对湿度、平均风速、 -->
+<!-- 日照时数。通过比较以上模型的AIC值和模型的实际意义，本文选择Logistic可加模型(模型 -->
+<!-- III)作为最优模型，其AIC值最小，为782.7841。但在上面估计的Logistic可加模型(模型 -->
+<!-- III)中，是否供暖和是否临海等自变量未通过显著性检验，因此将其删除并重新建立 -->
+<!-- Logistic回归模型。 -->
 
-sign=function(x){
-  for(i in c(seq(3,33,3))) {
-   if(x[i]<0.01){
-     x[i-2]=paste(x[i-2],'***',sep = '')
-   }else if(0.01<x[i]&x[i]<0.05){
-      x[i-2]=paste(x[i-2],'**',sep = '')
-   }else if(0.05<x[i]&x[i]<0.1){
-       x[i-2]=paste(x[i-2],'*',sep = '')
-   }
-  }
-  return(x)
-}
-
-month..=apply(cbind(one,two,three,four),2,function(x) as.character(x))
-month..[c(4,10,31),3:4]='-'
-month..[1:33,]=apply(month..[1:33,],2,sign)
-month..[c(seq(2,32,3)),]=apply(month..[c(seq(2,32,3)),],2,function(x) {paste('(',x,')',sep='')})
-rowname=vector();rowname[c(seq(1,21,2),23,24)]=as.character(month[2:14,1]);rowname[seq(2,22,2)]=''
-month=as.data.frame(cbind(rowname,month..[-c(seq(3,33,3)),]))
-colnames(month)=c('变量','模型I','模型II','模型III','模型IV')
-library("kableExtra")
-knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"),
-             caption="月度空气严重污染天数模型汇总表",digits = 4,
-             longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>%
-    kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"),
-                  ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5),
-                  repeat_header_text = "(续)")%>%
-    kable_styling(full_width = T) %>%
-    column_spec(1, width = c("4.5cm"))%>%
-    footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%",
-             general_title = "注:",
-             footnote_as_chunk = T)
-
-```
-
-根据表 \@ref(tab:tab-severe-m-huizong) 可知，在Logistic回归模型(模型I)中，显著的
-变量有常住人口、私人汽车拥有量、平均气温、降水量、平均相对湿度、平均风速、日照时
-数、纬度；在Logistic混合效应模型(模型II)中，显著的变量有私人汽车拥有量、平均气温、
-降水量、平均相对湿度、平均风速、日照时数、纬度；在Logistic可加模型(模型III)中，
-显著的变量有降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、纬度；
-在Logistic可加混合效应模型(模型IV)中，显著的变量有降水量、平均相对湿度、平均风速、
-日照时数。通过比较以上模型的AIC值和模型的实际意义，本文选择Logistic可加模型(模型
-III)作为最优模型，其AIC值最小，为782.7841。但在上面估计的Logistic可加模型(模型
-III)中，是否供暖和是否临海等自变量未通过显著性检验，因此将其删除并重新建立
-Logistic回归模型。
-
-以月度是否出现严重污染为因变量，常住人口、平均气温、降水量、平均相对湿度、平
-均风速、日照时数、纬度为自变量，建立Logistic可加模型，模型估计结果中
-参数部分结果显示在表 \@ref(tab:tab-severe-gam-m-best) 中。
-非参数项的曲线显示在图 
-\@ref(fig:fig-severe-gam-m-best) 中，非参数项显著性检验结果在表 
-\@ref(tab:tab-severe-gam-m-smooth-best) 中。 
+由以上分析可知，在众多因素中，既存在与因变量是线性关系的变量，也有与因变量呈非线性关系的
+变量。故接下来以月度是否出现严重污染为因变量，私人汽车拥有量、降水量、平均相对湿度、平均风速、
+日照时数、常住人口、平均气温、是否供暖、是否临海、纬度10个因素为自变量，建立Logistic
+可加模型，模型估计结果中参数部分结果显示在表 \@ref(tab:tab-severe-gam-m-best) 中，非
+参数项的曲线显示在图\@ref(fig:fig-severe-gam-m-best) 中，非参数项显著性检验结果在表
+\@ref(tab:tab-severe-gam-m-smooth-best) 中。
 
 ```{r tab-severe-gam-m-best, eval=T, results='markup'}
-varlist <- read.csv("../data/var_list.csv")
-dat.sel.m.severe <- read.csv("../results/dat.sel.m.severe.csv")
-severe=ifelse(dat.sel.m.severe$severe>0,1,0)
-dat.sel.m.severe$severe=severe 
-varinfo <- varlist[match(names(dat.sel.m.severe), as.character(varlist$var_code)), c(1:3,7)]
-varinfo <- varinfo[order(varinfo$var_no), ] 
-varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzero")[[1]]]), 
-"heating", "coast") 
+varsel <- c(as.character(varinfo[,3][-c(1:4, 24:25)][getActive(gam1, 37, "nonzero")[[1]]]),
+            "heating", "coast")
 varselname <- varlist[match(varsel, as.character(varlist$var_code)), c(1:3,7)]
 varselname <- as.character(varselname[order(varselname$var_no), 2])
-#library(mgcv)
-library(gamm4)
-gam.m.severe.best <- gamm4(severe~s(pop)
+library(mgcv)
+gam.m.severe.best <- gam(severe~s(pop)+car
                    +s(mean_temp)+rain+humid+wind_speed+sun
-                   +s(lat),
+                   +heating+coast+s(lat),
                    data=dat.sel.m.severe,
-                   family = binomial)
+                   family = binomial, method = "REML")
 
-gam.m.severe.best.coef <- summary(gam.m.severe.best$mer)$coefficients[c(1:5),]
+gam.m.severe.best.coef <- summary(gam.m.severe.best)$p.table
 
-dimnames(gam.m.severe.best.coef) <- list(c("截距项", varselname[4:7]), c("估计值", "标准误", "t值", "P值"))
+dimnames(gam.m.severe.best.coef) <- list(c("截距项", varselname[-c(1,3,10)]), c("估计值", "标准误", "t值", "P值"))
 
 library("kableExtra")
 knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r"),
@@ -597,12 +578,19 @@ knitr::kable(gam.m.severe.best.coef, row.names =T, align = c("r", "r", "r", "r")
                   repeat_header_text = "(续)")%>%
     kable_styling(full_width = T) %>%
     column_spec(1, width = c("4.5cm"))
+
 ```
 
-```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="95%", fig.pos="H", fig.cap = "月度是否出现空气严重污染最优模型非参数曲线", dev=c("png","cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
+由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，私人汽车拥有量，
+降水量、平均相对湿度、平均风速、日照时数均通过显著性检验，且其系数均为负，表明在
+其他条件不变的情况下，降水量越大、平均相对湿度越大、平均风速越大、日照时数越长，
+月度出现严重污染的概率越小。在其他条件不变的情况下，私人汽车拥有量越多，月度出现
+严重污染的概率越小。这与一般认知不符，本文在之后部分给出解释。
+
+```{r fig-severe-gam-m-best, eval=T, fig.height=5.5, fig.width=6.5,out.width="1.0\\textwidth", fig.pos="H", fig.cap = "月度是否出现空气严重污染最优模型非参数曲线", dev=c("cairo_pdf"),dev.args=list(family="Microsoft YaHei UI Light")}
 par(mfrow = c(2,2))
 par(mar=c(5,4,2,1))
-plot.gam(gam.m.severe.best$gam,
+plot.gam(gam.m.severe.best,
          select=1,
          col="blue",
          shade=T,
@@ -610,7 +598,7 @@ plot.gam(gam.m.severe.best$gam,
          ylab="severe",xlab = "常住人口数"
          )
 par(mar=c(5,4,2,1))
-plot.gam(gam.m.severe.best$gam,
+plot.gam(gam.m.severe.best,
          select=2,
          col="blue",
          shade=T,
@@ -618,7 +606,7 @@ plot.gam(gam.m.severe.best$gam,
          ylab="severe",xlab = "平均温度"
          )
 par(mar=c(5,4,2,1))
-plot.gam(gam.m.severe.best$gam,
+plot.gam(gam.m.severe.best,
          select=3,
          col="blue",
          shade=T,
@@ -628,7 +616,7 @@ plot.gam(gam.m.severe.best$gam,
 ```
 
 ```{r tab-severe-gam-m-smooth-best, eval=T, results='markup'}
-gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe.best$gam)$s.table[,-2])
+gam.smooth.tab.m.severe <- as.data.frame(summary(gam.m.severe.best)$s.table[,-2])
 
 dimnames(gam.smooth.tab.m.severe) <- list(varselname[c(1,3,10)], c("经验自由度", "F统计量值", "P值"))
 
@@ -643,48 +631,55 @@ knitr::kable(gam.smooth.tab.m.severe, row.names =T, align = c("c", "c", "c", "c"
     column_spec(1, width = c("4.5cm"))
 ```
 
-由表 \@ref(tab:tab-severe-gam-m-best) 可知，在10%的显著性水平下，参数部分的降水
-量、平均相对湿度、平均风速、日照时数、均通过显著性检验，表明在其他条件不变的情况
-下，降水量越大、平均相对湿度越大、平均风速越大、日照时数越长，月度出现严重污染的
-概率越小。
-
 图 \@ref(fig:fig-severe-gam-m-best) 展示了常住人口数、平均气温、纬度与月度是否出
-现空气严重污染的非参数关系曲线，且从表 \@ref(tab:tab-severe-gam-m-smooth-best)中
-可以看出，在10%的显著性水平下，三个变量对月度是否出现严重污染的概率的非线性影响
-均是显著的。由图 \@ref(fig:fig-severe-gam-m-best) 可以看出，月度是否出现空气严重
-污染的概率一开始随着常住人口数的上升而缓慢上升，但对于常住人口数超过2000万的城市
-而言，月度出现空气严重污染的概率会下降。对于城市月平均温度，月度出现空气严重污染
-的概率随着平均温度的上升而下降，但这个下降不是线性的。对于纬度，月度出现空气严重
-污染的概率随着纬度的上升而上升，但到了北纬40度之后，月度出现空气严重污染的概率不
-再随着纬度上升而上升，而是基本持平的。
+现空气严重污染的非参数关系曲线，且从表 \@ref(tab:tab-severe-gam-m-smooth-best)
+中可以看出，在10%的显著性水平下，三个变量对月度是否出现严重污染的概率的非线性影
+响均是显著的。由图 \@ref(fig:fig-severe-gam-m-best) 可以看出，月度是否出现空气严
+重污染的概率一开始随着常住人口数的上升而缓慢上升，但对于常住人口数超过2000万的城
+市而言，月度出现空气严重污染的概率会下降。对于城市月平均温度，月度出现空气严重污
+染的概率随着平均温度的上升而下降，但这个下降不是线性的。对于纬度，月度出现空气严
+重污染的概率随着纬度的上升而上升，但到了北纬40度之后，月度出现空气严重污染的概率
+不再随着纬度上升而上升，而是基本持平的。
 
-同时各项参数的符号与实际意义也相符。结合相关领域知识可以知道，当气温较高时，大气处
-于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会变好；反之，当气温较低
-时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变差。这与最优模型的研究结
-果保持一致。而风速越大在一定程度内有利于空气污
-染物的扩散和稀释，空气质量越优。同样，增加降水量和湿度均对空气有净化作用，空气质量越好。
+## 模型解释
+
+平均温度、降水量、平均相对湿度、平均风速、日照时数、纬度这6项参数的符号与实际意义
+相符。结合相关领域知识可以知道，大气污染在垂直方向的扩散主要取决于气温的垂直分布，
+当气温较高时，大气处于不稳定状态，在热力对流的作用下污染物向上扩散，空气质量就会
+变好；反之，当气温较低时，大气变得稳定，污染物的扩散受到抑制作用，空气质量就会变
+差。这与模型的研究结果保持一致。而风速越大在一定程度内有利于空气污染物的扩散和稀释，
+空气质量越优。针对降水量，大气降水不仅可以冲刷空气中的部分颗粒物，也可以在一
+定程度上抑制地面扬尘发生，从而有效控制颗粒物的排放，对空气质量有较好的净化作用。
+相对湿度能够促进一次污染物向二次颗粒污染物转化，相对湿度较大时，由于常规污染物周
+围被水分包裹，质量加重，重力增大造成一定程度沉降，从而减小污染物浓度，空气质量相
+对较好。泊松可加模型中的是否供暖和是否临海两个地理因素的参数符号也与实际情况相符，
+与本文第二部分的t检验结果也保持一致，供暖地区和内陆地区的年度空气严重污染天数多于
+非供暖地区和临海地区。
+
+对于私人汽车拥有量与空气严重污染出现概率呈负相关的情况，很可能是由于人
+们近年来环保意识有所加强，并且有限号等交通政策出台以及汽车行业相关技术的发展使得
+汽车尾气排放量有所减少，虽然私人汽车拥有量增加，但并未引起空气污染的加重，甚至空
+气严重污染情况出现的概率下降。
 
 # 结论
 
 本文从空气污染可能出现的最坏情况，也是空气质量的最低等级：空气严重污染的角度，对
-35个城市年度空气严重污染天数建立泊松可加混合模型框架下的各种模型，对月度是否出现
-空气严重污染建立Logistic可加混合模型框架下的各种模型，并通过模型拟合优度指标及模
-型实际意义等方面综合选取了最优模型。在建立模型过程中，使用了Lasso方法进行自变量
-筛选及以决定其进入模型的形式。
+35个城市年度空气严重污染天数建立泊松可加模型，对月度是否出现空气严重污染建立
+Logistic可加模型，在建立模型的过程中，使用了Lasso方法进行自变量筛选及决定其进入
+模型的形式。
 
-对于年度空气严重污染天数，社会经济影响因素中的建成区绿化覆盖率是影响天数多少的主
-要因素，并且这个影响是非线性的，总体而言，年度空气严重污染天数是随着建成区绿化覆
-盖率的增加而逐渐增加，这很可能是是因为先污染后治理模式的存在。人们预先意识不到污
-染的严重性，只是在空气质量变差以后才加强环境治理，于是造成空气质量污染越严重，绿
-化率越高的情况。气候因素中的降水量、平均风速、日照时数对年度空气严重污染天数有显
-著影响，并且降水量是负的线性影响，平均风速和日照时数是非线性影响。地理因素中仅有
-纬度对年度空气严重污染天数有显著性线性影响。
+对于年度空气严重污染天数，社会经济影响因素中的常住人口数是影响天数多少的主要因素，
+并且这个影响是非线性的，总体而言，年度空气严重污染天数是随着常住人口数的增加而逐
+渐增多，但常住人口数超过2000万的特大城市，对于空气严重污染控制的比较好，年度空气
+严重污染天数并不多。气候因素中的降水量和平均风速对年度空气严重污染天数有负向线性
+影响，而日照时数有非线性影响。地理因素中的是否供暖，是否临海和纬度均对年度空气严
+重污染天数有显著性线性影响。
 
 对于月度是否出现空气严重污染，社会经济影响因素主要有常住人口数，其与月度是否出现
 空气严重污染概率之间具有非线性关系；气候因素中的平均气温，降水量，平均相对湿度，
-平均风速和日照时数对月度是否出现空气严重污染的概率局有显著性影响，这5个气候因素
+平均风速和日照时数对月度是否出现空气严重污染的概率有显著性影响，这5个气候因素
 中，除平均温度是负的非线性影响外，其余是负向线性影响。地理因素中只有纬度变量对月
-度是否出现空气严重污染有显著性影响，并且这个影响是线性的。通过比较年度空气严重污
+度是否出现空气严重污染有显著性影响，并且这个影响是非线性的。通过比较年度空气严重污
 染天数和月度是否出现空气严重污染之间的影响因素，我们发现二者并不完成重合。这可能
 是由于年度空气质量严重污染天数相比月度空气质量严重污染天数更具稳定性。
 
