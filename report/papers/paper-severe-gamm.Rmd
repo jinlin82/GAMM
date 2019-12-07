@@ -51,6 +51,12 @@ graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
 
+**TODO**
+- [ ] 1. 第2段每个参考文献尽量写开
+- [ ] 2. 增加年度模型的模型解释，主要是对系数进行定量化解释
+- [ ] 3. 月度模型模型解释部分对系数进行定量化解释
+
+
 **摘要：**本文以2014-2017年中国重点监测的35个城市的年度空气质量严重污染天数和月
 度空气质量严重污染天数为研究对象，分别构建泊松和Logistic可加模型对城市空气质量的
 影响因素进行研究。结果显示，对于年度空气严重污染天数，社会经济影响因素中的常住人
@@ -289,39 +295,6 @@ mapply(function(i, y) {
 区绿化覆盖率、平均风速、日照时数这4个因素与因变量呈非线性相关关系，而其他因素呈线性
 相关关系，故接下来对服从泊松分布的年度城市空气严重污染天数建立泊松可加模型。
 
-<!-- ```{r tab-severe-y-huizong, eval=FALSE, include=FALSE, results='markup'} -->
-<!-- yearly=read.csv("../results/yearly.csv") -->
-<!-- yearly..=apply(yearly,2,function(x) as.character(x)) -->
-<!-- yearly..[seq(1,41,4)+1,(2:5)]=t(apply(yearly..[seq(1,41,4)+1,(2:5)],1,function(x) {as.factor(paste('(',as.character(-as.numeric(x)),')',sep = ""))})) -->
-<!-- yearly=yearly..[-c(seq(1,41,4)+2,seq(1,41,4)+3),] -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(yearly, row.names =F, align = c("l", "c", "c", "c"), -->
-<!--              caption="年度空气严重污染天数模型汇总表",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm"))%>% -->
-<!--     footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%", -->
-<!--              general_title = "注:",footnote_as_chunk = T) -->
-
-<!-- ``` -->
-
-
-<!-- 根据表 \@ref(tab:tab-severe-y-huizong) 结果可知，在泊松回归模型(模型I)中，显著的 -->
-<!-- 变量有常住人口、建成区绿化覆盖率、私人汽车拥有量、平均相对湿度、平均风速、日照时 -->
-<!-- 数、供暖、临海；在泊松混合效应模型(模型II)中，显著的变量有常住人口、降水量、平均 -->
-<!-- 风速、日照时数、纬度；在泊松可加模型(模型III)中，显著的变量有降水量、供暖、临海、 -->
-<!-- 纬度、建成区绿化覆盖率、平均风速、日照时数；在泊松可加混合效应模型(模型IV)中，显 -->
-<!-- 著的变量有降水量、临海、纬度、建成区绿化覆盖率、平均风速、日照时数。从模型拟合优 -->
-<!-- 度来看，泊松混合效应模型(模型II)效果最好，其AIC值最小，为534.3405；泊松可加混合 -->
-<!-- 效应模型(模型IV)次之，其AIC为540.6188。但泊松混合效应模型(模型II)中是否临海这个 -->
-<!-- 地理因素不显著，而根据第二部分的t检验可知，临海和不临海的城市的空气质量之间存在 -->
-<!-- 显著差异。故综合考虑模型拟合优度和之前的变量筛选结果，将泊松可加混合效应模型(模 -->
-<!-- 型IV)确定为年度空气严重污染天数的最优模型。接下来去掉泊松可加混合效应模型(模型 -->
-<!-- IV)中不显著的变量，重新构建新的模型。 -->
-
 根据lasso分析的自变量选择结果，以年度空气严重污染天数为因变量，私人汽车拥有
 量、降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、是否供暖、
 是否临海、纬度10个因素为自变量构建泊松可加模型，但部分线性自变量未通过显著性
@@ -475,76 +448,6 @@ mapply(function(i, y) {
 
 
 ## 月度是否出现空气严重污染的Logistic可加模型
-
-<!-- 类似于以上关于年度空气严重污染天数的模型构建过程，首先对于服从二点分布的月度是否发生严 -->
-<!-- 重污染建立logistic回归模型、然后考虑城市之间的相关性及自变量的非线性影响，分别建立Logistic -->
-<!-- 混合模型和Logistic可加模型，最后综合考虑城市之间的相关性及自变量的非线性影响，建立Logistic -->
-<!-- 可加混合模型进行相应分析。最后在这些可选模型中通过综合比较模型拟合优度，模型实际意义等确定 -->
-<!-- 月度空气污染天数最优模型。模型具体结果见表 \@ref(tab:tab-severe-m-huizong)。 -->
-
-<!-- ```{r tab-severe-m-huizong, eval=T, results='markup'} -->
-
-<!-- month=read.csv("../results/new_severe_month_gamm4.csv") -->
-<!-- one=two=three=four=vector() -->
-<!-- one[c(seq(1,31,3),34,35)]=as.character(month[2:14,2]) -->
-<!-- one[c(seq(2,32,3))]=month[2:12,3] -->
-<!-- one[c(seq(3,33,3))]=month[2:12,4] -->
-<!-- two[c(seq(1,31,3),34,35)]=as.character(month[2:14,5]) -->
-<!-- two[c(seq(2,32,3))]=month[2:12,6] -->
-<!-- two[c(seq(3,33,3))]=month[2:12,7] -->
-<!-- three[c(seq(1,31,3),34,35)]=as.character(month[2:14,8]) -->
-<!-- three[c(seq(2,32,3))]=month[2:12,9] -->
-<!-- three[c(seq(3,33,3))]=month[2:12,10] -->
-<!-- four[c(seq(1,31,3),34,35)]=as.character(month[2:14,11]) -->
-<!-- four[c(seq(2,32,3))]=month[2:12,12] -->
-<!-- four[c(seq(3,33,3))]=month[2:12,13] -->
-
-
-<!-- sign=function(x){ -->
-<!--   for(i in c(seq(3,33,3))) { -->
-<!--    if(x[i]<0.01){ -->
-<!--      x[i-2]=paste(x[i-2],'***',sep = '') -->
-<!--    }else if(0.01<x[i]&x[i]<0.05){ -->
-<!--       x[i-2]=paste(x[i-2],'**',sep = '') -->
-<!--    }else if(0.05<x[i]&x[i]<0.1){ -->
-<!--        x[i-2]=paste(x[i-2],'*',sep = '') -->
-<!--    } -->
-<!--   } -->
-<!--   return(x) -->
-<!-- } -->
-
-<!-- month..=apply(cbind(one,two,three,four),2,function(x) as.character(x)) -->
-<!-- month..[c(4,10,31),3:4]='-' -->
-<!-- month..[1:33,]=apply(month..[1:33,],2,sign) -->
-<!-- month..[c(seq(2,32,3)),]=apply(month..[c(seq(2,32,3)),],2,function(x) {paste('(',x,')',sep='')}) -->
-<!-- rowname=vector();rowname[c(seq(1,21,2),23,24)]=as.character(month[2:14,1]);rowname[seq(2,22,2)]='' -->
-<!-- month=as.data.frame(cbind(rowname,month..[-c(seq(3,33,3)),])) -->
-<!-- colnames(month)=c('变量','模型I','模型II','模型III','模型IV') -->
-<!-- library("kableExtra") -->
-<!-- knitr::kable(month, row.names =F, align = c("l", "c", "c", "c"), -->
-<!--              caption="月度空气严重污染天数模型汇总表",digits = 4, -->
-<!--              longtable = TRUE, booktabs = TRUE, escape = F,linesep = "") %>% -->
-<!--     kable_styling(latex_options = c("striped", "scale_down", "repeat_header", "hold_position"), -->
-<!--                   ## stripe_index = rep(1:5, 4)+rep(c(0,10,20,30), each = 5), -->
-<!--                   repeat_header_text = "(续)")%>% -->
-<!--     kable_styling(full_width = T) %>% -->
-<!--     column_spec(1, width = c("4.5cm"))%>% -->
-<!--     footnote(general ="*显著性水平10%；**显著性水平5%；***显著性水平1%", -->
-<!--              general_title = "注:", -->
-<!--              footnote_as_chunk = T) -->
-
-<!-- ``` -->
-
-<!-- 根据表 \@ref(tab:tab-severe-m-huizong) 可知，在Logistic回归模型(模型I)中，显著的 -->
-<!-- 变量有常住人口、私人汽车拥有量、平均气温、降水量、平均相对湿度、平均风速、日照时 -->
-<!-- 数、纬度；在Logistic混合效应模型(模型II)中，显著的变量有私人汽车拥有量、平均气温、 -->
-<!-- 降水量、平均相对湿度、平均风速、日照时数、纬度；在Logistic可加模型(模型III)中， -->
-<!-- 显著的变量有降水量、平均相对湿度、平均风速、日照时数、常住人口、平均气温、纬度； -->
-<!-- 在Logistic可加混合效应模型(模型IV)中，显著的变量有降水量、平均相对湿度、平均风速、 -->
-<!-- 日照时数。通过比较以上模型的AIC值和模型的实际意义，本文选择Logistic可加模型(模型 -->
-<!-- III)作为最优模型，其AIC值最小，为782.7841。但在上面估计的Logistic可加模型(模型 -->
-<!-- III)中，是否供暖和是否临海等自变量未通过显著性检验，因此将其删除并重新建立 -->
-<!-- Logistic回归模型。 -->
 
 由以上分析可知，在众多因素中，既存在与因变量是线性关系的变量，也有与因变量呈非线性关系的
 变量。故接下来以月度是否出现严重污染为因变量，私人汽车拥有量、降水量、平均相对湿度、平均风速、
