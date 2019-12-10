@@ -127,15 +127,11 @@ Sys.setlocale("LC_ALL", "Chinese")
 科进行交叉学科研究。
 
 
-
-
-
-
 \cleardoublepage
 
 \pagestyle{emptypage}
 
-\renewcommand{\chapterlabel}{\bibname}    % 设置页眉
+\renewcommand{\chapterlabel}{\bibname}
 
 <!-- # 参考文献 {-} -->
 [//]: # (\bibliography{Bibfile})

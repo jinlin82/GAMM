@@ -1,7 +1,7 @@
 ---
 title: "基于半参数混合模型的城市空气质量影响因素分析"
-author: '金林&nbsp; 李研&nbsp; 王红红'
-date: '（中南财经政法大学&nbsp; 统计与数学学院，湖北&nbsp; 武汉 430073）'
+# author: '金林&nbsp; 李研&nbsp; 王红红'
+# date: '（中南财经政法大学&nbsp; 统计与数学学院，湖北&nbsp; 武汉 430073）'
 output:
   bookdown::pdf_document2:
     keep_tex: true
@@ -50,6 +50,12 @@ options(scipen=100)
 graphics.off()
 Sys.setlocale("LC_ALL", "Chinese")
 ```
+
+
+&nbsp;
+
+&nbsp;
+
 
 **摘要:** 本文以2014-2017年中国重点监测的35个城市的年度和月度空气质量指数（AQI）
 为研究对象，利用半参数混合效应模型对城市空气质量的影响因素进行研究。结果显示，对
